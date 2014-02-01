@@ -4,8 +4,10 @@ var bokeh = {}
 
 bokeh.init = function () {
 	var svg = d3.select("#svg")
-	var c = circle(svg, 350, 350, 1)
-	circle(svg, 300, 300, 1)
+//	var c = circle(svg, 350, 350, 1)
+	var c = circleSimple(svg, 350, 350, 60)
+//	circle(svg, 300, 300, 1)
+	circleSimple(svg, 300, 300, 60)
 	
 //	if (false)
 	d3.select("#feGaussianBlur3765")
@@ -34,6 +36,24 @@ function circle(svg, x, y, scale) {
 	var c = svg.append("path")
 		.attr("d", circlePath(a))
 		.attr("transform", "translate("+x+", "+y+") scale("+scale+")")
+		.style({
+			"fill": hsl255ToHex(140, 133, 197),
+			"fill-opacity": 0.6,
+			"stroke": hsl255ToHex(140, 133, 228),
+			"stroke-opacity": 1,
+			"stroke-width": 1.5,
+			"filter": "url(#filter3763)"
+		})
+	return c
+}
+
+function circleSimple(svg, x, y, r) {
+	var c = svg.append("circle")
+		.attr("cx", 0)
+		.attr("cy", 0)
+		.attr("r", r)
+//		.attr("fill", "url(#rg2)")
+		.attr("transform", "translate("+x+", "+y+") scale("+1+")")
 		.style({
 			"fill": hsl255ToHex(140, 133, 197),
 			"fill-opacity": 0.6,
@@ -80,18 +100,18 @@ function rgbToHex(rgb) {
 }
 
 // h, s, l in [0,1]
-function hslToRgb(h, s, l){
+function hslToRgb(h, s, l) {
     var r, g, b
 	
     if (s === 0 || l === 1 || l === 0) {
         r = g = b = l // achromatic
     } else {
         function hue2rgb(p, q, t){
-            if(t < 0) t += 1
-            if(t > 1) t -= 1
-            if(t < 1/6) return p + (q - p) * 6 * t
-            if(t < 1/2) return q
-            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6
+            if (t < 0) t += 1
+            if (t > 1) t -= 1
+            if (t < 1/6) return p + (q - p) * 6 * t
+            if (t < 1/2) return q
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6
             return p
         }
 
