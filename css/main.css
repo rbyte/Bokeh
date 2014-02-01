@@ -2,3 +2,19 @@ body {
 	margin: 0;
 	padding: 0;
 }
+@-webkit-keyframes rotating {
+    from{
+        -webkit-transform: rotate(0deg);
+    }
+    to{
+        -webkit-transform: rotate(360deg);
+    }
+}
+.rotating {
+    -webkit-animation: rotating 2s linear infinite;
+}
+path {
+	fill: none;
+	stroke: #000;
+	stroke-width: 3px;
+}
