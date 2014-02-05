@@ -10,10 +10,10 @@ bokeh.init = function () {
 	var c2 = new Particle(svg, 300, 300, 60, 140, 133, 197, 0.6, 5)
 	
 	var psys = new PSystem()
-	psys.addParticle(new Particle(svg, 650, 650, 60, 140, 133, 197, 0.6, 5))
-	psys.addParticle(new Particle(svg, 500, 650, 60, 140, 133, 197, 0.6, 5))
-	psys.addParticle(new Particle(svg, 650, 500, 60, 140, 133, 197, 0.6, 5))
-	psys.addParticle(new Particle(svg, 500, 500, 60, 140, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 650, 650, 60, 100, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 500, 650, 60, 100, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 650, 500, 60, 122, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 500, 500, 60, 122, 133, 197, 0.6, 5))
 	psys.start()
 	
 //	if (false)
@@ -83,8 +83,67 @@ function rainbow(d, i, a) {
 		return hsl255ToHex(t*255, 255, 125)
 	}
 }
-	
 
+
+
+
+
+
+
+
+}
+
+
+
+
+
+function createChart() {
+	var self = {}
+	
+	var margin = {top: 20, right: 20, bottom: 30, left: 50},
+		width = 960 - margin.left - margin.right,
+		height = 200 - margin.top - margin.bottom
+	
+	var svgPlot = d3.select("body").append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+	  .append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+	
+	var x = d3.scale.linear().range([0, width])
+	var y = d3.scale.linear().range([height, 0])
+
+	var xAxis = d3.svg.axis().scale(x).orient("bottom")
+	var yAxis = d3.svg.axis().scale(y).orient("left")
+	
+	var line = d3.svg.line()
+		.x(function(d,i) { return x(i) })
+		.y(function(d) { return y(d) })
+
+	var xg = svgPlot.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + height + ")")
+	
+	var yg = svgPlot.append("g")
+		.attr("class", "y axis")
+	
+	var pathG = svgPlot.append("path")
+	
+	self.updateChart = function(data) {
+		x.domain([0, data.length-1])
+		y.domain(d3.extent(data))
+
+		xg.call(xAxis)
+		yg.call(yAxis)
+
+		pathG.remove()
+		pathG = svgPlot.append("path")
+			.datum(data)
+			.attr("class", "line")
+			.attr("d", line)
+	}
+		
+	return self
 }
 
 
@@ -124,6 +183,9 @@ function Particle(svg,x,y,r,h,l,s,a,g) {
 	self.g = g // gauss
 	self.r = r // radius
 	
+	self.velocity = 0
+	self.acceleration = 0
+	
 	self.obj = circleSimple(svg,x,y,r,h,s,l,a)
 	
 }
@@ -131,34 +193,77 @@ function Particle(svg,x,y,r,h,l,s,a,g) {
 function PSystem() {
 	var self = this
 	
-	// averages/means
-	var mean_numberOfParticles = 10
-	var mean_h = 141 // 124 - 183 sind so schmerzgrenzen
-	var mean_s = 180
+	// goal averages/means
+	var g_mean_numberOfParticles = 10
+	var g_mean_h = 140 // 124 - 183 sind so schmerzgrenzen
+	var g_mean_s = 180
 	// the higher layers (z-index) are always brigther (!)
 	// feBlend screen may be an alternative
 	var base_l = 90
-	var mean_a = 200
+	var g_mean_a = 200
 	
 	// rather smaller for upper layers
 	// could also scale with transform, but this also has downsides
-	var mean_r = 50
+	var g_mean_r = 50
 	// rather higher for higher radius
-	var mean_g = 30
+	var g_mean_g = 30
 	
-	// variance
-	var var_numberOfParticles
-	var var_h = 10
-	var var_s = 30
-//	var var_l 
-	var var_a = 30
+	// goal variance
+	var g_var_numberOfParticles
+	var g_var_h = 300
+	var g_var_s = 30
+//	var g_var_l 
+	var g_var_a = 30
 	
-	var var_r = 200
-	var var_g = 30
+	var g_var_r = 200
+	var g_var_g = 30
+	
+	var g_mean_velocity = 4
 	
 	var plist = []
 	
+	var log_mean_h = []
+	var log_var_h = []
+	var log_mean_velocity = []
+	
+	var chart_log_mean_h = createChart()
+	var chart_log_var_h = createChart()
+	var chart_log_mean_velocity = createChart()
+	
 	self.start = function() {
+		var mean_h = self.mean(plist, "h")
+		var var_h = self.variance(plist, "h")
+		var mean_velocity = self.mean(plist, "velocity")
+//		var var_velocity = self.variance(plist, "velocity")
+//		var mean_acceleration = self.mean(plist, "acceleration")
+//		var var_acceleration = self.variance(plist, "acceleration")
+		
+		log_mean_h.push(mean_h)
+		log_var_h.push(var_h)
+		log_mean_velocity.push(mean_velocity)
+		
+		chart_log_mean_h.updateChart(log_mean_h)
+		chart_log_var_h.updateChart(log_var_h)
+		chart_log_mean_velocity.updateChart(log_mean_velocity)
+		
+		for (var i=0; i<plist.length; i++) {
+			plist[i].acceleration += (mean_velocity < g_mean_velocity ? 1 : -1 ) * 0.1
+			
+			plist[i].velocity += plist[i].acceleration
+			
+			plist[i].h += (mean_h < g_mean_h ? 1 : -1) * plist[i].velocity
+			
+			var d_mean = plist[i].h - mean_h
+			var cor_var_sign = (var_h < g_var_h && d_mean > 0)
+				|| (var_h > g_var_h && d_mean < 0) ? 1 : -1
+			plist[i].h += cor_var_sign * plist[i].velocity/2
+			
+			plist[i].obj.transition()
+				.duration(500)
+				.ease(d3.ease("linear"))
+				.style("fill", hsl255ToHex(plist[i].h, plist[i].s, plist[i].l))
+				.each("end", i === plist.length -1 ? self.start : function() {})
+		}
 		
 	}
 	
@@ -166,29 +271,37 @@ function PSystem() {
 		plist.push(particle)
 	}
 	
-	self.variance = function(vals) {
-		var mean = self.mean(vals)
+	self.variance = function(list, property) {
+		var mean = self.mean(list, property)
 		var newVals = []
-		for (var i=0; i<vals.length; i++) {
-			var a = vals[i]-mean
+		for (var i=0; i<list.length; i++) {
+			var a = (property !== undefined ? list[i][property] : list[i]) - mean
 			newVals.push(a*a)
 		}
 		return self.mean(newVals)
 	}
 	
-	self.mean = function(vals) {
-		return self.sum(vals)/vals.length
+	self.mean = function(list, property) {
+		return self.sum(list, property)/list.length
 	}
 	
-	self.sum = function(vals) {
+	self.sum = function(list, property) {
 		var sum = 0
-		for (var i=0; i<vals.length; i++) {
-			sum = vals[i]
+		for (var i=0; i<list.length; i++) {
+			sum += property !== undefined ? list[i][property] : list[i]
 		}
 		return sum
 	}
 	
 }
+
+
+
+
+
+
+
+
 
 
 
