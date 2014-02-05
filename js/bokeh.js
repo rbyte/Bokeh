@@ -2,6 +2,7 @@
 bokeh = function() { // spans everything - not indented
 var bokeh = {}
 
+stopItNow = false
 
 bokeh.init = function () {
 	var svg = d3.select("#svg")
@@ -10,10 +11,10 @@ bokeh.init = function () {
 	var c2 = new Particle(svg, 300, 300, 60, 140, 133, 197, 0.6, 5)
 	
 	var psys = new PSystem()
-	psys.addParticle(new Particle(svg, 650, 650, 60, 100, 133, 197, 0.6, 5))
-	psys.addParticle(new Particle(svg, 500, 650, 60, 100, 133, 197, 0.6, 5))
-	psys.addParticle(new Particle(svg, 650, 500, 60, 122, 133, 197, 0.6, 5))
-	psys.addParticle(new Particle(svg, 500, 500, 60, 122, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 650, 650, 60, 130, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 500, 650, 60, 135, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 650, 500, 60, 152, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 500, 500, 60, 152, 133, 197, 0.6, 5))
 	psys.start()
 	
 //	if (false)
@@ -97,10 +98,10 @@ function rainbow(d, i, a) {
 
 
 
-function createChart() {
+function createChart(name) {
 	var self = {}
 	
-	var margin = {top: 20, right: 20, bottom: 30, left: 50},
+	var margin = {top: 10, right: 20, bottom: 30, left: 50},
 		width = 960 - margin.left - margin.right,
 		height = 200 - margin.top - margin.bottom
 	
@@ -126,6 +127,11 @@ function createChart() {
 	
 	var yg = svgPlot.append("g")
 		.attr("class", "y axis")
+	
+    yg.append("text")
+      .attr("x", 6)
+      .attr("dy", ".71em")
+      .text(name)
 	
 	var pathG = svgPlot.append("path")
 	
@@ -218,45 +224,71 @@ function PSystem() {
 	var g_var_r = 200
 	var g_var_g = 30
 	
-	var g_mean_velocity = 4
+	var g_max_velocity = 4
 	
 	var plist = []
 	
-	var log_mean_h = []
-	var log_var_h = []
-	var log_mean_velocity = []
+	var log = {}
+	log.items = ["h", "velocity", "acceleration"]
 	
-	var chart_log_mean_h = createChart()
-	var chart_log_var_h = createChart()
-	var chart_log_mean_velocity = createChart()
+	for (var i=0; i<log.items.length; i++) {
+		log["mean_"+log.items[i]] = []
+		log["var_"+log.items[i]] = []
+		
+		log["chart_mean_"+log.items[i]] = createChart("mean "+log.items[i])
+		log["chart_var_"+log.items[i]] = createChart("var "+log.items[i])
+	}
+	
+	log.updateLog = function() {
+		for (var i=0; i<log.items.length; i++) {
+			var mean_ = log["mean_"+log.items[i]]
+			var var_ = log["var_"+log.items[i]]
+			
+			mean_.push(self.mean(plist, log.items[i]))
+			var_.push(self.variance(plist, log.items[i]))
+			
+			log["chart_mean_"+log.items[i]].updateChart(mean_)
+			log["chart_var_"+log.items[i]].updateChart(var_)
+		}
+	}
 	
 	self.start = function() {
+		if (stopItNow)
+			return
+		
+		log.updateLog()
 		var mean_h = self.mean(plist, "h")
 		var var_h = self.variance(plist, "h")
 		var mean_velocity = self.mean(plist, "velocity")
-//		var var_velocity = self.variance(plist, "velocity")
-//		var mean_acceleration = self.mean(plist, "acceleration")
-//		var var_acceleration = self.variance(plist, "acceleration")
-		
-		log_mean_h.push(mean_h)
-		log_var_h.push(var_h)
-		log_mean_velocity.push(mean_velocity)
-		
-		chart_log_mean_h.updateChart(log_mean_h)
-		chart_log_var_h.updateChart(log_var_h)
-		chart_log_mean_velocity.updateChart(log_mean_velocity)
 		
 		for (var i=0; i<plist.length; i++) {
-			plist[i].acceleration += (mean_velocity < g_mean_velocity ? 1 : -1 ) * 0.1
+			var d_all_mean_h = g_mean_h - mean_h
+			var d_all_max_velocity = Math.abs(mean_velocity)/g_max_velocity
+			// 2 solutions
+			// linear prediction
+			// velocity max
 			
-			plist[i].velocity += plist[i].acceleration
 			
-			plist[i].h += (mean_h < g_mean_h ? 1 : -1) * plist[i].velocity
+			plist[i].acceleration += (d_all_mean_h < 0 ? -1 : 1) * 0.05
 			
 			var d_mean = plist[i].h - mean_h
 			var cor_var_sign = (var_h < g_var_h && d_mean > 0)
 				|| (var_h > g_var_h && d_mean < 0) ? 1 : -1
-			plist[i].h += cor_var_sign * plist[i].velocity/2
+			plist[i].acceleration += cor_var_sign * 0.025
+			
+			
+//			if ((plist[i].velocity > 0 && plist[i].acceleration > 0)
+//				|| (plist[i].velocity < 0 && plist[i].acceleration < 0)
+//				&& d_all_max_velocity > 0)
+//			if (d_all_max_velocity > 0)
+				plist[i].acceleration *= 1-d_all_max_velocity
+			
+//			if (Math.abs(plist[i].acceleration) > 1.5)
+//				plist[i].acceleration = 1+Math.log(Math.abs(plist[i].acceleration)-1)
+			
+			plist[i].velocity += plist[i].acceleration
+			
+			plist[i].h += plist[i].velocity
 			
 			plist[i].obj.transition()
 				.duration(500)
@@ -317,6 +349,7 @@ function saveSVGshortcut() {
 	document.addEventListener("keydown", function (evt) {
 		switch(evt.keyCode) {
 			case 83: openSVG(); break // s
+			case 69: stopItNow = true; break // 7
 		}
 	}, false)
 }
