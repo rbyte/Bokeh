@@ -13,8 +13,3 @@ body {
 .rotating {
     -webkit-animation: rotating 2s linear infinite;
 }
-path {
-	fill: none;
-	stroke: #000;
-	stroke-width: 3px;
-}

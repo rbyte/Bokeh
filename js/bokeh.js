@@ -5,10 +5,16 @@ var bokeh = {}
 
 bokeh.init = function () {
 	var svg = d3.select("#svg")
-//	var c = circle(svg, 350, 350, 1)
-	var c = circleSimple(svg, 350, 350, 60)
-//	circle(svg, 300, 300, 1)
-	circleSimple(svg, 300, 300, 60)
+	
+	var c = new Particle(svg, 350, 350, 60, 140, 133, 197, 0.6, 5)
+	var c2 = new Particle(svg, 300, 300, 60, 140, 133, 197, 0.6, 5)
+	
+	var psys = new PSystem()
+	psys.addParticle(new Particle(svg, 650, 650, 60, 140, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 500, 650, 60, 140, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 650, 500, 60, 140, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 500, 500, 60, 140, 133, 197, 0.6, 5))
+	psys.start()
 	
 //	if (false)
 	d3.select("#feGaussianBlur3765")
@@ -16,11 +22,12 @@ bokeh.init = function () {
 		.duration(5000)
 		.attr("stdDeviation", 10)
 	
-	c
+	c.obj
 		.transition()
 		.duration(5000)
 		.style("fill", hsl255ToHex(140, 133, 255))
-		.attr("transform", "translate("+500+", "+700+") scale("+2+")")
+		.attr("transform", "translate("+250+", "+650+")") //  scale("+2+")
+		.attr("r", "120")
 	
 	saveSVGshortcut()
 	
@@ -41,16 +48,21 @@ var path = svg.append("path")
 	.attr("d", d3.svg.line()
 		.tension(0) // Catmull–Rom
 		.interpolate("cardinal-closed"))
-
-var circle = svg.append("circle")
-	.attr("r", 13)
-	.attr("transform", "translate(" + points[0] + ")")
-
+//	.style({
+//		"fill": "none",
+//		"stroke": hsl255ToHex(140, 133, 255),
+//		"stroke-opacity": 1,
+//		"stroke-width": "3px"
+//	})
+if (false)
 transition()
 
 function transition() {
-	circle.transition()
+	c2.obj.transition()
 		.duration(10000)
+		.ease(d3.ease("linear"))
+//		.style("fill", "#ff0000")
+		.styleTween("fill", rainbow)
 		.attrTween("transform", translateAlong(path.node()))
 		.each("end", transition)
 }
@@ -59,70 +71,128 @@ function transition() {
 function translateAlong(path) {
 	var l = path.getTotalLength()
 	return function(d, i, a) {
-		return function(t) {
+		return function(t) { // is an interpolator, t is in [0,1]
 			var p = path.getPointAtLength(t * l)
 			return "translate(" + p.x + "," + p.y + ")"
 		}
 	}
 }
+
+function rainbow(d, i, a) {
+	return function(t) {
+		return hsl255ToHex(t*255, 255, 125)
+	}
+}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 }
 
-function circlePath(a) {
-	// http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-	return "m "+a+",0 a "
-		+a+","+a+" 0 1 1 -"+2*a+",0 "
-		+a+","+a+" 0 1 1  "+2*a+",0 z"
-}
 
-function circle(svg, x, y, scale) {
-	var a = 60
-	var c = svg.append("path")
-		.attr("d", circlePath(a))
-		.attr("transform", "translate("+x+", "+y+") scale("+scale+")")
-		.style({
-			"fill": hsl255ToHex(140, 133, 197),
-			"fill-opacity": 0.6,
-			"stroke": hsl255ToHex(140, 133, 228),
-			"stroke-opacity": 1,
-			"stroke-width": 1.5,
-			"filter": "url(#filter3763)"
-		})
-	return c
-}
-
-function circleSimple(svg, x, y, r) {
+function circleSimple(svg, x, y, r, h, s, l, a) {
 	var c = svg.append("circle")
 		.attr("cx", 0)
 		.attr("cy", 0)
 		.attr("r", r)
 //		.attr("fill", "url(#rg2)")
-		.attr("transform", "translate("+x+", "+y+") scale("+1+")")
+		.attr("transform", "translate("+x+", "+y+")") //  scale("+1+")
 		.style({
-			"fill": hsl255ToHex(140, 133, 197),
-			"fill-opacity": 0.6,
-			"stroke": hsl255ToHex(140, 133, 228),
-			"stroke-opacity": 1,
-			"stroke-width": 1.5,
+			"fill": hsl255ToHex(h, s, l),
+			"fill-opacity": a,
+//			"stroke": hsl255ToHex(140, 133, 228),
+//			"stroke-opacity": 1,
+//			"stroke-width": 1.5,
 			"filter": "url(#filter3763)"
 		})
 	return c
 }
+
+
+
+
+function Particle(svg,x,y,r,h,l,s,a,g) {
+	var self = this
+	
+	self.x = x
+	self.y = y
+	
+	// hue lightness saturation alpha
+	self.h = h
+	self.l = l
+	self.s = s
+	self.a = a
+	
+	self.g = g // gauss
+	self.r = r // radius
+	
+	self.obj = circleSimple(svg,x,y,r,h,s,l,a)
+	
+}
+
+function PSystem() {
+	var self = this
+	
+	// averages/means
+	var mean_numberOfParticles = 10
+	var mean_h = 141 // 124 - 183 sind so schmerzgrenzen
+	var mean_s = 180
+	// the higher layers (z-index) are always brigther (!)
+	// feBlend screen may be an alternative
+	var base_l = 90
+	var mean_a = 200
+	
+	// rather smaller for upper layers
+	// could also scale with transform, but this also has downsides
+	var mean_r = 50
+	// rather higher for higher radius
+	var mean_g = 30
+	
+	// variance
+	var var_numberOfParticles
+	var var_h = 10
+	var var_s = 30
+//	var var_l 
+	var var_a = 30
+	
+	var var_r = 200
+	var var_g = 30
+	
+	var plist = []
+	
+	self.start = function() {
+		
+	}
+	
+	self.addParticle = function(particle) {
+		plist.push(particle)
+	}
+	
+	self.variance = function(vals) {
+		var mean = self.mean(vals)
+		var newVals = []
+		for (var i=0; i<vals.length; i++) {
+			var a = vals[i]-mean
+			newVals.push(a*a)
+		}
+		return self.mean(newVals)
+	}
+	
+	self.mean = function(vals) {
+		return self.sum(vals)/vals.length
+	}
+	
+	self.sum = function(vals) {
+		var sum = 0
+		for (var i=0; i<vals.length; i++) {
+			sum = vals[i]
+		}
+		return sum
+	}
+	
+}
+
+
+
+
 
 function saveSVGshortcut() {
 	function openSVG() {
@@ -137,6 +207,8 @@ function saveSVGshortcut() {
 		}
 	}, false)
 }
+
+
 
 function hsl255ToHex(h, s, l) {
 	return hslToHex(h/255, s/255, l/255)
@@ -188,6 +260,6 @@ function hslToRgb(h, s, l) {
 	}
 }
 
+
 return bokeh
 }()
-
