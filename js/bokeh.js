@@ -11,10 +11,10 @@ bokeh.init = function () {
 	var c2 = new Particle(svg, 300, 300, 60, 140, 133, 197, 0.6, 5)
 	
 	var psys = new PSystem()
-	psys.addParticle(new Particle(svg, 650, 650, 60, 130, 133, 197, 0.6, 5))
-	psys.addParticle(new Particle(svg, 500, 650, 60, 135, 133, 197, 0.6, 5))
-	psys.addParticle(new Particle(svg, 650, 500, 60, 152, 133, 197, 0.6, 5))
-	psys.addParticle(new Particle(svg, 500, 500, 60, 152, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 650, 650, 60, 50, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 500, 650, 60, 100, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 650, 500, 60, 150, 133, 197, 0.6, 5))
+	psys.addParticle(new Particle(svg, 500, 500, 60, 180, 133, 197, 0.6, 5))
 	psys.start()
 	
 //	if (false)
@@ -98,7 +98,7 @@ function rainbow(d, i, a) {
 
 
 
-function createChart(name) {
+function createChart(name, orientationBaseline) {
 	var self = {}
 	
 	var margin = {top: 10, right: 20, bottom: 30, left: 50},
@@ -134,6 +134,7 @@ function createChart(name) {
       .text(name)
 	
 	var pathG = svgPlot.append("path")
+	var pathOrientationHorizontal = svgPlot.append("path")
 	
 	self.updateChart = function(data) {
 		x.domain([0, data.length-1])
@@ -147,6 +148,16 @@ function createChart(name) {
 			.datum(data)
 			.attr("class", "line")
 			.attr("d", line)
+			
+		x.domain([0, 1])
+		
+		if (orientationBaseline !== undefined) {
+			pathOrientationHorizontal.remove()
+			pathOrientationHorizontal = svgPlot.append("path")
+				.datum([orientationBaseline, orientationBaseline])
+				.attr("class", "line")
+				.attr("d", line)
+		}
 	}
 		
 	return self
@@ -189,8 +200,10 @@ function Particle(svg,x,y,r,h,l,s,a,g) {
 	self.g = g // gauss
 	self.r = r // radius
 	
-	self.velocity = 0
-	self.acceleration = 0
+	self.v = 0
+	self.acc = 0
+	self.activity = 0
+	self.activityRounds = 0
 	
 	self.obj = circleSimple(svg,x,y,r,h,s,l,a)
 	
@@ -216,7 +229,7 @@ function PSystem() {
 	
 	// goal variance
 	var g_var_numberOfParticles
-	var g_var_h = 300
+	var g_var_h = 10
 	var g_var_s = 30
 //	var g_var_l 
 	var g_var_a = 30
@@ -224,19 +237,19 @@ function PSystem() {
 	var g_var_r = 200
 	var g_var_g = 30
 	
-	var g_max_velocity = 4
-	
-	var plist = []
+	var pls = [] // particle list
 	
 	var log = {}
-	log.items = ["h", "velocity", "acceleration"]
+	log.items = ["h", "v", "acc"]
 	
 	for (var i=0; i<log.items.length; i++) {
 		log["mean_"+log.items[i]] = []
 		log["var_"+log.items[i]] = []
 		
-		log["chart_mean_"+log.items[i]] = createChart("mean "+log.items[i])
-		log["chart_var_"+log.items[i]] = createChart("var "+log.items[i])
+		log["chart_mean_"+log.items[i]] = createChart(
+			"mean "+log.items[i], log.items[i] === "h" ? g_mean_h : undefined) // eval("g_mean_"+log.items[i])
+		log["chart_var_"+log.items[i]] = createChart(
+			"var "+log.items[i], log.items[i] === "h" ? g_var_h : undefined)
 	}
 	
 	log.updateLog = function() {
@@ -244,8 +257,8 @@ function PSystem() {
 			var mean_ = log["mean_"+log.items[i]]
 			var var_ = log["var_"+log.items[i]]
 			
-			mean_.push(self.mean(plist, log.items[i]))
-			var_.push(self.variance(plist, log.items[i]))
+			mean_.push(self.mean(pls, log.items[i]))
+			var_.push(self.variance(pls, log.items[i]))
 			
 			log["chart_mean_"+log.items[i]].updateChart(mean_)
 			log["chart_var_"+log.items[i]].updateChart(var_)
@@ -257,50 +270,70 @@ function PSystem() {
 			return
 		
 		log.updateLog()
-		var mean_h = self.mean(plist, "h")
-		var var_h = self.variance(plist, "h")
-		var mean_velocity = self.mean(plist, "velocity")
+		var mean_h = self.mean(pls, "h")
+		var var_h = self.variance(pls, "h")
+		var mean_v = self.mean(pls, "v")
 		
-		for (var i=0; i<plist.length; i++) {
+		if (Math.random() < 0.1) {
+			var particle = pls[Math.round(Math.random()*(pls.length-1))]
+			particle.activity = (Math.random()-0.5)/30
+			particle.activityRounds += Math.round(Math.random()*20)
+		}
+		
+		for (var i=0; i<pls.length; i++) {
 			var d_all_mean_h = g_mean_h - mean_h
-			var d_all_max_velocity = Math.abs(mean_velocity)/g_max_velocity
-			// 2 solutions
+			var d_all_var_h = g_var_h - var_h
+			
+			
 			// linear prediction
-			// velocity max
+			// steps it takes @ current v to reach g_mean_h
+			var prediction = mean_v === 0 ? 1000 : d_all_mean_h/mean_v
+			// the less steps to go, the more I dampen acceleration
+			// below this number, accDelta is 0, increasing above, to *1 (max)
+			var predDampen = 20
+			// the max
+			var accDeltaAbs = 0.03
+			if (Math.abs(d_all_mean_h) < 10)
+				accDeltaAbs *= Math.abs(d_all_mean_h)/10
+			if (prediction >= 0 && prediction <= predDampen)
+				accDeltaAbs = 0
+			if (prediction > predDampen)
+				accDeltaAbs *= 1-predDampen/prediction
 			
+			var accDelta = (d_all_mean_h < 0 ? -1 : 1) * accDeltaAbs
+			if (pls[i].activityRounds > 0) {
+				pls[i].activityRounds--
+				accDelta += pls[i].activity
+			}
 			
-			plist[i].acceleration += (d_all_mean_h < 0 ? -1 : 1) * 0.05
-			
-			var d_mean = plist[i].h - mean_h
+			// accelerate to reach goal variance
+			var d_mean = pls[i].h - mean_h
 			var cor_var_sign = (var_h < g_var_h && d_mean > 0)
 				|| (var_h > g_var_h && d_mean < 0) ? 1 : -1
-			plist[i].acceleration += cor_var_sign * 0.025
+			if (Math.abs(d_all_var_h) > 3
+				&& ((cor_var_sign > 0 && mean_v <= 0)
+				|| (cor_var_sign < 0 && mean_v >= 0)))
+				accDelta += cor_var_sign * 0.01
 			
+			pls[i].acc += accDelta
 			
-//			if ((plist[i].velocity > 0 && plist[i].acceleration > 0)
-//				|| (plist[i].velocity < 0 && plist[i].acceleration < 0)
-//				&& d_all_max_velocity > 0)
-//			if (d_all_max_velocity > 0)
-				plist[i].acceleration *= 1-d_all_max_velocity
+			// always dampen accelation & speed
+			pls[i].acc *= 0.90
+			pls[i].v += pls[i].acc
+			pls[i].v *= 0.90
+			pls[i].h += pls[i].v
 			
-//			if (Math.abs(plist[i].acceleration) > 1.5)
-//				plist[i].acceleration = 1+Math.log(Math.abs(plist[i].acceleration)-1)
-			
-			plist[i].velocity += plist[i].acceleration
-			
-			plist[i].h += plist[i].velocity
-			
-			plist[i].obj.transition()
-				.duration(500)
+			pls[i].obj.transition()
+				.duration(30)
 				.ease(d3.ease("linear"))
-				.style("fill", hsl255ToHex(plist[i].h, plist[i].s, plist[i].l))
-				.each("end", i === plist.length -1 ? self.start : function() {})
+				.style("fill", hsl255ToHex(pls[i].h, pls[i].s, pls[i].l))
+				.each("end", i === pls.length -1 ? self.start : function() {})
 		}
 		
 	}
 	
 	self.addParticle = function(particle) {
-		plist.push(particle)
+		pls.push(particle)
 	}
 	
 	self.variance = function(list, property) {
@@ -308,7 +341,7 @@ function PSystem() {
 		var newVals = []
 		for (var i=0; i<list.length; i++) {
 			var a = (property !== undefined ? list[i][property] : list[i]) - mean
-			newVals.push(a*a)
+			newVals.push(Math.abs(a)) // instead of a²
 		}
 		return self.mean(newVals)
 	}
