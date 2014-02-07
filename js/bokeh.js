@@ -6,89 +6,46 @@ stopItNow = false
 
 bokeh.init = function () {
 	var svg = d3.select("#svg")
-
 	var psys = new PSystem()
-
 	saveSVGshortcut()
 }
 
-function Particle(x,y,r,h,s,l,a,g) {
+function PSystem() {
 	var self = this
+	var properties = ["x","y","r","h","s","l","a","g"]
+	var gMean =	{x: 500, y: 400, r: 100, h: 140, s: 180, l: 180, a: 0.5, g: 20}
+	var gVar =	{x: 100, y: 100, r: 50, h: 10, s: 30, l: 0, a: 0.3, g: 5}
+	var numberOfParticles = 4
+	var pls = [] // particle list
+	var log = {}
 	
-	function Prop(initial) {
-//		this.parent = self
+	function Property(p) {
 		var self = this
-		self._ = initial // value
-		
+		self._ = gMean[p]+(Math.random()*2-1)*gVar[p]
 		self.v = 0 // velocity
 		self.acc = 0 // acceleration
 		self.activity = 0
 		self.activityRounds = 0
 	}
 	
-	self.x = new Prop(x)
-	self.y = new Prop(y)
-	self.r = new Prop(r) // radius
-	
-	self.h = new Prop(h) // hue
-	self.s = new Prop(s) // saturation
-	self.l = new Prop(l) // lightness
-	self.a = new Prop(a) // alpha
-	
-	self.g = new Prop(g) // gauss
-	
-	self.obj = circleFor(self)
-	return self
-}
-
-function PSystem() {
-	var self = this
-	// goal means and variances
-	var gMean =	{x: 500, y: 400, r: 100, h: 140, s: 180, l: 200, a: 0.5, g: 20}
-	var gVar =	{x: 100, y: 100, r: 50, h: 10, s: 30, l: 30, a: 0.2, g: 5}
-	var numberOfParticles = 4
-	var pls = [] // particle list
-	var log = {}
+	function Particle() {
+		var p = this
+		for (var i=0; i<properties.length; i++)
+			p[properties[i]] = new Property(properties[i])
+		
+		p.obj = circleSimple(p.x._, p.y._, p.r._, p.h._, p.s._, p.l._, p.a._, p.g._)
+		return p
+	}
 	
 	self.init = function() {
-		function dr(attr) {
-			return (gMean[attr]+(Math.random()-0.5)*gVar[attr])
-		}
-		
-		for (var i=0; i<numberOfParticles; i++) {
-			pls.push(new Particle(
-				dr("x"),dr("y"),dr("r"),dr("h"),dr("s"),dr("l"),dr("a"),dr("g")))
-		}
+		for (var i=0; i<numberOfParticles; i++)
+			pls.push(new Particle())
 		
 //		log.items = [["h", "_", "mean"], ["h", "v", "mean"], ["h", "acc", "mean"]]
 //		log.items = [["h", "_", "mean"], ["g", "_", "mean"], ["r", "_", "mean"]]
 		log.items = []
-		
-		for (var i=0; i<log.items.length; i++) {
-			var e = log.items[i]
-			var en = e[0]+"_"+e[1]+"_"+e[2]
-			log[en] = []
-			
-			var orientation = undefined
-			if (e[1] === "_")
-				orientation = e[2] === "mean" ? gMean[e[0]] : gVar[e[0]]
-			
-			log["chart_"+en] = createChart(en, orientation)
-		}
-		
+		log.init()
 		self.start()
-	}
-	
-	log.updateLog = function() {
-		for (var i=0; i<log.items.length; i++) {
-			var e = log.items[i]
-			var en = e[0]+"_"+e[1]+"_"+e[2]
-			var l = log[en]
-			l.push(e[2] === "mean"
-				? mean(plsList(e[0], e[1]))
-				: variance(plsList(e[0], e[1])))
-			log["chart_"+en].updateChart(l)
-		}
 	}
 	
 	self.start = function() {
@@ -98,28 +55,32 @@ function PSystem() {
 		var stepsTdelta = 30
 		
 		log.updateLog()
-		step("h")
-		step("g")
-		step("r")
-		step("a")
 		step("x")
 		step("y")
+		step("r")
+		step("h")
+		step("s")
+		step("a")
+		step("g")
 		
 		for (var i=0; i<pls.length; i++) {
 			var p = pls[i]
 			p.obj.feGaussianBlur.transition()
 				.duration(stepsTdelta)
 				.ease(d3.ease("linear"))
-				.attr("stdDeviation", p.g._)
+				.attr("stdDeviation", round(p.g._))
 			
 			var t = p.obj.transition()
 				.duration(stepsTdelta)
 				.ease(d3.ease("linear"))
-				.style("fill", hsl255ToHex(p.h._, p.s._, p.l._))
-				// todo number rounding
-				.style("fill-opacity", p.a._)
-				.attr("r", p.r._)
-				.attr("transform", "translate("+p.x._+", "+p.y._+")")
+				.style("fill", hsl255ToHex(
+					round(p.h._),
+					round(p.s._),
+					round(p.l._)))
+				.style("fill-opacity", round(p.a._))
+				.attr("r", round(p.r._))
+				// todo number rounding. does not round in translate
+				.attr("transform", "translate("+round(p.x._)+", "+round(p.y._)+")")
 			
 			if (i === pls.length-1)
 				t.each("end", self.start)
@@ -179,10 +140,36 @@ function PSystem() {
 			pa.v += pa.acc
 			pa.v *= 0.90
 			pa._ += pa.v
+			// x & y may want to go beyond 0
 			pa._ = Math.max(0, pa._)
 		}
 	}
 	
+	log.init = function() {
+		for (var i=0; i<log.items.length; i++) {
+			var e = log.items[i]
+			var en = e[0]+"_"+e[1]+"_"+e[2]
+			log[en] = []
+			
+			var orientation = undefined
+			if (e[1] === "_")
+				orientation = e[2] === "mean" ? gMean[e[0]] : gVar[e[0]]
+			
+			log["chart_"+en] = createChart(en, orientation)
+		}
+	}
+	
+	log.updateLog = function() {
+		for (var i=0; i<log.items.length; i++) {
+			var e = log.items[i]
+			var en = e[0]+"_"+e[1]+"_"+e[2]
+			var l = log[en]
+			l.push(e[2] === "mean"
+				? mean(plsList(e[0], e[1]))
+				: variance(plsList(e[0], e[1])))
+			log["chart_"+en].updateChart(l)
+		}
+	}
 	
 	var plsList = function(property, attribute) {
 		var list = []
@@ -223,7 +210,35 @@ function PSystem() {
 
 
 
-
+function circleSimple(x, y, r, h, s, l, a, g) {
+	var filterName = Math.random().toString(36).substring(7)
+	var feGaussianBlur = d3.select("#svg defs")
+		.append("filter")
+		.attr("id", filterName)
+		.attr("x", -3)
+		.attr("y", -3)
+		.attr("width", 8)
+		.attr("height", 8)
+		.append("feGaussianBlur")
+		.attr("stdDeviation", g)
+	
+	var c = d3.select("#svg").append("circle")
+		.attr("cx", 0)
+		.attr("cy", 0)
+		.attr("r", r)
+//		.attr("fill", "url(#rg2)")
+		.attr("transform", "translate("+x+", "+y+")") //  scale("+1+")
+		.style({
+			"fill": hsl255ToHex(h, s, l),
+			"fill-opacity": a,
+//			"stroke": hsl255ToHex(140, 133, 228),
+//			"stroke-opacity": 1,
+//			"stroke-width": 1.5,
+			"filter": "url(#"+filterName+")"
+		})
+	c.feGaussianBlur = feGaussianBlur
+	return c
+}
 
 function createChart(name, orientationBaseline) {
 	var self = {}
@@ -290,38 +305,8 @@ function createChart(name, orientationBaseline) {
 	return self
 }
 
-function circleFor(p) { // particle
-	return circleSimple(p.x._, p.y._, p.r._, p.h._, p.s._, p.l._, p.a._, p.g._)
-}
-
-function circleSimple(x, y, r, h, s, l, a, g) {
-	var filterName = Math.random().toString(36).substring(7)
-	var feGaussianBlur = d3.select("#svg defs")
-		.append("filter")
-		.attr("id", filterName)
-		.attr("x", -3)
-		.attr("y", -3)
-		.attr("width", 8)
-		.attr("height", 8)
-		.append("feGaussianBlur")
-		.attr("stdDeviation", g)
-	
-	var c = d3.select("#svg").append("circle")
-		.attr("cx", 0)
-		.attr("cy", 0)
-		.attr("r", r)
-//		.attr("fill", "url(#rg2)")
-		.attr("transform", "translate("+x+", "+y+")") //  scale("+1+")
-		.style({
-			"fill": hsl255ToHex(h, s, l),
-			"fill-opacity": a,
-//			"stroke": hsl255ToHex(140, 133, 228),
-//			"stroke-opacity": 1,
-//			"stroke-width": 1.5,
-			"filter": "url(#"+filterName+")"
-		})
-	c.feGaussianBlur = feGaussianBlur
-	return c
+function round(number) {
+	return Number(number.toFixed(1))
 }
 
 function saveSVGshortcut() {
@@ -340,7 +325,7 @@ function saveSVGshortcut() {
 }
 
 
-
+// TODO use d3 instead of ...
 function hsl255ToHex(h, s, l) {
 	return hslToHex(h/255, s/255, l/255)
 }
