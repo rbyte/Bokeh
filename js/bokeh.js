@@ -6,84 +6,13 @@ stopItNow = false
 
 bokeh.init = function () {
 	var svg = d3.select("#svg")
-	var c = new Particle(350, 350, 60, 140, 133, 197, 0.6, 5)
-	var c2 = new Particle(300, 300, 60, 140, 133, 197, 0.6, 5)
-	
+
 	var psys = new PSystem()
-	
-//	if (false)
-	d3.select("#feGaussianBlur3765")
-		.transition()
-		.duration(5000)
-		.attr("stdDeviation", 10)
-	
-	c.obj
-		.transition()
-		.duration(5000)
-		.style("fill", hsl255ToHex(140, 133, 255))
-		.attr("transform", "translate("+250+", "+650+")") //  scale("+2+")
-		.attr("r", "120")
-	
+
 	saveSVGshortcut()
-	
-	// http://bl.ocks.org/mbostock/1705868
-	var points = [
-	[480, 200],[580, 400],[680, 100],[780, 300],[180, 300],[280, 100],[380, 400]
-	]
-
-	var path = svg.append("path")
-		.data([points])
-		.attr("d", d3.svg.line()
-			.tension(0) // Catmull–Rom
-			.interpolate("cardinal-closed"))
-	//	.style({
-	//		"fill": "none",
-	//		"stroke": hsl255ToHex(140, 133, 255),
-	//		"stroke-opacity": 1,
-	//		"stroke-width": "3px"
-	//	})
-	if (false)
-	transition()
-
-	function transition() {
-		c2.obj.transition()
-			.duration(10000)
-			.ease(d3.ease("linear"))
-	//		.style("fill", "#ff0000")
-			.styleTween("fill", rainbow)
-			.attrTween("transform", translateAlong(path.node()))
-			.each("end", transition)
-	}
-
-	// Returns an attrTween for translating along the specified path element.
-	function translateAlong(path) {
-		var l = path.getTotalLength()
-		return function(d, i, a) {
-			return function(t) { // is an interpolator, t is in [0,1]
-				var p = path.getPointAtLength(t * l)
-				return "translate(" + p.x + "," + p.y + ")"
-			}
-		}
-	}
-
-	function rainbow(d, i, a) {
-		return function(t) {
-			return hsl255ToHex(t*255, 255, 125)
-		}
-	}
-
 }
 
-
-
-
-
-
-
-
-
-
-function Particle(x,y,r,h,l,s,a,g) {
+function Particle(x,y,r,h,s,l,a,g) {
 	var self = this
 	
 	function Prop(initial) {
@@ -99,6 +28,7 @@ function Particle(x,y,r,h,l,s,a,g) {
 	
 	self.x = new Prop(x)
 	self.y = new Prop(y)
+	self.r = new Prop(r) // radius
 	
 	self.h = new Prop(h) // hue
 	self.s = new Prop(s) // saturation
@@ -106,7 +36,6 @@ function Particle(x,y,r,h,l,s,a,g) {
 	self.a = new Prop(a) // alpha
 	
 	self.g = new Prop(g) // gauss
-	self.r = new Prop(r) // radius
 	
 	self.obj = circleFor(self)
 	return self
@@ -115,30 +44,36 @@ function Particle(x,y,r,h,l,s,a,g) {
 function PSystem() {
 	var self = this
 	// goal means and variances
-	var gMean = {h: 140, s: 180, a: 200, r: 50, g: 5}
-	var gVar = {h: 10, s: 30, a: 30, r: 200, g: 2}
+	var gMean =	{x: 500, y: 400, r: 100, h: 140, s: 180, l: 200, a: 0.5, g: 20}
+	var gVar =	{x: 100, y: 100, r: 50, h: 10, s: 30, l: 30, a: 0.2, g: 5}
+	var numberOfParticles = 4
 	var pls = [] // particle list
 	var log = {}
 	
 	self.init = function() {
-		pls.push(new Particle(650, 650, 60, 50, 133, 197, 0.6, 5))
-		pls.push(new Particle(500, 650, 60, 100, 133, 197, 0.6, 5))
-		pls.push(new Particle(650, 500, 60, 150, 133, 197, 0.6, 5))
-		pls.push(new Particle(500, 500, 60, 180, 133, 197, 0.6, 5))
+		function dr(attr) {
+			return (gMean[attr]+(Math.random()-0.5)*gVar[attr])
+		}
 		
-		log.items = [["h", "_"], ["h", "v"], ["h", "acc"]]
+		for (var i=0; i<numberOfParticles; i++) {
+			pls.push(new Particle(
+				dr("x"),dr("y"),dr("r"),dr("h"),dr("s"),dr("l"),dr("a"),dr("g")))
+		}
+		
+//		log.items = [["h", "_", "mean"], ["h", "v", "mean"], ["h", "acc", "mean"]]
+//		log.items = [["h", "_", "mean"], ["g", "_", "mean"], ["r", "_", "mean"]]
+		log.items = []
 		
 		for (var i=0; i<log.items.length; i++) {
 			var e = log.items[i]
-			var en = e[0]+" "+e[1]
+			var en = e[0]+"_"+e[1]+"_"+e[2]
+			log[en] = []
 			
-			log["mean_"+en] = []
-			log["var_"+en] = []
-
-			log["chart_mean_"+en] = createChart(
-				"mean "+en, e[1] === "_" ? gMean[en[0]] : undefined)
-			log["chart_var_"+en] = createChart(
-				"var "+en, e[1] === "_" ? gVar[en[0]] : undefined)
+			var orientation = undefined
+			if (e[1] === "_")
+				orientation = e[2] === "mean" ? gMean[e[0]] : gVar[e[0]]
+			
+			log["chart_"+en] = createChart(en, orientation)
 		}
 		
 		self.start()
@@ -147,16 +82,12 @@ function PSystem() {
 	log.updateLog = function() {
 		for (var i=0; i<log.items.length; i++) {
 			var e = log.items[i]
-			var en = e[0]+" "+e[1]
-			
-			var mean_ = log["mean_"+en]
-			var var_ = log["var_"+en]
-			
-			mean_.push(mean(plsList(e[0], e[1])))
-			var_.push(variance(plsList(e[0], e[1])))
-			
-			log["chart_mean_"+en].updateChart(mean_)
-			log["chart_var_"+en].updateChart(var_)
+			var en = e[0]+"_"+e[1]+"_"+e[2]
+			var l = log[en]
+			l.push(e[2] === "mean"
+				? mean(plsList(e[0], e[1]))
+				: variance(plsList(e[0], e[1])))
+			log["chart_"+en].updateChart(l)
 		}
 	}
 	
@@ -169,18 +100,27 @@ function PSystem() {
 		log.updateLog()
 		step("h")
 		step("g")
+		step("r")
+		step("a")
+		step("x")
+		step("y")
 		
 		for (var i=0; i<pls.length; i++) {
-			pls[i].obj.feGaussianBlur.transition()
+			var p = pls[i]
+			p.obj.feGaussianBlur.transition()
 				.duration(stepsTdelta)
 				.ease(d3.ease("linear"))
-				.attr("stdDeviation", pls[i].g._)
+				.attr("stdDeviation", p.g._)
 			
-			var t = pls[i].obj.transition()
+			var t = p.obj.transition()
 				.duration(stepsTdelta)
 				.ease(d3.ease("linear"))
-				.style("fill", hsl255ToHex(pls[i].h._, pls[i].s._, pls[i].l._))
-				
+				.style("fill", hsl255ToHex(p.h._, p.s._, p.l._))
+				// todo number rounding
+				.style("fill-opacity", p.a._)
+				.attr("r", p.r._)
+				.attr("transform", "translate("+p.x._+", "+p.y._+")")
+			
 			if (i === pls.length-1)
 				t.each("end", self.start)
 		}
@@ -193,12 +133,12 @@ function PSystem() {
 		
 		if (Math.random() < 0.1) {
 			var particle = pls[Math.round(Math.random()*(pls.length-1))]
-			particle[attr].activity = (Math.random()-0.5)/30
+			particle[attr].activity = (Math.random()-0.5)/300*gVar[attr]
 			particle[attr].activityRounds += Math.round(Math.random()*20)
 		}
 		
 		for (var i=0; i<pls.length; i++) {
-			var p = pls[i][attr]
+			var pa = pls[i][attr]
 			var dMean = gMean[attr] - mean_
 			var dVar = gVar[attr] - var_
 			
@@ -218,13 +158,13 @@ function PSystem() {
 				accDeltaAbs *= 1-predDampen/prediction
 			
 			var accDelta = (dMean < 0 ? -1 : 1) * accDeltaAbs
-			if (p.activityRounds > 0) {
-				p.activityRounds--
-				accDelta += p.activity
+			if (pa.activityRounds > 0) {
+				pa.activityRounds--
+				accDelta += pa.activity
 			}
 			
 			// accelerate to reach goal variance
-			var d_mean = p._ - mean_
+			var d_mean = pa._ - mean_
 			var cor_var_sign = (var_ < gVar[attr] && d_mean > 0)
 				|| (var_ > gVar[attr] && d_mean < 0) ? 1 : -1
 			if (Math.abs(dVar) > 3
@@ -232,14 +172,14 @@ function PSystem() {
 				|| (cor_var_sign < 0 && mean_v >= 0)))
 				accDelta += cor_var_sign * 0.01
 			
-			p.acc += accDelta
+			pa.acc += accDelta
 			
 			// always dampen accelation & speed
-			p.acc *= 0.90
-			p.v += p.acc
-			p.v *= 0.90
-			p._ += p.v
-			p._ = Math.max(0, p._)
+			pa.acc *= 0.90
+			pa.v += pa.acc
+			pa.v *= 0.90
+			pa._ += pa.v
+			pa._ = Math.max(0, pa._)
 		}
 	}
 	
