@@ -13,20 +13,27 @@ body {
 .rotating {
     -webkit-animation: rotating 2s linear infinite;
 }
-
 .axis path,
 .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
 }
-
 .x.axis path {
-  display: none;
+	display: none;
 }
-
 .line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
+	fill: none;
+	stroke: red;
+	stroke-width: 1.5px;
+}
+.particle {
+	fill: none;
+	stroke: steelblue;
+	stroke-width: 0.5px;
+}
+.orientationBaseline {
+	fill: none;
+	stroke: black;
+	stroke-width: 1px;
 }
