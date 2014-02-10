@@ -2,6 +2,22 @@ body {
 	margin: 0;
 	padding: 0;
 }
+#svgWrapper {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+}
+#svgWrapper svg {
+	max-height: 50%;
+	max-width: 50%;
+	vertical-align: middle;
+}
+.helperSpanToAlignImageVertically {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
 @-webkit-keyframes rotating {
     from{
         -webkit-transform: rotate(0deg);

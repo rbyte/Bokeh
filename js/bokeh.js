@@ -2,14 +2,16 @@
 bokeh = function() { // spans everything - not indented
 var bokeh = {}
 
-stopItNow = false
-var svgWidth = 1200
-var svgHeight = 800
+pauseStepping = false
+var svgWidth = 400
+var svgHeight = 300
+var psys
 
 bokeh.init = function () {
 	var svg = d3.select("#svg")
-	svg.attr("width", svgWidth)
-	svg.attr("height", svgHeight)
+//	svg.attr("width", svgWidth)
+//	svg.attr("height", svgHeight)
+	svg.attr("viewBox", "0 0 "+svgWidth+" "+svgHeight)
 	
 	svg.append("rect")
 		.attr("x", 0)
@@ -18,8 +20,16 @@ bokeh.init = function () {
 		.attr("height", "100%")
 		.style("fill", d3.hsl(151/255*360, 77/255, 111/255) )
 	
-	new ParticleSystem()
-	saveSVGshortcut()
+	setUpKShortcuts()
+	psys = new ParticleSystem()
+	// in chrome, the svg viewbox aspect is not honored. the svg is stretched to
+	// width and height 100% of the parent and "overflow" is visible
+	// surround viewbox with white rectangles
+	svg.append("rect").attr("x", "100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
+	svg.append("rect").attr("x", "-100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
+	svg.append("rect").attr("x", "0%").attr("y", "-100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
+	svg.append("rect").attr("x", "0%").attr("y", "100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
+	
 }
 
 function ParticleSystem() {
@@ -27,9 +37,10 @@ function ParticleSystem() {
 	var properties = ["x","y","r","h","s","l","a","g"]
 	var gMean =	{h: 140,	s: 180,	l: 180,	a: .20,	g: svgWidth*.04,	x: svgWidth*.5,		y: svgHeight*.5,	r: svgWidth*.15}
 	var gVar =	{h: 10,		s: 10,	l: 40,	a: .10,	g: svgWidth*.025,	x: svgWidth*.22,	y: svgHeight*.22,	r: svgWidth*.07}
-	var gMin =	{h: 0,		s: 0,	l: 0,	a: 0,	g: svgWidth*.002,	x: svgWidth*-.25,	y: svgHeight*-.25,	r: svgWidth*0}
-	var gMax =	{h: 255,	s: 255,	l: 255,	a: .8,	g: svgWidth*.1,		x: svgWidth*1.25,	y: svgHeight*1.25,	r: svgWidth*1}
+	var gMin =	{h: 0,		s: 0,	l: 0,	a: 0,	g: svgWidth*.002,	x: svgWidth*-.20,	y: svgHeight*-.20,	r: svgWidth*0}
+	var gMax =	{h: 255,	s: 255,	l: 255,	a: .8,	g: svgWidth*.1,		x: svgWidth*1.20,	y: svgHeight*1.20,	r: svgWidth*1}
 	var actF =	{h: 1,		s: 1,	l: 1,	a: 1,	g: 1, x: 1, y: 1, r: 0.5}
+	// TODO if true, circles do not show in inkscape
 	var disableBlur = false
 	if (disableBlur) {
 		gMean.g = 0
@@ -82,7 +93,7 @@ function ParticleSystem() {
 	}
 	
 	self.start = function() {
-		if (stopItNow)
+		if (pauseStepping)
 			return
 		
 		for (var i=0; i<properties.length; i++)
@@ -399,7 +410,7 @@ function createChart(name, orientationBaseline) {
 	return self
 }
 
-function saveSVGshortcut() {
+function setUpKShortcuts() {
 	function openSVG() {
 		window.open("data:image/svg+xml," + encodeURIComponent(
 			document.getElementById("svgWrapper").innerHTML
@@ -409,7 +420,10 @@ function saveSVGshortcut() {
 	document.addEventListener("keydown", function (evt) {
 		switch(evt.keyCode) {
 			case 83: openSVG(); break // s
-			case 69: stopItNow = true; break // 7
+			case 69: // e
+				pauseStepping = !pauseStepping
+				if (!pauseStepping) psys.start()
+				break
 		}
 	}, false)
 }
