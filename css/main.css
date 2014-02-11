@@ -4,13 +4,15 @@ body {
 }
 #svgWrapper {
 	position: fixed;
-	width: 100%;
-	height: 100%;
+	top: -100%;
+	left: -100%;
+	width: 300%;
+	height: 300%;
 	text-align: center;
 }
 #svgWrapper svg {
-	max-height: 50%;
-	max-width: 50%;
+	/*max-height: 50%;*/
+	/*max-width: 50%;*/
 	vertical-align: middle;
 }
 .helperSpanToAlignImageVertically {
@@ -18,16 +20,12 @@ body {
     height: 100%;
     vertical-align: middle;
 }
-@-webkit-keyframes rotating {
-    from{
-        -webkit-transform: rotate(0deg);
-    }
-    to{
-        -webkit-transform: rotate(360deg);
-    }
-}
-.rotating {
-    -webkit-animation: rotating 2s linear infinite;
+#fps {
+	position: fixed;
+	color: #ccc;
+	font-size: 200%;
+	bottom: 2%;
+	right: 2%;
 }
 .axis path,
 .axis line {

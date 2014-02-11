@@ -1,3 +1,21 @@
+/*
+2dos
+
+ui elements
+	svg size adjustment
+		fullscreen
+	show current svg
+	pause
+	save as png
+	restart
+expose particle system parameters
+	...
+
+correlate size more with z-index
+Gauss Radius Reduzieren in feFilter
+Use Radial Gradient Stop Approximation
+
+*/
 
 bokeh = function() { // spans everything - not indented
 var bokeh = {}
@@ -5,6 +23,7 @@ var bokeh = {}
 pauseStepping = false
 var svgWidth = 400
 var svgHeight = 300
+var SVGsizeInWindow = 0.3 // percent
 var psys
 
 bokeh.init = function () {
@@ -12,6 +31,7 @@ bokeh.init = function () {
 //	svg.attr("width", svgWidth)
 //	svg.attr("height", svgHeight)
 	svg.attr("viewBox", "0 0 "+svgWidth+" "+svgHeight)
+	setSVGSizeInWindow()
 	
 	svg.append("rect")
 		.attr("x", 0)
@@ -23,13 +43,23 @@ bokeh.init = function () {
 	setUpKShortcuts()
 	psys = new ParticleSystem()
 	// in chrome, the svg viewbox aspect is not honored. the svg is stretched to
-	// width and height 100% of the parent and "overflow" is visible
+	// width and height 100% of the parent and "overflow" (objects outside of the viewbox)
+	// are visible
 	// surround viewbox with white rectangles
 	svg.append("rect").attr("x", "100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
 	svg.append("rect").attr("x", "-100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
 	svg.append("rect").attr("x", "0%").attr("y", "-100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
 	svg.append("rect").attr("x", "0%").attr("y", "100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
-	
+}
+
+function setSVGSizeInWindow(percent) {
+	if (percent !== undefined)
+		SVGsizeInWindow = Math.max(percent, 0.05)
+	// 1/3* because the wrappers size is 300%
+	// this allows the zooming of the svg beyond the page borders
+	d3.select("#svg")
+		.style("max-height", 1/3*100*SVGsizeInWindow+"%")
+		.style("max-width", 1/3*100*SVGsizeInWindow+"%")
 }
 
 function ParticleSystem() {
@@ -40,11 +70,10 @@ function ParticleSystem() {
 	var gMin =	{h: 0,		s: 0,	l: 0,	a: 0,	g: svgWidth*.002,	x: svgWidth*-.20,	y: svgHeight*-.20,	r: svgWidth*0}
 	var gMax =	{h: 255,	s: 255,	l: 255,	a: .8,	g: svgWidth*.1,		x: svgWidth*1.20,	y: svgHeight*1.20,	r: svgWidth*1}
 	var actF =	{h: 1,		s: 1,	l: 1,	a: 1,	g: 1, x: 1, y: 1, r: 0.5}
-	// TODO if true, circles do not show in inkscape
+	// TODO if true, circles do not show in inkscape: stddeviation=0 is not supported
 	var disableBlur = false
 	if (disableBlur) {
-		gMean.g = 0
-		gVar.g = 0
+		gMean.g = gVar.g = actF.g = gMin.g = 0
 	}
 	var numberOfParticles = 20
 	var kissenSize = 0.02 // [0, 0.5]
@@ -53,10 +82,14 @@ function ParticleSystem() {
 	var accDeltaAbsMax = 0.02
 	var triggerActivityPropability = 0.05 // influenced by number of particles
 	var predDampen = 20
-	var stepsTdelta = 1
+	var transition = false
+	var transitionDuration = 100
 	
 	var pls = [] // particle list
 	var log = {}
+	var lastStep
+	var timeDeltaBetweenSteps = []
+	var lastFPSupdate
 	
 	function Particle(pNo) {
 		var p = this
@@ -96,9 +129,11 @@ function ParticleSystem() {
 		if (pauseStepping)
 			return
 		
+		updateFpsCounter()
+		
 		for (var i=0; i<properties.length; i++)
 			// lightness is bound to z-index
-			if (properties[i] !== "l" && (!disableBlur || properties[i] !== "g"))
+			if (properties[i] !== "l")
 				step(properties[i])
 		
 		// additional constrains
@@ -120,26 +155,34 @@ function ParticleSystem() {
 		
 		for (var i=0; i<pls.length; i++) {
 			var p = pls[i]
-			p.obj.feGaussianBlur
-				.transition()
-				.duration(stepsTdelta)
-				.ease(d3.ease("linear"))
-				.attr("stdDeviation", p.g._)
 			
-			var t = p.obj
-				.transition()
-				.duration(stepsTdelta)
+			var o = p.obj.feGaussianBlur
+			
+			if (transition)
+				o = o.transition()
+				.duration(transitionDuration)
 				.ease(d3.ease("linear"))
+			
+			o.attr("stdDeviation", p.g._)
+			
+			o = p.obj
+			if (transition)
+				o = o.transition()
+				.duration(transitionDuration)
+				.ease(d3.ease("linear"))
+			
+			var t = o
 				.style("fill", d3.hsl(p.h._/255*360, p.s._/255, p.l._/255) )
 				.style("fill-opacity", p.a._)
 				.attr("r", p.r._)
 				.attr("transform", "translate("+p.x._+", "+p.y._+")")
 			
-			if (i === pls.length-1)
+			if (transition && i === pls.length-1)
 				t.each("end", self.start)
 		}
-		
-//		setTimeout(self.start, stepsTdelta)
+		// lets the browser render, then restarts
+		if (!transition)
+			setTimeout(self.start, 1)
 	}
 	
 	var step = function(attr) {
@@ -197,6 +240,7 @@ function ParticleSystem() {
 			
 			pa.acc += accDelta
 			
+			
 			// always dampen accelation & speed
 			pa.acc *= 0.90
 			pa.v += pa.acc
@@ -221,6 +265,25 @@ function ParticleSystem() {
 			if (log.contains(attr, "v")) pa.log.v.push(pa.v)
 			if (log.contains(attr, "acc")) pa.log.acc.push(pa.acc)
 		}
+	}
+	
+	// this is actually a steps per second function.
+	// if transitions are enabled, multiple frames may be drawn between steps
+	function updateFpsCounter() {
+		var curTime = new Date().getTime()
+		if (lastStep !== undefined) {
+			var tDeltaMS = curTime - lastStep
+			timeDeltaBetweenSteps.push(tDeltaMS)
+			if (timeDeltaBetweenSteps.length > 10) {
+				if (lastFPSupdate === undefined || curTime-lastFPSupdate > 1000) {
+					lastFPSupdate = curTime
+					d3.select("#fps").text(Math.round(1000/mean(timeDeltaBetweenSteps))+" fps")
+				}
+				// remove oldest
+				timeDeltaBetweenSteps.shift()
+			}
+		}
+		lastStep = curTime
 	}
 	
 	log.contains = function(prop, attr) {
@@ -410,20 +473,38 @@ function createChart(name, orientationBaseline) {
 	return self
 }
 
-function setUpKShortcuts() {
-	function openSVG() {
-		window.open("data:image/svg+xml," + encodeURIComponent(
-			document.getElementById("svgWrapper").innerHTML
-		))
-	}
+function round(number) {
+	return Number(number.toFixed(1))
+}
 
+function openSVG() {
+	var svg = document.getElementById("svg")
+	window.open("data:image/svg+xml," + encodeURIComponent(
+	// http://stackoverflow.com/questions/1700870/how-do-i-do-outerhtml-in-firefox
+		svg.outerHTML || new XMLSerializer().serializeToString(svg)
+	))
+}
+bokeh.key_s = function() {
+	openSVG()
+}
+bokeh.key_e = function() {
+	pauseStepping = !pauseStepping
+	if (!pauseStepping) psys.start()
+}
+bokeh.key_plus = function() {
+	setSVGSizeInWindow(SVGsizeInWindow*1.1)
+}
+bokeh.key_minus = function() {
+	setSVGSizeInWindow(SVGsizeInWindow*0.9)
+}
+
+function setUpKShortcuts() {
 	document.addEventListener("keydown", function (evt) {
 		switch(evt.keyCode) {
-			case 83: openSVG(); break // s
-			case 69: // e
-				pauseStepping = !pauseStepping
-				if (!pauseStepping) psys.start()
-				break
+			case 83: bokeh.key_s(); break
+			case 69: bokeh.key_e(); break
+			case 107: bokeh.key_plus(); break
+			case 109: bokeh.key_minus(); break
 		}
 	}, false)
 }
