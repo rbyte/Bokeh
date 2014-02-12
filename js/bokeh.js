@@ -25,53 +25,21 @@ var svgWidth = 400
 var svgHeight = 300
 var SVGsizeInWindow = 0.3 // percent
 var psys
+var codeMirror
 
 bokeh.init = function () {
-	var editor = CodeMirror(document.body, {
-		value: "console.log(\"hi!\")",
+
+	codeMirror = CodeMirror(document.body, {
+		value: "gMean.h=140;\nbgColor.h=151",
 		mode: "javascript",
 		indentWithTabs: true,
 		lineNumbers: true
 	})
+//	codeMirror.on("change", function() {})
 	
-	editor.on("change", function() {
-		try {
-			eval(editor.getValue())
-		} catch(e) {
-			if (e instanceof SyntaxError) {
-				
-			} else {
-				console.log(e)
-			}
-		}
-		
-	})
-	
-	
-	
-	var svg = d3.select("#svg")
-//	svg.attr("width", svgWidth)
-//	svg.attr("height", svgHeight)
-	svg.attr("viewBox", "0 0 "+svgWidth+" "+svgHeight)
-	setSVGSizeInWindow()
-	
-	svg.append("rect")
-		.attr("x", 0)
-		.attr("y", 0)
-		.attr("width", "100%")
-		.attr("height", "100%")
-		.style("fill", d3.hsl(151/255*360, 77/255, 111/255) )
+	psys = new ParticleSystem()
 	
 	setUpKShortcuts()
-	psys = new ParticleSystem()
-	// in chrome, the svg viewbox aspect is not honored. the svg is stretched to
-	// width and height 100% of the parent and "overflow" (objects outside of the viewbox)
-	// are visible
-	// surround viewbox with white rectangles
-	svg.append("rect").attr("x", "100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
-	svg.append("rect").attr("x", "-100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
-	svg.append("rect").attr("x", "0%").attr("y", "-100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
-	svg.append("rect").attr("x", "0%").attr("y", "100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
 }
 
 function setSVGSizeInWindow(percent) {
@@ -92,6 +60,7 @@ function ParticleSystem() {
 	var gMin =	{h: 0,		s: 0,	l: 0,	a: 0,	g: svgWidth*.002,	x: svgWidth*-.20,	y: svgHeight*-.20,	r: svgWidth*0}
 	var gMax =	{h: 255,	s: 255,	l: 255,	a: .8,	g: svgWidth*.1,		x: svgWidth*1.20,	y: svgHeight*1.20,	r: svgWidth*1}
 	var actF =	{h: 1,		s: 1,	l: 1,	a: 1,	g: 1, x: 1, y: 1, r: 0.5}
+	var bgColor = {h: 151,	s: 77,	l: 111,	a: 1}
 	// TODO if true, circles do not show in inkscape: stddeviation=0 is not supported
 	var disableBlur = false
 	if (disableBlur) {
@@ -132,10 +101,12 @@ function ParticleSystem() {
 	}
 	
 	self.init = function() {
+		setUpSVG()
+		
 		for (var i=0; i<numberOfParticles; i++) {
 			var p = new Particle(i)
 			pls.push(p)
-			// particle in front are brighter
+			// particles in front are brighter
 			var lvar = gVar.l/255
 			p.l._ *= ((1-lvar)+i/numberOfParticles*(lvar*2))
 		}
@@ -152,6 +123,24 @@ function ParticleSystem() {
 			return
 		
 		updateFpsCounter()
+		
+		try {
+			eval(codeMirror.getValue())
+		} catch(e) {
+			if (e instanceof SyntaxError) {
+				
+			} else {
+				console.log(e)
+			}
+		}
+		
+		for (var i=1; pls.length - numberOfParticles !== 0; i++) {
+			if (pls.length > numberOfParticles) {
+				pls.shift().obj.remove()
+			} else {
+				pls.push(new Particle(numberOfParticles+i))
+			}
+		}
 		
 		for (var i=0; i<properties.length; i++)
 			// lightness is bound to z-index
@@ -178,24 +167,23 @@ function ParticleSystem() {
 		for (var i=0; i<pls.length; i++) {
 			var p = pls[i]
 			
-			var o = p.obj.feGaussianBlur
-			
-			if (transition) {
-				o = o.transition()
-				.duration(transitionDuration)
-				.ease(d3.ease("linear"))
+			function applyTransition(obj) {
+				if (transition) {
+					obj = obj.transition()
+						.duration(transitionDuration)
+						.ease(d3.ease("linear"))
+				}
+				return obj
 			}
 			
-			o.attr("stdDeviation", p.g._)
+			applyTransition(p.obj.feGaussianBlur)
+				.attr("stdDeviation", p.g._)
 			
-			o = p.obj
-			if (transition) {
-				o = o.transition()
-				.duration(transitionDuration)
-				.ease(d3.ease("linear"))
-			}
+			applyTransition(d3.select("#backgroundRect"))
+				.style("fill", d3.hsl(bgColor.h/255*360, bgColor.s/255, bgColor.l/255) )
+				.style("fill-opacity", bgColor.a)
 			
-			var t = o
+			var t = applyTransition(p.obj)
 				.style("fill", d3.hsl(p.h._/255*360, p.s._/255, p.l._/255) )
 				.style("fill-opacity", p.a._)
 				.attr("r", p.r._)
@@ -308,6 +296,33 @@ function ParticleSystem() {
 			}
 		}
 		lastStep = curTime
+	}
+	
+	function setUpSVG() {
+		var svg = d3.select("#svg")
+	//	svg.attr("width", svgWidth)
+	//	svg.attr("height", svgHeight)
+		svg.attr("viewBox", "0 0 "+svgWidth+" "+svgHeight)
+		setSVGSizeInWindow()
+
+		svg.append("rect")
+			.attr("id", "backgroundRect")
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("width", "100%")
+			.attr("height", "100%")
+			.style("fill", d3.hsl(bgColor.h/255*360, bgColor.s/255, bgColor.l/255) )
+			.style("fill-opacity", bgColor.a)
+
+		// in chrome, the svg viewbox aspect is not honored. the svg is stretched to
+		// width and height 100% of the parent and "overflow" (objects outside of the viewbox)
+		// are visible
+		// surround viewbox with white rectangles
+		svg.append("rect").attr("x", "100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
+		svg.append("rect").attr("x", "-100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
+		svg.append("rect").attr("x", "0%").attr("y", "-100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
+		svg.append("rect").attr("x", "0%").attr("y", "100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
+		
 	}
 	
 	log.contains = function(prop, attr) {
