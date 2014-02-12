@@ -27,6 +27,28 @@ var SVGsizeInWindow = 0.3 // percent
 var psys
 
 bokeh.init = function () {
+	var editor = CodeMirror(document.body, {
+		value: "console.log(\"hi!\")",
+		mode: "javascript",
+		indentWithTabs: true,
+		lineNumbers: true
+	})
+	
+	editor.on("change", function() {
+		try {
+			eval(editor.getValue())
+		} catch(e) {
+			if (e instanceof SyntaxError) {
+				
+			} else {
+				console.log(e)
+			}
+		}
+		
+	})
+	
+	
+	
 	var svg = d3.select("#svg")
 //	svg.attr("width", svgWidth)
 //	svg.attr("height", svgHeight)
@@ -158,18 +180,20 @@ function ParticleSystem() {
 			
 			var o = p.obj.feGaussianBlur
 			
-			if (transition)
+			if (transition) {
 				o = o.transition()
 				.duration(transitionDuration)
 				.ease(d3.ease("linear"))
+			}
 			
 			o.attr("stdDeviation", p.g._)
 			
 			o = p.obj
-			if (transition)
+			if (transition) {
 				o = o.transition()
 				.duration(transitionDuration)
 				.ease(d3.ease("linear"))
+			}
 			
 			var t = o
 				.style("fill", d3.hsl(p.h._/255*360, p.s._/255, p.l._/255) )
@@ -182,7 +206,7 @@ function ParticleSystem() {
 		}
 		// lets the browser render, then restarts
 		if (!transition)
-			setTimeout(self.start, 1)
+			setTimeout(self.start, 50)
 	}
 	
 	var step = function(attr) {
