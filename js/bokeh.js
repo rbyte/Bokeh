@@ -1,26 +1,8 @@
-/*
-2dos
-
-ui elements
-	svg size adjustment
-		fullscreen
-	show current svg
-	pause
-	save as png
-	restart
-expose particle system parameters
-	...
-
-correlate size more with z-index
-Gauss Radius Reduzieren in feFilter
-Use Radial Gradient Stop Approximation
-
-*/
 
 bokeh = function() { // spans everything - not indented
 var bokeh = {}
 
-pauseStepping = false
+var pauseStepping = false
 var svgWidth = 400
 var svgHeight = 300
 var SVGsizeInWindow = 0.3 // percent
