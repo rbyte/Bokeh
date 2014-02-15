@@ -13,4 +13,4 @@ correlate size more with z-index
 performance improvement
 	Gauss Radius Reduzieren in feFilter
 	Use Radial Gradient Stop Approximation
-
+by default, log n steps
