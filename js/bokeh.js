@@ -11,19 +11,20 @@ var codeMirror
 var properties = ["x","y","r","h","s","l","a","g"]
 
 var gMean=	{h: 140,	s: 180,	l: 180,	a: .20,	g: svgWidth*.04,	x: svgWidth*.5,		y: svgHeight*.5,	r: svgWidth*.15}
-var gVar=	{h: 10,		s: 10,	l: 40,	a: .10,	g: svgWidth*.025,	x: svgWidth*.22,	y: svgHeight*.22,	r: svgWidth*.07}
+var gVar=	{h: 7,		s: 10,	l: 40,	a: .10,	g: svgWidth*.025,	x: svgWidth*.22,	y: svgHeight*.22,	r: svgWidth*.07}
 var gMin=	{h: 0,		s: 0,	l: 0,	a: 0,	g: svgWidth*.002,	x: svgWidth*-.20,	y: svgHeight*-.20,	r: svgWidth*0}
 var gMax=	{h: 255,	s: 255,	l: 255,	a: .8,	g: svgWidth*.1,		x: svgWidth*1.20,	y: svgHeight*1.20,	r: svgWidth*1}
 var actF=	{h: 1,		s: 1,	l: 1,	a: 1,	g: 1, x: 1, y: 1, r: 0.5}
-var bgColor= {h: 151,	s: 77,	l: 111,	a: 1}
+var bgColor= {h: 151,	s: 77,	l: 111,	a: 0} // TODO
+var distributionSliders = {}
 
-// stddeviation/g=0 is not supported in inkscape
+// stddeviation/g=0 is not supported in inkscape (circles will not show)
 if (/*disableBlur = */ false) {
 	gMax.g = gMin.g = 0
 }
 
 var log = {}
-//log.items = [["r", "_", "mean"], ["g", "_", "mean"]]
+//log.items = [["h", "_", "mean"]]
 //log.items = [["g", "_", "mean"], ["r", "_", "mean"],["a", "_", "mean"], ["x", "_", "mean"], ["y", "_", "mean"]]
 log.items = []
 
@@ -47,19 +48,149 @@ bokeh.run = function () {
 	setUpSVG()
 	
 	codeMirror = CodeMirror(document.body, {
-		value:
-"gMean.h=140;\n\
-bgColor.h=151",
+		value: "",
 		mode: "javascript",
 		indentWithTabs: true,
 		lineNumbers: true
 		/*matchBrackets: true*/
 	})
-//	codeMirror.on("change", function() {})
+	codeMirror.on("change", function() {})
 	
 	log.init()
+	setUpDistributionSlider("h")
 	setUpKShortcuts()
 	progressParticleSystem()
+}
+
+function setUpDistributionSlider(prop) {
+//	var svg = d3.select("#distSliderSVG")
+	// outer rectangle, that contains everything
+	distributionSliders[prop] = {}
+	
+	var svg = distributionSliders[prop].svg = d3.select("#dsvg")
+		.append("svg")
+		.attr("id", "distSliderSVG_"+prop)
+		.attr("xmlns", "http://www.w3.org/2000/svg")
+//		.attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+		.attr("width", 200)
+		.attr("height", 400)
+		.attr("viewBox", "0 0 "+200+" "+400)
+	
+	var defs = svg.append("defs")
+	var allHues = defs.append("linearGradient").attr("id", "allHues")
+	allHues.append("stop").style({"stop-color": "#ff0000", "stop-opacity": "1"}).attr("offset", 0)
+	allHues.append("stop").style({"stop-color": "#ffff00", "stop-opacity": "1"}).attr("offset", 0.18512578)
+	allHues.append("stop").style({"stop-color": "#00ff00", "stop-opacity": "1"}).attr("offset", 0.34256288)
+	allHues.append("stop").style({"stop-color": "#00ffff", "stop-opacity": "1"}).attr("offset", 0.5)
+	allHues.append("stop").style({"stop-color": "#0000ff", "stop-opacity": "1"}).attr("offset", 0.65429997)
+	allHues.append("stop").style({"stop-color": "#ff00ff", "stop-opacity": "1"}).attr("offset", 0.8119877)
+	allHues.append("stop").style({"stop-color": "#ff0000", "stop-opacity": "1"}).attr("offset", 1)
+	
+	var whiteShade = defs.append("linearGradient").attr("id", "whiteShade")
+	whiteShade.append("stop").style({"stop-color": "#ffffff", "stop-opacity": "0"}).attr("offset", 0)
+	whiteShade.append("stop").style({"stop-color": "#ffffff", "stop-opacity": ".4"}).attr("offset", 1)
+	
+	defs.append("linearGradient")
+		.attr("id", "allHuesVertical")
+		.attr("xlink:href", "#allHues")
+		.attr("gradientTransform", "rotate(90)")
+	
+	
+	const opx = 0, opy = 0, ow = 200, oh = 400,
+	// percent of width the scale takes
+	perc = .10,
+	// the drag area rectangle (a portion of outer)
+	px = opx+ow*perc, py = opy, w = ow*(1-perc), h = oh,
+	left = .15, right = .05, top = .01, bottom = .01,
+	topSpan = .7, baseSpan = .8, varianceSpan = .2
+	
+	function getPath(x, y) {
+		function bound(l, x, h) { return Math.max(Math.min(x, h), l) }
+		// mouse position x & y, relative to box and forced into margin
+		var rX = bound(left, (x-px)/w, 1-right)
+		var rY = bound(top, (y-py)/h, 1-bottom)
+		
+		// half y span of ground
+		var vrc = Math.min(1 - rX, (.5 - Math.abs(rY - .5))*2)/2
+		rX = bound(1-vrc*2, rX, 1)
+		
+		// TODO
+		gMean.h = (gMax.h - gMin.h) * rY
+		gVar.h = (gMax.h - gMin.h) * vrc * 0.3
+//		bgColor.h = gMean.h
+		
+		// http://www.w3.org/TR/SVG/paths.html#PathData
+		// the start and end point are only needed for the fill (hueScale)
+		// to be aligned correctly
+		// see DistributionSliderPathIllustration.svg
+		return ("M"+px+","+py
+			+" L"+px+","+(py+(rY - vrc)*h)
+			// start control point, end control point, end point
+			+" c0,"+vrc*baseSpan*h+" "+rX*w+","+vrc*h*topSpan+" "+rX*w+","+vrc*h
+			+" s-"+rX*w+","+vrc*(1-baseSpan)*h+" -"+rX*w+","+vrc*h
+			+" L"+px+","+(py+h)
+			+"Z")
+	}
+	
+	distributionSliders[prop].updateParticles = function() {
+		if (distributionSliders[prop].dssvgg !== undefined)
+			distributionSliders[prop].dssvgg.remove()
+		distributionSliders[prop].dssvgg = svg
+			.append("g").attr("id", "distSliderSVGcircles")
+		
+		for (var i=0; i<pls.length; i++) {
+			var yy =  (pls[i][prop]._ - gMin[prop]) / (gMax[prop]-gMin[prop]) * h
+			
+			distributionSliders[prop].dssvgg.append("path")
+				.attr("d", "M0,"+yy+" L"+ow*perc+","+yy)
+				.style({
+					"stroke": "#fff", // d3.hsl(0/255*360, 0/255, 255/255)
+					"stroke-opacity": .5,
+					"stroke-width": 4,
+					"stroke-linecap": "butt"
+				})
+		}
+	}
+	
+	var drag = d3.behavior.drag()
+		.on("drag", dragmove)
+	
+	function dragmove(d) {
+		distributionCurve.attr("d", getPath(d3.event.x, d3.event.y))
+	}
+	
+	svg.append("rect")
+		.attr("id", "dragArea")
+		.attr("x", px)
+		.attr("y", py)
+		.attr("width", w)
+		.attr("height", h)
+		// fill "none" will disable drag
+		.style({"fill": "#fff", "stroke": "#ccc", "stroke-width": 1})
+		.call(drag)
+	
+	var distributionCurve = svg.append("path")
+		.attr("id", "distributionCurve")
+		.attr("d", getPath(px+0.5*w, py+0.5*h))
+		.style({'fill': 'url(#allHuesVertical)', 'fill-opacity': 1, "stroke": "none"})
+		.call(drag)
+	
+	svg.append("rect")
+		.attr("id", "scale")
+		.attr("width", ow*perc)
+		.attr("height", oh)
+		.attr("x", opx)
+		.attr("y", opy)
+		.style({'fill': 'url(#allHuesVertical)', 'fill-opacity': 1, "stroke": "none"})
+
+	svg.append("rect")
+		.attr("id", "whiteOverlay")
+		.attr("width", ow*perc*0.5)
+		.attr("height", oh)
+		.attr("x", opx+ow*perc*0.5)
+		.attr("y", opy)
+		.style({'fill': 'url(#whiteShade)', 'fill-opacity': 1, "stroke": "none"})
+	
 }
 
 function Particle(pNo) {
@@ -112,7 +243,7 @@ function progressParticleSystem() {
 		// lightness is bound to z-index
 		if (properties[i] !== "l")
 			step(properties[i])
-
+	
 	// additional constrains
 	for (var i=0; i<pls.length; i++) {
 		// increasing radius decreases opacity and increases blur
@@ -129,7 +260,8 @@ function progressParticleSystem() {
 	}
 
 	log.updateLog()
-
+	distributionSliders.h.updateParticles()
+	
 	for (var i=0; i<pls.length; i++) {
 		var p = pls[i]
 
@@ -306,12 +438,7 @@ log.init = function() {
 		var e = log.items[i]
 		var en = e[0]+"_"+e[1]+"_"+e[2]
 		log[en] = []
-
-		var orientation = undefined
-		if (e[1] === "_")
-			orientation = e[2] === "mean" ? gMean[e[0]] : gVar[e[0]]
-
-		log["chart_"+en] = createChart(en, orientation)
+		log["chart_"+en] = createChart(en)
 	}
 }
 
@@ -324,11 +451,77 @@ log.updateLog = function() {
 			? mean(plsList(e[0], e[1]))
 			: variance(plsList(e[0], e[1])))
 		var chart = log["chart_"+en]
-		chart.updateChart(l)
+		chart.updateChart(l, gMin[e[0]], gMax[e[0]])
 		for (var k=0; k<pls.length; k++) {
-			chart.addToChart(pls[k][e[0]].log[e[1]])
+			chart.addParticlesToChart(pls[k][e[0]].log[e[1]])
 		}
 	}
+}
+
+function createChart(name) {
+	var self = {}
+	
+	var margin = {top: 10, right: 20, bottom: 30, left: 50},
+		width = 960 - margin.left - margin.right,
+		height = 200 - margin.top - margin.bottom
+	
+	var svgPlot = d3.select("body").append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+	  .append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+	
+	var x = d3.scale.linear().range([0, width])
+	var y = d3.scale.linear().range([height, 0])
+
+	var xAxis = d3.svg.axis().scale(x).orient("bottom")
+	var yAxis = d3.svg.axis().scale(y).orient("left")
+	
+	var line = d3.svg.line()
+		.x(function(d,i) { return x(i) })
+		.y(function(d) { return y(d) })
+
+	var xg = svgPlot.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + height + ")")
+	
+	var yg = svgPlot.append("g")
+		.attr("class", "y axis")
+	
+    yg.append("text")
+      .attr("x", 6)
+      .attr("dy", ".71em")
+      .text(name)
+	
+	var pathG = svgPlot.append("path")
+	
+	self.updateChart = function(data, min, max) {
+		x.domain([0, data.length-1])
+		y.domain([min, max])
+		xg.call(xAxis)
+		yg.call(yAxis)
+		
+		pathG.remove()
+		pathG = svgPlot.append("g")
+		pathG.append("path")
+			.datum(data)
+			.attr("class", "line")
+			.attr("d", line)
+			
+		x.domain([0, 1])
+	}
+	
+	self.addParticlesToChart = function(data) {
+		x.domain([0, data.length-1])
+		xg.call(xAxis)
+		
+		pathG.append("path")
+			.datum(data)
+			.attr("class", "particle")
+			.attr("d", line)
+	}
+		
+	return self
 }
 
 var plsList = function(property, attribute) {
@@ -383,90 +576,6 @@ function createSVGcircle(x, y, r, h, s, l, a, g) {
 		})
 	c.feGaussianBlur = feGaussianBlur
 	return c
-}
-
-function createChart(name, orientationBaseline) {
-	var self = {}
-	
-	var margin = {top: 10, right: 20, bottom: 30, left: 50},
-		width = 960 - margin.left - margin.right,
-		height = 200 - margin.top - margin.bottom
-	
-	var svgPlot = d3.select("body").append("svg")
-		.attr("width", width + margin.left + margin.right)
-		.attr("height", height + margin.top + margin.bottom)
-	  .append("g")
-		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-	
-	var x = d3.scale.linear().range([0, width])
-	var y = d3.scale.linear().range([height, 0])
-
-	var xAxis = d3.svg.axis().scale(x).orient("bottom")
-	var yAxis = d3.svg.axis().scale(y).orient("left")
-	
-	var line = d3.svg.line()
-		.x(function(d,i) { return x(i) })
-		.y(function(d) { return y(d) })
-
-	var xg = svgPlot.append("g")
-		.attr("class", "x axis")
-		.attr("transform", "translate(0," + height + ")")
-	
-	var yg = svgPlot.append("g")
-		.attr("class", "y axis")
-	
-    yg.append("text")
-      .attr("x", 6)
-      .attr("dy", ".71em")
-      .text(name)
-	
-	var pathG = svgPlot.append("path")
-	var pathOrientationHorizontal = svgPlot.append("path")
-	
-	var yDomainMin = Number.POSITIVE_INFINITY
-	var yDomainMax = Number.NEGATIVE_INFINITY
-	
-	function updateAxis(data) {
-		x.domain([0, data.length-1])
-		var extent = d3.extent(data)
-		yDomainMin = Math.min(yDomainMin, extent[0])
-		yDomainMax = Math.max(yDomainMax, extent[1])
-		
-		y.domain([yDomainMin, yDomainMax])
-		xg.call(xAxis)
-		yg.call(yAxis)
-	}
-	
-	self.updateChart = function(data) {
-		updateAxis(data)
-		
-		pathG.remove()
-		pathG = svgPlot.append("g")
-		pathG.append("path")
-			.datum(data)
-			.attr("class", "line")
-			.attr("d", line)
-			
-		x.domain([0, 1])
-		
-		if (orientationBaseline !== undefined) {
-			pathOrientationHorizontal.remove()
-			pathOrientationHorizontal = svgPlot.append("path")
-				.datum([orientationBaseline, orientationBaseline])
-				.attr("class", "orientationBaseline")
-				.attr("d", line)
-		}
-	}
-	
-	self.addToChart = function(data) {
-		updateAxis(data)
-		pathG.append("path")
-			.datum(data)
-			.attr("class", "particle")
-			.attr("d", line)
-	}
-		
-	return self
 }
 
 function round(number) {

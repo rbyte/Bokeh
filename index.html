@@ -26,12 +26,69 @@
 
 ]]></style>
 
-	<defs></defs>
+	<defs>
+		<linearGradient id="allHues">
+		  <stop style="stop-color:#ff0000;stop-opacity:1" offset="0" />
+		  <stop style="stop-color:#ffff00;stop-opacity:1" offset="0.18512578" />
+		  <stop style="stop-color:#00ff00;stop-opacity:1" offset="0.34256288" />
+		  <stop style="stop-color:#00ffff;stop-opacity:1" offset="0.5" />
+		  <stop style="stop-color:#0000ff;stop-opacity:1" offset="0.65429997" />
+		  <stop style="stop-color:#ff00ff;stop-opacity:1" offset="0.8119877" />
+		  <stop style="stop-color:#ff0000;stop-opacity:1" offset="1" />
+		</linearGradient>
+
+		<linearGradient id="whiteShade">
+		  <stop style="stop-color:#ffffff;stop-opacity:0" offset="0" />
+		  <stop style="stop-color:#ffffff;stop-opacity:.4" offset="1" />
+		</linearGradient>
+
+		<linearGradient
+		   id="allHuesVertical"
+		   xlink:href="#allHues"
+		   gradientTransform="rotate(90)" />
+	</defs>
 
 </svg>
 </div>
+
+<svg id="distSliderSVG"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="300px"
+	height="600px"
+>
+
+    <style type="text/css"><![CDATA[
+	]]></style>
+
+  <defs>
+
+    <linearGradient id="allHues">
+      <stop style="stop-color:#ff0000;stop-opacity:1" offset="0" />
+      <stop style="stop-color:#ffff00;stop-opacity:1" offset="0.18512578" />
+      <stop style="stop-color:#00ff00;stop-opacity:1" offset="0.34256288" />
+      <stop style="stop-color:#00ffff;stop-opacity:1" offset="0.5" />
+      <stop style="stop-color:#0000ff;stop-opacity:1" offset="0.65429997" />
+      <stop style="stop-color:#ff00ff;stop-opacity:1" offset="0.8119877" />
+      <stop style="stop-color:#ff0000;stop-opacity:1" offset="1" />
+    </linearGradient>
 	
-	<div id="fps"></div>
+    <linearGradient id="whiteShade">
+      <stop style="stop-color:#ffffff;stop-opacity:0" offset="0" />
+      <stop style="stop-color:#ffffff;stop-opacity:.4" offset="1" />
+    </linearGradient>
+	
+    <linearGradient
+       id="allHuesVertical"
+       xlink:href="#allHues"
+       gradientTransform="rotate(90)" />
+  </defs>
+
+</svg>
+
+<div id="fps"></div>
+
+<div id="dsvg"></div>
 
 <script>bokeh.run()</script>
 	

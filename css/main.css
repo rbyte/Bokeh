@@ -9,6 +9,7 @@ body {
 	width: 300%;
 	height: 300%;
 	text-align: center;
+	z-index: -1;
 }
 #svgWrapper svg {
 	/*max-height: 50%;*/
