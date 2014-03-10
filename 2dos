@@ -1,17 +1,32 @@
-ui elements
-	svg size adjustment
-		fullscreen
-	show current svg
-	pause
-	save as png
-	restart
-expose particle system parameters
-	find good ui/interaction methods
-	...
+ui elements -> add menu on side penal
+	svg size adjustment -> slider (& + -)
+	show/hide fps
+	fullscreen -> switch
+	pause -> switch
+	show current svg (freeze) -> link
+	// https://developer.mozilla.org/en-US/docs/HTML/Canvas/Drawing_DOM_objects_into_a_canvas
+	(save as png -> link), resolution selection?
+	(restart -> button)
+	show source -> link
+	hilfe? info?
+alter simulation
+	background colour picker -> hsl
+	add dSlider for h,r,s,a,g -> switch with preview
+	number of particles -> slider
+	transition duration -> slider -> 0 = off (for slowing)
 
+
+set initial dSlider to mean & var
+	find way to calc vcr from given var
+	dSlider variance can create ground beyond scale
+abstract dSlider to enable other properties
+
+code mirror switch
 correlate size more with z-index
 performance improvement
 	Gauss Radius Reduzieren in feFilter
 	Use Radial Gradient Stop Approximation
 by default, log n steps
 interactivity (mouse playing)
+	hover highlights particle in dSliders
+pick individual particles in distribution slider and drag their value

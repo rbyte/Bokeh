@@ -7,13 +7,14 @@ var svgHeight = 300
 var SVGsizeInWindow = 0.3 // percent
 var codeMirror
 
-// x, y position, radius, hue, saturation, lightness, alpha (opacity), gauss std deviation
 var properties = ["x","y","r","h","s","l","a","g"]
+var propFullName = {x: "Horizonal Position", y: "Vertical Position", r: "Radius",
+	h: "Hue", s: "Saturation", l: "Lightness", a: "Alpha/Opacity", g: "Gauss Smoothing"}
 
 var gMean=	{h: 140,	s: 180,	l: 180,	a: .20,	g: svgWidth*.04,	x: svgWidth*.5,		y: svgHeight*.5,	r: svgWidth*.15}
 var gVar=	{h: 7,		s: 10,	l: 40,	a: .10,	g: svgWidth*.025,	x: svgWidth*.22,	y: svgHeight*.22,	r: svgWidth*.07}
 var gMin=	{h: 0,		s: 0,	l: 0,	a: 0,	g: svgWidth*.002,	x: svgWidth*-.20,	y: svgHeight*-.20,	r: svgWidth*0}
-var gMax=	{h: 255,	s: 255,	l: 255,	a: .8,	g: svgWidth*.1,		x: svgWidth*1.20,	y: svgHeight*1.20,	r: svgWidth*1}
+var gMax=	{h: 255,	s: 255,	l: 255,	a: .8,	g: svgWidth*.2,		x: svgWidth*1.20,	y: svgHeight*1.20,	r: svgWidth*1}
 var actF=	{h: 1,		s: 1,	l: 1,	a: 1,	g: 1, x: 1, y: 1, r: 0.5}
 var bgColor= {h: 151,	s: 77,	l: 111,	a: 0} // TODO
 var distributionSliders = {}
@@ -54,47 +55,62 @@ bokeh.run = function () {
 		lineNumbers: true
 		/*matchBrackets: true*/
 	})
-	codeMirror.on("change", function() {})
+//	codeMirror.on("change", function() {})
 	
 	log.init()
 	setUpDistributionSlider("h")
+	setUpDistributionSlider("s")
+	setUpDistributionSlider("a")
+	setUpDistributionSlider("g")
 	setUpKShortcuts()
 	progressParticleSystem()
 }
 
-function setUpDistributionSlider(prop) {
+function setUpDistributionSlider(p) {
 //	var svg = d3.select("#distSliderSVG")
 	// outer rectangle, that contains everything
-	distributionSliders[prop] = {}
+	distributionSliders[p] = {}
 	
-	var svg = distributionSliders[prop].svg = d3.select("#dsvg")
+	var svg = distributionSliders[p].svg = d3.select("#dsvg")
 		.append("svg")
-		.attr("id", "distSliderSVG_"+prop)
+		.attr("id", "distSliderSVG_"+p)
 		.attr("xmlns", "http://www.w3.org/2000/svg")
+		// TODO gives namespace error, but does not seem to matter
 //		.attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
 		.attr("width", 200)
 		.attr("height", 400)
 		.attr("viewBox", "0 0 "+200+" "+400)
 	
 	var defs = svg.append("defs")
-	var allHues = defs.append("linearGradient").attr("id", "allHues")
-	allHues.append("stop").style({"stop-color": "#ff0000", "stop-opacity": "1"}).attr("offset", 0)
-	allHues.append("stop").style({"stop-color": "#ffff00", "stop-opacity": "1"}).attr("offset", 0.18512578)
-	allHues.append("stop").style({"stop-color": "#00ff00", "stop-opacity": "1"}).attr("offset", 0.34256288)
-	allHues.append("stop").style({"stop-color": "#00ffff", "stop-opacity": "1"}).attr("offset", 0.5)
-	allHues.append("stop").style({"stop-color": "#0000ff", "stop-opacity": "1"}).attr("offset", 0.65429997)
-	allHues.append("stop").style({"stop-color": "#ff00ff", "stop-opacity": "1"}).attr("offset", 0.8119877)
-	allHues.append("stop").style({"stop-color": "#ff0000", "stop-opacity": "1"}).attr("offset", 1)
+	var allHues = defs.append("linearGradient").attr("id", "lgrad_h")
+	allHues.append("stop").style({"stop-color": "#ff0000"}).attr("offset", 0)
+	allHues.append("stop").style({"stop-color": "#ffff00"}).attr("offset", 0.18512578)
+	allHues.append("stop").style({"stop-color": "#00ff00"}).attr("offset", 0.34256288)
+	allHues.append("stop").style({"stop-color": "#00ffff"}).attr("offset", 0.5)
+	allHues.append("stop").style({"stop-color": "#0000ff"}).attr("offset", 0.65429997)
+	allHues.append("stop").style({"stop-color": "#ff00ff"}).attr("offset", 0.8119877)
+	allHues.append("stop").style({"stop-color": "#ff0000"}).attr("offset", 1)
 	
-	var whiteShade = defs.append("linearGradient").attr("id", "whiteShade")
-	whiteShade.append("stop").style({"stop-color": "#ffffff", "stop-opacity": "0"}).attr("offset", 0)
-	whiteShade.append("stop").style({"stop-color": "#ffffff", "stop-opacity": ".4"}).attr("offset", 1)
+	var saturation = defs.append("linearGradient").attr("id", "lgrad_s")
+	saturation.append("stop").style({"stop-color": "#888"}).attr("offset", 0)
+	saturation.append("stop").style({"stop-color": "#f00"}).attr("offset", 1).attr("class", "lgrad_hueDependentColour")
+	
+	var alpha = defs.append("linearGradient").attr("id", "lgrad_a")
+	alpha.append("stop").style({"stop-color": "#888", "stop-opacity": "0"}).attr("offset", 0).attr("class", "lgrad_hueDependentColour")
+	alpha.append("stop").style({"stop-color": "#f00"}).attr("offset", 1).attr("class", "lgrad_hueDependentColour")
+	
+	var gamma = defs.append("linearGradient").attr("id", "lgrad_g")
+	gamma.append("stop").style({"stop-color": "#000"}).attr("offset", 0)
+	gamma.append("stop").style({"stop-color": "#fff"}).attr("offset", 1)
 	
 	defs.append("linearGradient")
-		.attr("id", "allHuesVertical")
-		.attr("xlink:href", "#allHues")
+		.attr("id", "lgradVert_"+p)
+		.attr("xlink:href", "#lgrad_"+p)
 		.attr("gradientTransform", "rotate(90)")
 	
+	var whiteShade = defs.append("linearGradient").attr("id", "whiteShade")
+	whiteShade.append("stop").style({"stop-color": "#fff", "stop-opacity": "0"}).attr("offset", 0)
+	whiteShade.append("stop").style({"stop-color": "#fff", "stop-opacity": ".4"}).attr("offset", 1)
 	
 	const opx = 0, opy = 0, ow = 200, oh = 400,
 	// percent of width the scale takes
@@ -102,7 +118,7 @@ function setUpDistributionSlider(prop) {
 	// the drag area rectangle (a portion of outer)
 	px = opx+ow*perc, py = opy, w = ow*(1-perc), h = oh,
 	left = .15, right = .05, top = .01, bottom = .01,
-	topSpan = .7, baseSpan = .8, varianceSpan = .2
+	topSpan = .3, baseSpan = .8, varianceSpan = .2
 	
 	function getPath(x, y) {
 		function bound(l, x, h) { return Math.max(Math.min(x, h), l) }
@@ -111,37 +127,60 @@ function setUpDistributionSlider(prop) {
 		var rY = bound(top, (y-py)/h, 1-bottom)
 		
 		// half y span of ground
-		var vrc = Math.min(1 - rX, (.5 - Math.abs(rY - .5))*2)/2
-		rX = bound(1-vrc*2, rX, 1)
+		var vrc = (1-rX)*.5
+		gMean[p] = (gMax[p] - gMin[p]) * rY
+		// 0.3 is a "looks good" approximation
+		gVar[p] = (gMax[p] - gMin[p]) * vrc * 0.3
 		
-		// TODO
-		gMean.h = (gMax.h - gMin.h) * rY
-		gVar.h = (gMax.h - gMin.h) * vrc * 0.3
-//		bgColor.h = gMean.h
+		// the upper and lower extreme cannot go beyond the border,
+		// because it distorts the background pattern & such a distribution
+		// is not logical
+		var vrcUp = vrc
+		var vrcDown = vrc
+		if (rY-vrc < 0)
+			vrcUp = rY
+		if (rY+vrc > 1)
+			vrcDown -= rY+vrc-1
+		
+		// do not overshoot
+//		vrc = Math.min(vrc, (.5 - Math.abs(rY - .5)))
+//		rX = bound(1-vrc*2, rX, 1)
 		
 		// http://www.w3.org/TR/SVG/paths.html#PathData
 		// the start and end point are only needed for the fill (hueScale)
 		// to be aligned correctly
 		// see DistributionSliderPathIllustration.svg
 		return ("M"+px+","+py
-			+" L"+px+","+(py+(rY - vrc)*h)
-			// start control point, end control point, end point
-			+" c0,"+vrc*baseSpan*h+" "+rX*w+","+vrc*h*topSpan+" "+rX*w+","+vrc*h
-			+" s-"+rX*w+","+vrc*(1-baseSpan)*h+" -"+rX*w+","+vrc*h
+			// upper base point
+			+" L"+px+","+(py+(rY - vrcUp)*h)
+			// base control point
+			+" c0,"+vrcUp*baseSpan*h+" "
+			// peak control point
+			+rX*w+","+(vrcUp*h-Math.min(vrcUp,vrcDown)*h*topSpan)+" "
+			// peak point
+			+rX*w+","+vrcUp*h
+			// base control point
+			+" s-"+rX*w+","+vrcDown*(1-baseSpan)*h
+			// lower base point
+			+" -"+rX*w+","+vrcDown*h
 			+" L"+px+","+(py+h)
 			+"Z")
 	}
 	
-	distributionSliders[prop].updateParticles = function() {
-		if (distributionSliders[prop].dssvgg !== undefined)
-			distributionSliders[prop].dssvgg.remove()
-		distributionSliders[prop].dssvgg = svg
+	distributionSliders[p].updateParticles = function() {
+		if (distributionSliders[p].dssvgg !== undefined)
+			distributionSliders[p].dssvgg.remove()
+		distributionSliders[p].dssvgg = svg
 			.append("g").attr("id", "distSliderSVGcircles")
 		
+		if (p === "h")
+			d3.selectAll(".lgrad_hueDependentColour").style({"stop-color":
+				d3.hsl(gMean.h/255*360, 255/255, 125/255)})
+		
 		for (var i=0; i<pls.length; i++) {
-			var yy =  (pls[i][prop]._ - gMin[prop]) / (gMax[prop]-gMin[prop]) * h
+			var yy =  (pls[i][p]._ - gMin[p]) / (gMax[p]-gMin[p]) * h
 			
-			distributionSliders[prop].dssvgg.append("path")
+			distributionSliders[p].dssvgg.append("path")
 				.attr("d", "M0,"+yy+" L"+ow*perc+","+yy)
 				.style({
 					"stroke": "#fff", // d3.hsl(0/255*360, 0/255, 255/255)
@@ -169,11 +208,28 @@ function setUpDistributionSlider(prop) {
 		.style({"fill": "#fff", "stroke": "#ccc", "stroke-width": 1})
 		.call(drag)
 	
+	
+	
 	var distributionCurve = svg.append("path")
 		.attr("id", "distributionCurve")
-		.attr("d", getPath(px+0.5*w, py+0.5*h))
-		.style({'fill': 'url(#allHuesVertical)', 'fill-opacity': 1, "stroke": "none"})
+		.attr("d", getPath( // 6.7 is an approximation
+			px+w*(1 - gVar[p] / (gMax[p]-gMin[p]) * 6.7),
+			py+h*(gMean[p] - gMin[p]) / (gMax[p]-gMin[p])))
+		.style({'fill': "url(#lgradVert_"+p+")", 'fill-opacity': 1, "stroke": "none"})
 		.call(drag)
+	
+	// produces the opacity background pattern
+	if (p === "a") {
+		var side = ow*perc/4
+		for (var i=0; i<4; i++)
+			for (var k=0; k<=oh/side; k++)
+				svg.append("rect")
+					.attr("width", side)
+					.attr("height", side)
+					.attr("x", opx+i*side)
+					.attr("y", opy+k*side)
+					.style({"fill": (i+k) % 2 ? "#ddd" : "#999"})
+	}
 	
 	svg.append("rect")
 		.attr("id", "scale")
@@ -181,7 +237,14 @@ function setUpDistributionSlider(prop) {
 		.attr("height", oh)
 		.attr("x", opx)
 		.attr("y", opy)
-		.style({'fill': 'url(#allHuesVertical)', 'fill-opacity': 1, "stroke": "none"})
+		.style({'fill': "url(#lgradVert_"+p+")", 'fill-opacity': 1, "stroke": "none"})
+	
+	if (p === "g") {
+		svg.append("path").style({'fill': "#ddd"})
+			.attr("d", "M"+opx+","+opy+" L"+opx+","+opy+h+" L"+opx+ow*perc*.5+","+opy)
+		svg.append("path").style({'fill': "#ddd"})
+			.attr("d", "M"+opx+ow*perc+","+opy+" L"+opx+ow*perc+","+opy+h+" L"+opx+ow*perc*.5+","+opy)
+	}
 
 	svg.append("rect")
 		.attr("id", "whiteOverlay")
@@ -190,6 +253,11 @@ function setUpDistributionSlider(prop) {
 		.attr("x", opx+ow*perc*0.5)
 		.attr("y", opy)
 		.style({'fill': 'url(#whiteShade)', 'fill-opacity': 1, "stroke": "none"})
+	
+	svg.append("text")
+		.attr("x", opx+ow*(perc+.03))
+		.attr("y", opy+oh*.05)
+		.text(propFullName[p])
 	
 }
 
@@ -260,7 +328,8 @@ function progressParticleSystem() {
 	}
 
 	log.updateLog()
-	distributionSliders.h.updateParticles()
+	for(var prop in distributionSliders)
+		distributionSliders[prop].updateParticles()
 	
 	for (var i=0; i<pls.length; i++) {
 		var p = pls[i]
