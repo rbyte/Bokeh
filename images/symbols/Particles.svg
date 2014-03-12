@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="442.57144"
+   height="442.57144"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="Particles.svg"
+   inkscape:export-filename="/home/matmax/my/ablage/Particles.png"
+   inkscape:export-xdpi="10.16785"
+   inkscape:export-ydpi="10.16785">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3767">
+      <stop
+         id="stop3769"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:0;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="0.80310881"
+         id="stop3773" />
+      <stop
+         id="stop3771"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0.07843138;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3755">
+      <stop
+         style="stop-color:#fe0000;stop-opacity:1;"
+         offset="0"
+         id="stop3757" />
+      <stop
+         style="stop-color:#7f7f7f;stop-opacity:1;"
+         offset="1"
+         id="stop3759" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3767"
+       id="radialGradient3765"
+       cx="369.28571"
+       cy="330.21933"
+       fx="369.28571"
+       fy="330.21933"
+       r="220.28572"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="68.753331"
+     inkscape:cy="263.61414"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="2"
+     fit-margin-left="2"
+     fit-margin-right="2"
+     fit-margin-bottom="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1141"
+     inkscape:window-x="1280"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-147.99998,-108.93361)">
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:#e6e6e6;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path3753"
+       sodipodi:cx="369.28571"
+       sodipodi:cy="330.21933"
+       sodipodi:rx="219.28572"
+       sodipodi:ry="219.28572"
+       d="m 588.57143,330.21933 c 0,121.10816 -98.17756,219.28572 -219.28572,219.28572 -121.10816,0 -219.28573,-98.17756 -219.28573,-219.28572 0,-121.10816 98.17757,-219.28572 219.28573,-219.28572 121.10816,0 219.28572,98.17756 219.28572,219.28572 z"
+       transform="matrix(0.92964828,0,0,0.92964828,26.809717,23.231498)" />
+    <path
+       d="m 588.57143,330.21933 c 0,121.10816 -98.17756,219.28572 -219.28572,219.28572 -121.10816,0 -219.28573,-98.17756 -219.28573,-219.28572 0,-121.10816 98.17757,-219.28572 219.28573,-219.28572 121.10816,0 219.28572,98.17756 219.28572,219.28572 z"
+       sodipodi:ry="219.28572"
+       sodipodi:rx="219.28572"
+       sodipodi:cy="330.21933"
+       sodipodi:cx="369.28571"
+       id="path3763"
+       style="color:#000000;fill:url(#radialGradient3765);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       sodipodi:type="arc"
+       transform="matrix(0.92964828,0,0,0.92964828,26.809717,23.231498)" />
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:#00277f;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:20;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path3764"
+       sodipodi:cx="-4.5456862"
+       sodipodi:cy="199.62976"
+       sodipodi:rx="21.718279"
+       sodipodi:ry="21.718279"
+       d="m 17.172593,199.62976 a 21.718279,21.718279 0 1 1 -43.436558,0 21.718279,21.718279 0 1 1 43.436558,0 z"
+       transform="matrix(0.4907094,0,0,0.4907094,41.639187,-32.843593)" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#path3764"
+       id="use3766"
+       transform="translate(480.83262,281.83256)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3766"
+       id="use3768"
+       transform="translate(-151.5229,125.25892)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3768"
+       id="use3770"
+       transform="translate(10.101526,-47.477169)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3770"
+       id="use3772"
+       transform="translate(68.690373,-138.3909)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3772"
+       id="use3774"
+       transform="translate(47.477171,153.54319)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3774"
+       id="use3776"
+       transform="translate(-207.08126,25.253813)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3776"
+       id="use3778"
+       transform="translate(147.48227,-261.62951)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#path3764"
+       id="use3780"
+       transform="translate(290.92393,427.29453)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3776"
+       id="use3782"
+       transform="translate(-56.568543,-95.964491)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3774"
+       id="use3784"
+       transform="translate(-264.65996,-158.59395)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3768"
+       id="use3786"
+       transform="translate(-41.416254,-273.75134)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#path3764"
+       id="use3788"
+       transform="translate(300.01531,229.30463)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#path3764"
+       id="use3790"
+       transform="translate(365.67522,277.79195)"
+       width="442.57144"
+       height="442.57144" />
+    <text
+       xml:space="preserve"
+       style="font-size:42.77616882px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:125%;letter-spacing:0px;word-spacing:0.0178234px;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Linux Libertine;-inkscape-font-specification:Linux Libertine"
+       x="14.247285"
+       y="39.174347"
+       id="text3792"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3794"
+         x="14.247285"
+         y="39.174347">ref</tspan></text>
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3786"
+       id="use3796"
+       transform="translate(89.903577,273.75135)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3768"
+       id="use3798"
+       transform="translate(84.852818,-79.802051)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3768"
+       id="use3800"
+       transform="translate(-41.416255,-26.263967)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3800"
+       id="use3802"
+       transform="translate(-43.436559,-38.385797)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3802"
+       id="use3804"
+       transform="translate(45.456864,-37.375644)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3800"
+       id="use3806"
+       transform="translate(112.12693,-5.0507623)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3806"
+       id="use3808"
+       transform="translate(17.172593,34.345187)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3768"
+       id="use3810"
+       transform="translate(25.253813,26.263966)"
+       width="442.57144"
+       height="442.57144" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#use3802"
+       id="use3812"
+       transform="translate(-45.456864,22.223356)"
+       width="442.57144"
+       height="442.57144" />
+  </g>
+</svg>

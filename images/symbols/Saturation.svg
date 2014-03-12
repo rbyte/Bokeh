@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="442.57144"
+   height="442.57144"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="Saturation.svg"
+   inkscape:export-filename="/home/matmax/my/ablage/Saturation.png"
+   inkscape:export-xdpi="10.16785"
+   inkscape:export-ydpi="10.16785">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3767">
+      <stop
+         id="stop3769"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:0;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="0.80310881"
+         id="stop3773" />
+      <stop
+         id="stop3771"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0.07843138;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3755">
+      <stop
+         style="stop-color:#fe0000;stop-opacity:1;"
+         offset="0"
+         id="stop3757" />
+      <stop
+         style="stop-color:#7f7f7f;stop-opacity:1;"
+         offset="1"
+         id="stop3759" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3755"
+       id="linearGradient3761"
+       x1="369.28552"
+       y1="109.93343"
+       x2="369.28552"
+       y2="548.83179"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3767"
+       id="radialGradient3765"
+       cx="369.28571"
+       cy="330.21933"
+       fx="369.28571"
+       fy="330.21933"
+       r="220.28572"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="177.77506"
+     inkscape:cy="226.88291"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="2"
+     fit-margin-left="2"
+     fit-margin-right="2"
+     fit-margin-bottom="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1141"
+     inkscape:window-x="1280"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-147.99998,-108.93361)">
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:url(#linearGradient3761);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path3753"
+       sodipodi:cx="369.28571"
+       sodipodi:cy="330.21933"
+       sodipodi:rx="219.28572"
+       sodipodi:ry="219.28572"
+       d="m 588.57143,330.21933 c 0,121.10816 -98.17756,219.28572 -219.28572,219.28572 -121.10816,0 -219.28573,-98.17756 -219.28573,-219.28572 0,-121.10816 98.17757,-219.28572 219.28573,-219.28572 121.10816,0 219.28572,98.17756 219.28572,219.28572 z" />
+    <path
+       d="m 588.57143,330.21933 c 0,121.10816 -98.17756,219.28572 -219.28572,219.28572 -121.10816,0 -219.28573,-98.17756 -219.28573,-219.28572 0,-121.10816 98.17757,-219.28572 219.28573,-219.28572 121.10816,0 219.28572,98.17756 219.28572,219.28572 z"
+       sodipodi:ry="219.28572"
+       sodipodi:rx="219.28572"
+       sodipodi:cy="330.21933"
+       sodipodi:cx="369.28571"
+       id="path3763"
+       style="color:#000000;fill:url(#radialGradient3765);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       sodipodi:type="arc" />
+  </g>
+</svg>

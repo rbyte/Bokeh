@@ -52,3 +52,48 @@ body {
 	stroke: black;
 	stroke-width: 1px;
 }
+.distributionCurve {
+	cursor: crosshair;
+}
+
+.menu {
+	position: absolute;
+	top: 10%;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.menu li img {
+	display: block;
+	border-radius: 5px;
+}
+.menu li {
+    position: relative;
+    display: block;
+	padding: 5px;
+	background: rgba(0, 0, 0, 0.0);
+    white-space: nowrap;
+	cursor: pointer;
+	-moz-user-select: none;
+	transition: background 300ms ease-in-out, box-shadow 300ms ease-in-out;
+}
+.menu li:hover {
+	background: rgba(210, 210, 210, 0.8);
+}
+.mLeft {
+	left: 0;
+}
+.mRight {
+	right: 0;
+	opacity: 0.4;
+}
+.hidden {
+	display: none;
+}
+#dsvg {
+	position: absolute;
+	left: 10%;
+}
+.toggledOn {
+	background-color: #555 !important;
+}

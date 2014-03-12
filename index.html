@@ -12,6 +12,25 @@
 </head>
 
 <body>
+	
+	<ul class="menu mLeft">
+		<li id="li_h" title="Hue" onclick="bokeh.clickHue()" onmouseover="bokeh.mouseoverHue()" onmouseout="bokeh.mouseoutHue()"><img src="images/symbols/hue.png" /></li>
+		<li id="li_s" title="Saturation" onclick="bokeh.clickSaturation()" onmouseover="bokeh.mouseoverSaturation()" onmouseout="bokeh.mouseoutSaturation()"><img src="images/symbols/Saturation.png" /></li>
+		<li id="li_g" title="Blur" onclick="bokeh.clickGamma()" onmouseover="bokeh.mouseoverGamma()" onmouseout="bokeh.mouseoutGamma()"><img src="images/symbols/Gamma.png" /></li>
+		<li id="li_a" title="Alpha" onclick="bokeh.clickAlpha()" onmouseover="bokeh.mouseoverAlpha()" onmouseout="bokeh.mouseoutAlpha()"><img src="images/symbols/AlphaSymbol.png" /></li>
+		<li id="li_r" title="Radius" onclick="bokeh.clickRadius()" onmouseover="bokeh.mouseoverRadius()" onmouseout="bokeh.mouseoutRadius()"><img src="images/symbols/Radius.png" /></li>
+		<li onclick="bokeh.clickParticle()" onmouseover="bokeh.mouseoverParticle()" onmouseout="bokeh.mouseoutParticle()"><img src="images/symbols/Particles.png" /></li>
+		<li onclick="bokeh.clickBackground()" onmouseover="bokeh.mouseoverBackground()" onmouseout="bokeh.mouseoutBackground()"><img src="images/symbols/Background.png" /></li>
+		<!--<li></li>-->
+	</ul>
+	
+	<ul class="menu mRight">
+		<li onclick="bokeh.clickBackground()" onmouseover="bokeh.mouseoverBackground()"><img src="images/symbols/Size.png" /></li> <!-- + - and wheel! -->
+		<li onclick="bokeh.clickTransition()" onmouseover="bokeh.mouseoverTransition()"><img src="images/symbols/Transition.png" /></li>
+		<li onclick="bokeh.clickDownload()" onmouseover="bokeh.mouseoverDownload()"><img src="images/symbols/Download.png" /></li>
+		<li onclick="bokeh.clickSource()" onmouseover="bokeh.mouseoverSource()"><img src="images/symbols/Source.png" /></li>
+		<!--<li></li>-->
+	</ul>
 
 <div id="svgWrapper">
 <span class="helperSpanToAlignImageVertically"></span>
@@ -27,64 +46,11 @@
 ]]></style>
 
 	<defs>
-		<linearGradient id="allHues">
-		  <stop style="stop-color:#ff0000;stop-opacity:1" offset="0" />
-		  <stop style="stop-color:#ffff00;stop-opacity:1" offset="0.18512578" />
-		  <stop style="stop-color:#00ff00;stop-opacity:1" offset="0.34256288" />
-		  <stop style="stop-color:#00ffff;stop-opacity:1" offset="0.5" />
-		  <stop style="stop-color:#0000ff;stop-opacity:1" offset="0.65429997" />
-		  <stop style="stop-color:#ff00ff;stop-opacity:1" offset="0.8119877" />
-		  <stop style="stop-color:#ff0000;stop-opacity:1" offset="1" />
-		</linearGradient>
-
-		<linearGradient id="whiteShade">
-		  <stop style="stop-color:#ffffff;stop-opacity:0" offset="0" />
-		  <stop style="stop-color:#ffffff;stop-opacity:.4" offset="1" />
-		</linearGradient>
-
-		<linearGradient
-		   id="allHuesVertical"
-		   xlink:href="#allHues"
-		   gradientTransform="rotate(90)" />
 	</defs>
 
 </svg>
 </div>
 
-<svg id="distSliderSVG"
-	xmlns="http://www.w3.org/2000/svg"
-	xmlns:xlink="http://www.w3.org/1999/xlink"
-	width="300px"
-	height="600px"
->
-
-    <style type="text/css"><![CDATA[
-	]]></style>
-
-  <defs>
-
-    <linearGradient id="allHues">
-      <stop style="stop-color:#ff0000;stop-opacity:1" offset="0" />
-      <stop style="stop-color:#ffff00;stop-opacity:1" offset="0.18512578" />
-      <stop style="stop-color:#00ff00;stop-opacity:1" offset="0.34256288" />
-      <stop style="stop-color:#00ffff;stop-opacity:1" offset="0.5" />
-      <stop style="stop-color:#0000ff;stop-opacity:1" offset="0.65429997" />
-      <stop style="stop-color:#ff00ff;stop-opacity:1" offset="0.8119877" />
-      <stop style="stop-color:#ff0000;stop-opacity:1" offset="1" />
-    </linearGradient>
-	
-    <linearGradient id="whiteShade">
-      <stop style="stop-color:#ffffff;stop-opacity:0" offset="0" />
-      <stop style="stop-color:#ffffff;stop-opacity:.4" offset="1" />
-    </linearGradient>
-	
-    <linearGradient
-       id="allHuesVertical"
-       xlink:href="#allHues"
-       gradientTransform="rotate(90)" />
-  </defs>
-
-</svg>
 
 <div id="fps"></div>
 

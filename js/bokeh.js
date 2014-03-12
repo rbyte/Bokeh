@@ -4,12 +4,12 @@ var bokeh = {}
 
 var svgWidth = 400
 var svgHeight = 300
-var SVGsizeInWindow = 0.3 // percent
-var codeMirror
+var SVGsizeInWindow = 0.2 // percent
+var codeMirror = {inUse: false}
 
 var properties = ["x","y","r","h","s","l","a","g"]
 var propFullName = {x: "Horizonal Position", y: "Vertical Position", r: "Radius",
-	h: "Hue", s: "Saturation", l: "Lightness", a: "Alpha/Opacity", g: "Gauss Smoothing"}
+	h: "Hue", s: "Saturation", l: "Lightness", a: "Alpha", g: /*Gauss Smoothing*/ "Blur"}
 
 var gMean=	{h: 140,	s: 180,	l: 180,	a: .20,	g: svgWidth*.04,	x: svgWidth*.5,		y: svgHeight*.5,	r: svgWidth*.15}
 var gVar=	{h: 7,		s: 10,	l: 40,	a: .10,	g: svgWidth*.025,	x: svgWidth*.22,	y: svgHeight*.22,	r: svgWidth*.07}
@@ -47,15 +47,7 @@ var lastFPSupdate
 
 bokeh.run = function () {
 	setUpSVG()
-	
-	codeMirror = CodeMirror(document.body, {
-		value: "",
-		mode: "javascript",
-		indentWithTabs: true,
-		lineNumbers: true
-		/*matchBrackets: true*/
-	})
-//	codeMirror.on("change", function() {})
+	codeMirror.init()
 	
 	log.init()
 	setUpDistributionSlider("h")
@@ -64,6 +56,19 @@ bokeh.run = function () {
 	setUpDistributionSlider("g")
 	setUpKShortcuts()
 	progressParticleSystem()
+}
+
+codeMirror.init = function() {
+	if (this.inUse) {
+		codeMirror._ = CodeMirror(document.body, {
+			value: "",
+			mode: "javascript",
+			indentWithTabs: true,
+			lineNumbers: true
+			/*matchBrackets: true*/
+		})
+		codeMirror._.on("change", function() {})
+	}
 }
 
 function setUpDistributionSlider(p) {
@@ -80,9 +85,14 @@ function setUpDistributionSlider(p) {
 		.attr("width", 200)
 		.attr("height", 400)
 		.attr("viewBox", "0 0 "+200+" "+400)
+		.attr("class", "hidden")
+		.attr("isToggledOn", "false") // custom; via click
 	
 	var defs = svg.append("defs")
-	var allHues = defs.append("linearGradient").attr("id", "lgrad_h")
+	// every distributionSlider has defs for all types
+	// if one svg is display: hidden, its def ids cannot be referenced anymore
+	// therefore, the ids have to be specific to each svg
+	var allHues = defs.append("linearGradient").attr("id", "lgrad_h_"+p)
 	allHues.append("stop").style({"stop-color": "#ff0000"}).attr("offset", 0)
 	allHues.append("stop").style({"stop-color": "#ffff00"}).attr("offset", 0.18512578)
 	allHues.append("stop").style({"stop-color": "#00ff00"}).attr("offset", 0.34256288)
@@ -91,21 +101,21 @@ function setUpDistributionSlider(p) {
 	allHues.append("stop").style({"stop-color": "#ff00ff"}).attr("offset", 0.8119877)
 	allHues.append("stop").style({"stop-color": "#ff0000"}).attr("offset", 1)
 	
-	var saturation = defs.append("linearGradient").attr("id", "lgrad_s")
+	var saturation = defs.append("linearGradient").attr("id", "lgrad_s_"+p)
 	saturation.append("stop").style({"stop-color": "#888"}).attr("offset", 0)
 	saturation.append("stop").style({"stop-color": "#f00"}).attr("offset", 1).attr("class", "lgrad_hueDependentColour")
 	
-	var alpha = defs.append("linearGradient").attr("id", "lgrad_a")
+	var alpha = defs.append("linearGradient").attr("id", "lgrad_a_"+p)
 	alpha.append("stop").style({"stop-color": "#888", "stop-opacity": "0"}).attr("offset", 0).attr("class", "lgrad_hueDependentColour")
 	alpha.append("stop").style({"stop-color": "#f00"}).attr("offset", 1).attr("class", "lgrad_hueDependentColour")
 	
-	var gamma = defs.append("linearGradient").attr("id", "lgrad_g")
+	var gamma = defs.append("linearGradient").attr("id", "lgrad_g_"+p)
 	gamma.append("stop").style({"stop-color": "#000"}).attr("offset", 0)
 	gamma.append("stop").style({"stop-color": "#fff"}).attr("offset", 1)
 	
 	defs.append("linearGradient")
 		.attr("id", "lgradVert_"+p)
-		.attr("xlink:href", "#lgrad_"+p)
+		.attr("xlink:href", "#lgrad_"+p+"_"+p)
 		.attr("gradientTransform", "rotate(90)")
 	
 	var whiteShade = defs.append("linearGradient").attr("id", "whiteShade")
@@ -121,6 +131,7 @@ function setUpDistributionSlider(p) {
 	topSpan = .3, baseSpan = .8, varianceSpan = .2
 	
 	function getPath(x, y) {
+		x += 3 // so that the cursor is always inside the curve area -> crosshair
 		function bound(l, x, h) { return Math.max(Math.min(x, h), l) }
 		// mouse position x & y, relative to box and forced into margin
 		var rX = bound(left, (x-px)/w, 1-right)
@@ -199,23 +210,21 @@ function setUpDistributionSlider(p) {
 	}
 	
 	svg.append("rect")
-		.attr("id", "dragArea")
+		.attr("class", "dragArea")
 		.attr("x", px)
 		.attr("y", py)
 		.attr("width", w)
 		.attr("height", h)
 		// fill "none" will disable drag
-		.style({"fill": "#fff", "stroke": "#ccc", "stroke-width": 1})
+		.style({"fill": "none", "stroke": "#ccc", "stroke-width": 1})
 		.call(drag)
 	
-	
-	
 	var distributionCurve = svg.append("path")
-		.attr("id", "distributionCurve")
+		.attr("class", "distributionCurve")
 		.attr("d", getPath( // 6.7 is an approximation
 			px+w*(1 - gVar[p] / (gMax[p]-gMin[p]) * 6.7),
 			py+h*(gMean[p] - gMin[p]) / (gMax[p]-gMin[p])))
-		.style({'fill': "url(#lgradVert_"+p+")", 'fill-opacity': 1, "stroke": "none"})
+		.style({'fill': "url(#lgradVert_"+p+")"})
 		.call(drag)
 	
 	// produces the opacity background pattern
@@ -232,12 +241,12 @@ function setUpDistributionSlider(p) {
 	}
 	
 	svg.append("rect")
-		.attr("id", "scale")
+		.attr("class", "scale")
 		.attr("width", ow*perc)
 		.attr("height", oh)
 		.attr("x", opx)
 		.attr("y", opy)
-		.style({'fill': "url(#lgradVert_"+p+")", 'fill-opacity': 1, "stroke": "none"})
+		.style({'fill': "url(#lgradVert_"+p+")"})
 	
 	if (p === "g") {
 		svg.append("path").style({'fill': "#ddd"})
@@ -247,12 +256,12 @@ function setUpDistributionSlider(p) {
 	}
 
 	svg.append("rect")
-		.attr("id", "whiteOverlay")
+		.attr("class", "whiteOverlay")
 		.attr("width", ow*perc*0.5)
 		.attr("height", oh)
 		.attr("x", opx+ow*perc*0.5)
 		.attr("y", opy)
-		.style({'fill': 'url(#whiteShade)', 'fill-opacity': 1, "stroke": "none"})
+		.style({'fill': 'url(#whiteShade)'})
 	
 	svg.append("text")
 		.attr("x", opx+ow*(perc+.03))
@@ -284,13 +293,12 @@ function progressParticleSystem() {
 		return
 
 	updateFpsCounter()
-
-	try {
-		eval(codeMirror.getValue())
-	} catch(e) {
-		if (e instanceof SyntaxError) {
-
-		} else {
+	
+	if (codeMirror.inUse) {
+		try {
+			eval(codeMirror._.getValue())
+		} catch(e) {
+//			if (e instanceof SyntaxError) {
 			console.log(e)
 		}
 	}
@@ -685,6 +693,60 @@ function setUpKShortcuts() {
 		}
 	}, false)
 }
+
+function distributionSliderHide(p, hide) {
+	var ds = d3.select("#distSliderSVG_"+p)
+	if (ds.attr("isToggledOn") === "false")
+		ds.classed("hidden", hide)
+}
+
+function distributionSliderToggle(p) {
+	// if toogled, it is visible, because the mouse has to be on the symbol
+	var ds = d3.select("#distSliderSVG_"+p)
+	var toggledOn = ds.attr("isToggledOn") === "false"
+	ds.attr("isToggledOn", toggledOn ? "true" : "false")
+	d3.select("#li_"+p).classed("toggledOn", toggledOn)
+}
+
+bokeh.clickHue = function() { distributionSliderToggle("h") }
+bokeh.clickSaturation = function() { distributionSliderToggle("s") }
+bokeh.clickGamma = function() { distributionSliderToggle("g") }
+bokeh.clickAlpha = function() { distributionSliderToggle("a") }
+bokeh.clickRadius = function() { distributionSliderToggle("r") }
+bokeh.clickParticle = function() {}
+bokeh.clickBackground = function() {}
+
+bokeh.clickSize = function() {}
+bokeh.clickTransition = function() {}
+bokeh.clickDownload = function() {}
+bokeh.clickSource = function() {}
+
+
+bokeh.mouseoverHue = function() { distributionSliderHide("h", false) }
+bokeh.mouseoutHue = function() { distributionSliderHide("h", true) }
+bokeh.mouseoverSaturation = function() { distributionSliderHide("s", false) }
+bokeh.mouseoutSaturation = function() { distributionSliderHide("s", true) }
+bokeh.mouseoverGamma = function() { distributionSliderHide("g", false) }
+bokeh.mouseoutGamma = function() { distributionSliderHide("g", true) }
+bokeh.mouseoverAlpha = function() { distributionSliderHide("a", false) }
+bokeh.mouseoutAlpha = function() { distributionSliderHide("a", true) }
+bokeh.mouseoverRadius = function() { distributionSliderHide("r", false) }
+bokeh.mouseoutRadius = function() { distributionSliderHide("r", true) }
+bokeh.mouseoverParticle = function() {}
+bokeh.mouseoutParticle = function() {}
+bokeh.mouseoverBackground = function() {}
+bokeh.mouseoutBackground = function() {}
+
+bokeh.mouseoverSize = function() {}
+bokeh.mouseoutSize = function() {}
+bokeh.mouseoverTransition = function() {}
+bokeh.mouseoutTransition = function() {}
+bokeh.mouseoverDownload = function() {}
+bokeh.mouseoutDownload = function() {}
+bokeh.mouseoverSource = function() {}
+bokeh.mouseoutSource = function() {}
+
+
 
 return bokeh
 }()
