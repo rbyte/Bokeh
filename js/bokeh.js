@@ -14,7 +14,7 @@ var propFullName = {x: "Horizonal Position", y: "Vertical Position", r: "Radius"
 var gMean=	{h: 140,	s: 180,	l: 180,	a: .20,	g: svgWidth*.04,	x: svgWidth*.5,		y: svgHeight*.5,	r: svgWidth*.15}
 var gVar=	{h: 7,		s: 10,	l: 40,	a: .10,	g: svgWidth*.025,	x: svgWidth*.22,	y: svgHeight*.22,	r: svgWidth*.07}
 var gMin=	{h: 0,		s: 0,	l: 0,	a: 0,	g: svgWidth*.002,	x: svgWidth*-.20,	y: svgHeight*-.20,	r: svgWidth*0}
-var gMax=	{h: 255,	s: 255,	l: 255,	a: .8,	g: svgWidth*.2,		x: svgWidth*1.20,	y: svgHeight*1.20,	r: svgWidth*1}
+var gMax=	{h: 255,	s: 255,	l: 255,	a: .8,	g: svgWidth*.1,		x: svgWidth*1.20,	y: svgHeight*1.20,	r: svgWidth*1}
 var actF=	{h: 1,		s: 1,	l: 1,	a: 1,	g: 1, x: 1, y: 1, r: 0.5}
 var bgColor= {h: 151,	s: 77,	l: 111,	a: 0} // TODO
 var distributionSliders = {}
@@ -54,6 +54,20 @@ bokeh.run = function () {
 	setUpDistributionSlider("s")
 	setUpDistributionSlider("a")
 	setUpDistributionSlider("g")
+	setUpDistributionSlider("r")
+	
+	var shapeScaleSlider = d3.slider()
+		.min(1)
+		.max(100)
+		.step(1)
+		.value(numberOfParticles)
+		.on("slide", function(evt, value) {
+//			console.log("baal: "+value)
+			if (!isNaN(value))
+				numberOfParticles = value
+		})
+	d3.select("#particleSlider").call(shapeScaleSlider)	
+	
 	setUpKShortcuts()
 	progressParticleSystem()
 }
@@ -82,8 +96,8 @@ function setUpDistributionSlider(p) {
 		.attr("xmlns", "http://www.w3.org/2000/svg")
 		// TODO gives namespace error, but does not seem to matter
 //		.attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
-		.attr("width", 200)
-		.attr("height", 400)
+//		.attr("width", 200)
+//		.attr("height", 400)
 		.attr("viewBox", "0 0 "+200+" "+400)
 		.attr("class", "hidden")
 		.attr("isToggledOn", "false") // custom; via click
@@ -113,6 +127,10 @@ function setUpDistributionSlider(p) {
 	gamma.append("stop").style({"stop-color": "#000"}).attr("offset", 0)
 	gamma.append("stop").style({"stop-color": "#fff"}).attr("offset", 1)
 	
+	var radius = defs.append("linearGradient").attr("id", "lgrad_r_"+p)
+	radius.append("stop").style({"stop-color": d3.hsl(147/255*360, 194/255, 138/255)}).attr("offset", 0)
+	radius.append("stop").style({"stop-color": "#fff"}).attr("offset", 1)
+	
 	defs.append("linearGradient")
 		.attr("id", "lgradVert_"+p)
 		.attr("xlink:href", "#lgrad_"+p+"_"+p)
@@ -139,9 +157,13 @@ function setUpDistributionSlider(p) {
 		
 		// half y span of ground
 		var vrc = (1-rX)*.5
+		var pre = gMean[p]
 		gMean[p] = (gMax[p] - gMin[p]) * rY
+		console.log(pre+" -> "+gMean[p])
+		pre = gVar[p]
 		// 0.3 is a "looks good" approximation
 		gVar[p] = (gMax[p] - gMin[p]) * vrc * 0.3
+		console.log(pre+" -> "+gVar[p])
 		
 		// the upper and lower extreme cannot go beyond the border,
 		// because it distorts the background pattern & such a distribution
@@ -231,7 +253,7 @@ function setUpDistributionSlider(p) {
 	if (p === "a") {
 		var side = ow*perc/4
 		for (var i=0; i<4; i++)
-			for (var k=0; k<=oh/side; k++)
+			for (var k=0; k<oh/side; k++)
 				svg.append("rect")
 					.attr("width", side)
 					.attr("height", side)
@@ -708,43 +730,52 @@ function distributionSliderToggle(p) {
 	d3.select("#li_"+p).classed("toggledOn", toggledOn)
 }
 
-bokeh.clickHue = function() { distributionSliderToggle("h") }
-bokeh.clickSaturation = function() { distributionSliderToggle("s") }
-bokeh.clickGamma = function() { distributionSliderToggle("g") }
-bokeh.clickAlpha = function() { distributionSliderToggle("a") }
-bokeh.clickRadius = function() { distributionSliderToggle("r") }
-bokeh.clickParticle = function() {}
-bokeh.clickBackground = function() {}
-
-bokeh.clickSize = function() {}
-bokeh.clickTransition = function() {}
-bokeh.clickDownload = function() {}
-bokeh.clickSource = function() {}
 
 
 bokeh.mouseoverHue = function() { distributionSliderHide("h", false) }
 bokeh.mouseoutHue = function() { distributionSliderHide("h", true) }
+bokeh.clickHue = function() { distributionSliderToggle("h") }
+
 bokeh.mouseoverSaturation = function() { distributionSliderHide("s", false) }
 bokeh.mouseoutSaturation = function() { distributionSliderHide("s", true) }
+bokeh.clickSaturation = function() { distributionSliderToggle("s") }
+
 bokeh.mouseoverGamma = function() { distributionSliderHide("g", false) }
 bokeh.mouseoutGamma = function() { distributionSliderHide("g", true) }
+bokeh.clickGamma = function() { distributionSliderToggle("g") }
+
 bokeh.mouseoverAlpha = function() { distributionSliderHide("a", false) }
 bokeh.mouseoutAlpha = function() { distributionSliderHide("a", true) }
+bokeh.clickAlpha = function() { distributionSliderToggle("a") }
+
 bokeh.mouseoverRadius = function() { distributionSliderHide("r", false) }
 bokeh.mouseoutRadius = function() { distributionSliderHide("r", true) }
+bokeh.clickRadius = function() { distributionSliderToggle("r") }
+
 bokeh.mouseoverParticle = function() {}
 bokeh.mouseoutParticle = function() {}
+bokeh.clickParticle = function() {}
+
 bokeh.mouseoverBackground = function() {}
 bokeh.mouseoutBackground = function() {}
+bokeh.clickBackground = function() {}
 
+// right
 bokeh.mouseoverSize = function() {}
 bokeh.mouseoutSize = function() {}
+bokeh.clickSize = function() {}
+
 bokeh.mouseoverTransition = function() {}
 bokeh.mouseoutTransition = function() {}
+bokeh.clickTransition = function() {}
+
 bokeh.mouseoverDownload = function() {}
 bokeh.mouseoutDownload = function() {}
+bokeh.clickDownload = function() {}
+
 bokeh.mouseoverSource = function() {}
 bokeh.mouseoutSource = function() {}
+bokeh.clickSource = function() {}
 
 
 

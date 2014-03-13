@@ -5,7 +5,9 @@
 	<title>Bokeh</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css"/>
 	<link rel="stylesheet" type="text/css" href="codemirror/lib/codemirror.css">
+	<link rel="stylesheet" type="text/css" href="css/d3.slider.css"/>
 	<script type="text/javascript" src='js/d3.v3.min.js'></script>
+	<script type="text/javascript" src="js/d3.slider.js"></script>
 	<script type="text/javascript" src="codemirror/lib/codemirror.js"></script>
 	<script type="text/javascript" src="codemirror/mode/javascript/javascript.js"></script>
 	<script type="text/javascript" src='js/bokeh.js'></script>
@@ -19,8 +21,15 @@
 		<li id="li_g" title="Blur" onclick="bokeh.clickGamma()" onmouseover="bokeh.mouseoverGamma()" onmouseout="bokeh.mouseoutGamma()"><img src="images/symbols/Gamma.png" /></li>
 		<li id="li_a" title="Alpha" onclick="bokeh.clickAlpha()" onmouseover="bokeh.mouseoverAlpha()" onmouseout="bokeh.mouseoutAlpha()"><img src="images/symbols/AlphaSymbol.png" /></li>
 		<li id="li_r" title="Radius" onclick="bokeh.clickRadius()" onmouseover="bokeh.mouseoverRadius()" onmouseout="bokeh.mouseoutRadius()"><img src="images/symbols/Radius.png" /></li>
-		<li onclick="bokeh.clickParticle()" onmouseover="bokeh.mouseoverParticle()" onmouseout="bokeh.mouseoutParticle()"><img src="images/symbols/Particles.png" /></li>
-		<li onclick="bokeh.clickBackground()" onmouseover="bokeh.mouseoverBackground()" onmouseout="bokeh.mouseoutBackground()"><img src="images/symbols/Background.png" /></li>
+		<li title="Number of Particles" onclick="bokeh.clickParticle()" onmouseover="bokeh.mouseoverParticle()" onmouseout="bokeh.mouseoutParticle()"><img src="images/symbols/Particles.png" />
+<!--			<ul><li>-->
+			<div id="particleSliderWrapper">
+				<span class="helperSpanToAlignImageVertically"></span>
+				<div id="particleSlider"></div>
+			</div>
+			<!--</li></ul>-->
+		</li>
+		<li title="Background Colour" onclick="bokeh.clickBackground()" onmouseover="bokeh.mouseoverBackground()" onmouseout="bokeh.mouseoutBackground()"><img src="images/symbols/Background.png" /></li>
 		<!--<li></li>-->
 	</ul>
 	

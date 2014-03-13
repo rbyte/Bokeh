@@ -63,6 +63,13 @@ body {
 	padding: 0;
 	list-style: none;
 }
+.mLeft {
+	left: 0;
+}
+.mRight {
+	right: 0;
+	opacity: 0.4;
+}
 .menu li img {
 	display: block;
 	border-radius: 5px;
@@ -80,20 +87,41 @@ body {
 .menu li:hover {
 	background: rgba(210, 210, 210, 0.8);
 }
-.mLeft {
-	left: 0;
+.menu li:hover div {
+    display: inline-block !important;
 }
-.mRight {
-	right: 0;
-	opacity: 0.4;
-}
+
+
 .hidden {
 	display: none;
 }
-#dsvg {
-	position: absolute;
-	left: 10%;
-}
 .toggledOn {
 	background-color: #555 !important;
+}
+#dsvg {
+	position: fixed;
+	left: 10%;
+	top: 10%;
+	width: 80%;
+	height: 80%;
+}
+#dsvg svg {
+	width: 20%;
+	height: 100%;
+}
+#particleSliderWrapper {
+	position: absolute;
+	/*text-align: center;*/
+	left: 100%;
+	top: 0;
+	height: 80%;
+	display: none;
+	background-color: #eee;
+	width: 215px;
+	padding: 10%;
+}
+#particleSlider {
+	width: 200px;
+	height: 80%;
+	vertical-align: middle;
 }
