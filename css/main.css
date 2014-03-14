@@ -70,7 +70,7 @@ body {
 .menu li {
     position: relative;
     /*display: block;*/
-	padding: 5px;
+	padding: 10px;
 	background: rgba(0, 0, 0, 0.0);
     white-space: nowrap;
 	cursor: pointer;
@@ -80,8 +80,10 @@ body {
 .menu li:hover {
 	background: rgba(210, 210, 210, 0.8);
 }
-.menu li img {
+.menu li img, .menu li svg {
 	display: block;
+	width: 80px;
+	height: 80px;
 	border-radius: 5px;
 }
 .liSliderWrapper {

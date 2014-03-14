@@ -17,17 +17,15 @@
 	
 	<ul class="menu mLeft">
 	<!--<ul id="myn" class="mLeft">-->
-		<li id="li_h" title="Hue" onclick="bokeh.clickHue()" onmouseover="bokeh.mouseoverHue()" onmouseout="bokeh.mouseoutHue()"><img src="images/symbols/hue.png" /></li>
-		<li id="li_s" title="Saturation" onclick="bokeh.clickSaturation()" onmouseover="bokeh.mouseoverSaturation()" onmouseout="bokeh.mouseoutSaturation()"><img src="images/symbols/Saturation.png" /></li>
-		<li id="li_g" title="Blur" onclick="bokeh.clickGamma()" onmouseover="bokeh.mouseoverGamma()" onmouseout="bokeh.mouseoutGamma()"><img src="images/symbols/Gamma.png" /></li>
-		<li id="li_a" title="Alpha" onclick="bokeh.clickAlpha()" onmouseover="bokeh.mouseoverAlpha()" onmouseout="bokeh.mouseoutAlpha()"><img src="images/symbols/AlphaSymbol.png" /></li>
-		<li id="li_r" title="Radius" onclick="bokeh.clickRadius()" onmouseover="bokeh.mouseoverRadius()" onmouseout="bokeh.mouseoutRadius()"><img src="images/symbols/Radius.png" /></li>
+		<li id="li_h" title="Hue" onclick="bokeh.clickHue()" onmouseover="bokeh.mouseoverHue()" onmouseout="bokeh.mouseoutHue()"><img src="images/symbols/hue.svg" /></li>
+		<li id="li_s" title="Saturation" onclick="bokeh.clickSaturation()" onmouseover="bokeh.mouseoverSaturation()" onmouseout="bokeh.mouseoutSaturation()"><img src="images/symbols/Saturation.svg" /></li>
+		<li id="li_g" title="Blur" onclick="bokeh.clickGamma()" onmouseover="bokeh.mouseoverGamma()" onmouseout="bokeh.mouseoutGamma()"><img src="images/symbols/Gamma.svg" /></li>
+		<li id="li_a" title="Alpha" onclick="bokeh.clickAlpha()" onmouseover="bokeh.mouseoverAlpha()" onmouseout="bokeh.mouseoutAlpha()"><img src="images/symbols/AlphaSymbol2.svg" /></li>
+		<li id="li_r" title="Radius" onclick="bokeh.clickRadius()" onmouseover="bokeh.mouseoverRadius()" onmouseout="bokeh.mouseoutRadius()"><img src="images/symbols/Radius.svg" /></li>
 		<li id="li_p" title="Number of Particles" onclick="bokeh.clickParticle()" onmouseover="bokeh.mouseoverParticle()" onmouseout="bokeh.mouseoutParticle()">
 			<svg id="li_p_svg"
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 100 100"
-				width="50"
-				height="50"
 			>
 				<defs>
 					<circle id="s1" cx="0" cy="0" r="5" style="fill: #1a72be; fill-opacity: 0.5;" />
@@ -42,28 +40,28 @@
 				<div id="particleSlider" class="liSlider"></div>
 			</div>
 		</li>
-		<li title="Background Colour" onclick="bokeh.clickBackground()" onmouseover="bokeh.mouseoverBackground()" onmouseout="bokeh.mouseoutBackground()"><img src="images/symbols/Background.png" /></li>
+		<li title="Background Colour" onclick="bokeh.clickBackground()" onmouseover="bokeh.mouseoverBackground()" onmouseout="bokeh.mouseoutBackground()"><img src="images/symbols/Background.svg" /></li>
 		<!--<li></li>-->
 	</ul>
 	
 	<ul class="menu mRight">
 		<li title="Zoom">
-			<img src="images/symbols/Size.png" />
+			<img src="images/symbols/Size.svg" />
 			<div class="liSliderWrapper sliderRight">
 				<span class="helperSpanToAlignImageVertically"></span>
 				<div id="sizeSlider" class="liSlider"></div>
 			</div>
 		</li> <!-- + - and wheel! -->
-		<li title="Speed"><img src="images/symbols/Transition.png" />
+		<li title="Speed"><img src="images/symbols/Transition.svg" />
 			<div class="liSliderWrapper sliderRight">
 				<span class="helperSpanToAlignImageVertically"></span>
 				<div id="transitionSlider" class="liSlider"></div>
 			</div>
 		</li>
-		<li title="Download SVG" onclick="bokeh.clickDownload()"><img src="images/symbols/Download.png" /></li>
+		<li title="Download SVG" onclick="bokeh.clickDownload()"><img src="images/symbols/Download.svg" /></li>
 		<li title="View Source">
 			<a href="https://github.com/rbyte/Kaleidoscope">
-				<img src="images/symbols/Source.png" />
+				<img src="images/symbols/Source.svg" />
 			</a>
 		</li>
 		<!--<li></li>-->
