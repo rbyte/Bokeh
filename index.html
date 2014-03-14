@@ -14,16 +14,94 @@
 </head>
 
 <body>
-	
+
+<div class="vertAlign">
+<span class="helperSpanToAlignImageVertically"></span>
 	<ul class="menu mLeft">
 	<!--<ul id="myn" class="mLeft">-->
-		<li id="li_h" title="Hue" onclick="bokeh.clickHue()" onmouseover="bokeh.mouseoverHue()" onmouseout="bokeh.mouseoutHue()"><img src="images/symbols/hue.svg" /></li>
-		<li id="li_s" title="Saturation" onclick="bokeh.clickSaturation()" onmouseover="bokeh.mouseoverSaturation()" onmouseout="bokeh.mouseoutSaturation()"><img src="images/symbols/Saturation.svg" /></li>
-		<li id="li_g" title="Blur" onclick="bokeh.clickGamma()" onmouseover="bokeh.mouseoverGamma()" onmouseout="bokeh.mouseoutGamma()"><img src="images/symbols/Gamma.svg" /></li>
-		<li id="li_a" title="Alpha" onclick="bokeh.clickAlpha()" onmouseover="bokeh.mouseoverAlpha()" onmouseout="bokeh.mouseoutAlpha()"><img src="images/symbols/AlphaSymbol2.svg" /></li>
-		<li id="li_r" title="Radius" onclick="bokeh.clickRadius()" onmouseover="bokeh.mouseoverRadius()" onmouseout="bokeh.mouseoutRadius()"><img src="images/symbols/Radius.svg" /></li>
-		<li id="li_p" title="Number of Particles" onclick="bokeh.clickParticle()" onmouseover="bokeh.mouseoverParticle()" onmouseout="bokeh.mouseoutParticle()">
-			<svg id="li_p_svg"
+		<li id="li_h">
+			<img src="images/symbols/hue.svg" onclick="bokeh.clickHue()" />
+			<div id="li_h_dsvg" class="liKasten left"></div>
+		</li>
+		<li id="li_s">
+			<!--<img src="images/symbols/Saturation.svg" />-->
+			<svg id="li_s_svg" onclick="bokeh.clickSaturation()"
+				class="symbolSVG"
+				xmlns="http://www.w3.org/2000/svg"
+				xmlns:xlink="http://www.w3.org/1999/xlink"
+				viewBox="0 0 442.57144 442.57144">
+			  <defs>
+				<linearGradient id="linearGradient3767">
+				  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
+				  <stop style="stop-color:#000000;stop-opacity:0" offset="0.80310881" />
+				  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
+				</linearGradient>
+				<linearGradient id="linearGradient3755">
+				  <stop class="lgrad_hueDependentColour"
+					 style="stop-color:#fe0000;stop-opacity:1" offset="0" />
+				  <stop style="stop-color:#7f7f7f;stop-opacity:1" offset="1" />
+				</linearGradient>
+				<linearGradient x1="369.28552" y1="109.93343" x2="369.28552"
+				   y2="548.83179" id="linearGradient3761"
+				   xlink:href="#linearGradient3755" gradientUnits="userSpaceOnUse" />
+				<radialGradient cx="369.28571" cy="330.21933" r="220.28572"
+				   fx="369.28571" fy="330.21933" id="radialGradient3765"
+				   xlink:href="#linearGradient3767"
+				   gradientUnits="userSpaceOnUse" />
+			  </defs>
+
+			  <g
+				 transform="translate(-147.99998,-108.93361)"
+				 id="layer1">
+				<path
+				   d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
+				   style="fill:url(#linearGradient3761)" />
+				<path
+				   d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
+				   style="fill:url(#radialGradient3765)" />
+			  </g>
+			</svg>
+			
+			<div id="li_s_dsvg" class="liKasten left"></div>
+		</li>
+		<li id="li_g">
+			<!--<img src="images/symbols/Gamma.svg" onclick="bokeh.clickGamma()" />-->
+			<svg id="li_g_svg" class="symbolSVG" onclick="bokeh.clickGamma()"
+			   xmlns="http://www.w3.org/2000/svg"
+			  viewBox="0 0 354.60001 354.60001">
+			  <defs>
+				<filter
+				   x="-0.43113771"
+				   y="-0.43113771"
+				   width="1.8622754"
+				   height="1.8622754"
+				   id="filter4307">
+				  <feGaussianBlur id="li_g_svg_feGaussianBlur"
+					 stdDeviation="35.928144" />
+				</filter>
+			  </defs>
+			  <g
+				 transform="translate(-122.69925,-97.76218)"
+				 id="layer1">
+				<path
+				   d="m 300,200 a 100,100 0 1 1 -200,0 100,100 0 1 1 200,0 z"
+				   transform="matrix(-0.91013649,0,0,-0.91013649,481.52276,459.09018)"
+				   style="fill:#000000;filter:url(#filter4307);" />
+			  </g>
+			</svg>
+			<div id="li_g_dsvg" class="liKasten left"></div>
+		</li>
+		<li id="li_a">
+			<img src="images/symbols/AlphaSymbol2.svg" onclick="bokeh.clickAlpha()" />
+			<div id="li_a_dsvg" class="liKasten left"></div>
+		</li>
+		<li id="li_r">
+			<img src="images/symbols/Radius.svg" onclick="bokeh.clickRadius()" />
+			<div id="li_r_dsvg" class="liKasten left"></div>
+		</li>
+		<li id="li_p" title="Number of Particles">
+			<svg id="li_p_svg" onclick="bokeh.clickParticle()"
+				class="symbolSVG"
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 100 100"
 			>
@@ -35,7 +113,7 @@
 			</svg>
 			
 <!--			<img src="images/symbols/Particles.png" />-->
-			<div class="liSliderWrapper sliderLeft">
+			<div class="liKasten left">
 				<span class="helperSpanToAlignImageVertically"></span>
 				<div id="particleSlider" class="liSlider"></div>
 			</div>
@@ -43,17 +121,20 @@
 		<li title="Background Colour" onclick="bokeh.clickBackground()" onmouseover="bokeh.mouseoverBackground()" onmouseout="bokeh.mouseoutBackground()"><img src="images/symbols/Background.svg" /></li>
 		<!--<li></li>-->
 	</ul>
-	
+</div>
+
+<div class="vertAlign alignRight">
+<span class="helperSpanToAlignImageVertically"></span>
 	<ul class="menu mRight">
 		<li title="Zoom">
 			<img src="images/symbols/Size.svg" />
-			<div class="liSliderWrapper sliderRight">
+			<div class="liKasten right">
 				<span class="helperSpanToAlignImageVertically"></span>
 				<div id="sizeSlider" class="liSlider"></div>
 			</div>
 		</li> <!-- + - and wheel! -->
 		<li title="Speed"><img src="images/symbols/Transition.svg" />
-			<div class="liSliderWrapper sliderRight">
+			<div class="liKasten right">
 				<span class="helperSpanToAlignImageVertically"></span>
 				<div id="transitionSlider" class="liSlider"></div>
 			</div>
@@ -66,7 +147,8 @@
 		</li>
 		<!--<li></li>-->
 	</ul>
-
+</div>
+		
 <div id="svgWrapper">
 <span class="helperSpanToAlignImageVertically"></span>
 <svg id="svg" xmlns="http://www.w3.org/2000/svg">

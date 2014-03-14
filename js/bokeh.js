@@ -9,7 +9,7 @@ var codeMirror = {inUse: false}
 
 var pProperties = ["h","s","l","a","g","x","y","r"]
 var pPropertiesName = {
-	h: "Hue", s: "Saturation", l: "Lightness", a: "Alpha",
+	h: "Hue", s: "Saturation", l: "Lightness", a: "Opacity",
 	g: /*Gauss Smoothing*/ "Blur", x: "Horizonal Position",
 	y: "Vertical Position", r: "Radius"}
 
@@ -130,17 +130,130 @@ function setUpDistributionSlider(p) {
 	// outer rectangle, that contains everything
 	distributionSliders[p] = {}
 	
-	var svg = distributionSliders[p].svg = d3.select("#dsvg")
+	const opx = 0, opy = 0, ow = 300, oh = 100,
+	// percent of width the scale takes
+	perc = .10,
+	horizontal = true,
+	// the drag area rectangle (a portion of outer)
+	px = opx+(horizontal ? 0 : ow*perc),
+	py = opy,
+	w = ow*(horizontal ? 1 : 1-perc),
+	h = oh*(horizontal ? 1-perc : 1),
+	left = horizontal ? .03 : .15,
+	right = .03,
+	top = .03,
+	bottom = horizontal ? .15 : .03,
+	topSpan = .3, baseSpan = .8, varianceSpan = .2
+	
+	var svg = distributionSliders[p].svg = d3.select("#li_"+p+"_dsvg")
 		.append("svg")
 		.attr("id", "distSliderSVG_"+p)
 		.attr("xmlns", "http://www.w3.org/2000/svg")
-		// TODO gives namespace error, but does not seem to matter
-//		.attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
-//		.attr("width", 200)
-//		.attr("height", 400)
-		.attr("viewBox", "0 0 "+200+" "+400)
-		.attr("class", "hidden")
-		.attr("isToggledOn", "false") // custom; via click
+		.attr("viewBox", "0 0 "+ow+" "+oh)
+		.attr("preserveAspectRatio", "xMinYMid meet")
+	
+//	d3.selectAll("menu li").attr("isToggledOn", "false")
+	
+	function getPath(x, y) {
+		// so that the cursor is always inside the curve area -> crosshair
+		if (horizontal) y -= 3
+		else x += 3
+		function bound(l, x, h) { return Math.max(Math.min(x, h), l) }
+		// mouse position x & y, relative to box and forced into margin
+		var rX = bound(left, (x-px)/w, 1-right)
+		var rY = bound(top, (y-py)/h, 1-bottom)
+		
+		// half span of ground
+		var vrc = (horizontal ? rY : 1-rX)*.5
+		var pre = gMean[p]
+		gMean[p] = (gMax[p] - gMin[p]) * (horizontal ? rX : rY)
+		console.log(p+" mean: "+pre+" -> "+gMean[p])
+		pre = gVar[p]
+		// 0.3 is a "looks good" approximation
+		gVar[p] = (gMax[p] - gMin[p]) * vrc * 0.3
+		console.log(p+" var: "+pre+" -> "+gVar[p])
+		
+		// the upper and lower extreme cannot go beyond the border,
+		// because it distorts the background pattern & such a distribution
+		// is not logical
+		var vrcUp = vrc
+		var vrcDown = vrc
+		if (rX-vrc < 0)
+			vrcUp = rX
+		if (rX+vrc > 1)
+			vrcDown -= rX+vrc-1
+		
+		// do not overshoot
+//		vrc = Math.min(vrc, (.5 - Math.abs(rY - .5)))
+//		rX = bound(1-vrc*2, rX, 1)
+		
+		// http://www.w3.org/TR/SVG/paths.html#PathData
+		// the start and end point are only needed for the fill (hueScale)
+		// to be aligned correctly
+		// see DistributionSliderPathIllustration.svg
+		return (!horizontal ?
+		("M"+px+","+py
+			// upper base point
+			+" L"+px+","+(py+(rY - vrcUp)*h)
+			// base control point
+			+" c0,"+vrcUp*baseSpan*h+" "
+			// peak control point
+			+rX*w+","+(vrcUp*h-Math.min(vrcUp,vrcDown)*h*topSpan)+" "
+			// peak point
+			+rX*w+","+vrcUp*h
+			// base control point
+			+" s-"+rX*w+","+vrcDown*(1-baseSpan)*h
+			// lower base point
+			+" -"+rX*w+","+vrcDown*h
+			+" L"+px+","+(py+h)
+			+"Z")
+		: ("M"+px+","+py+h
+			// upper base point
+			+" L"+(px+(rX - vrcUp)*w)+","+(py+h)
+			// base control point
+			+" c"+vrcUp*baseSpan*w+",0 "
+			// peak control point
+			+(vrcUp*w-Math.min(vrcUp,vrcDown)*w*topSpan)+",-"+(1-rY)*h+" "
+			// peak point
+			+vrcUp*w+",-"+(1-rY)*h
+			// base control point
+			+" s"+vrcDown*(1-baseSpan)*w+","+(1-rY)*h
+			// lower base point
+			+" "+vrcDown*w+","+(1-rY)*h
+			+" L"+(px+w)+","+(py+h)
+			+"Z")
+		)
+	}
+	
+	distributionSliders[p].updateParticles = function() {
+		if (distributionSliders[p].dssvgg !== undefined)
+			distributionSliders[p].dssvgg.remove()
+		distributionSliders[p].dssvgg = svg
+			.append("g").attr("id", "distSliderSVGcircles")
+		
+		if (p === "h")
+			d3.selectAll(".lgrad_hueDependentColour").style({"stop-color":
+				d3.hsl(gMean.h/255*360, 255/255, 127/255)})
+		
+		if (p === "g")
+			d3.select("#li_g_svg_feGaussianBlur")
+				.attr("stdDeviation", Math.sqrt((gMean.g-gMin.g) / (gMax.g-gMin.g))*50)
+		
+		for (var i=0; i<pls.length; i++) {
+			var z =  (pls[i][p]._ - gMin[p]) / (gMax[p]-gMin[p])
+			
+			distributionSliders[p].dssvgg.append("path")
+				.attr("d", horizontal
+					? "M"+z*w+","+py+h+" l0,"+(perc*oh)
+					: "M0,"+z*h+" l"+ow*perc+",0")
+				.style({
+					"stroke": "#fff", // d3.hsl(0/255*360, 0/255, 255/255)
+					"stroke-opacity": .5,
+					"stroke-width": 2,
+					"stroke-linecap": "butt"
+				})
+		}
+	}
 	
 	var defs = svg.append("defs")
 	// every distributionSlider has defs for all types
@@ -174,95 +287,16 @@ function setUpDistributionSlider(p) {
 	defs.append("linearGradient")
 		.attr("id", "lgradVert_"+p)
 		.attr("xlink:href", "#lgrad_"+p+"_"+p)
-		.attr("gradientTransform", "rotate(90)")
+		.attr("gradientTransform", "rotate("+(horizontal ? 0 : 90)+")")
 	
-	var whiteShade = defs.append("linearGradient").attr("id", "whiteShade")
-	whiteShade.append("stop").style({"stop-color": "#fff", "stop-opacity": "0"}).attr("offset", 0)
-	whiteShade.append("stop").style({"stop-color": "#fff", "stop-opacity": ".4"}).attr("offset", 1)
-	
-	const opx = 0, opy = 0, ow = 200, oh = 400,
-	// percent of width the scale takes
-	perc = .10,
-	// the drag area rectangle (a portion of outer)
-	px = opx+ow*perc, py = opy, w = ow*(1-perc), h = oh,
-	left = .15, right = .05, top = .01, bottom = .01,
-	topSpan = .3, baseSpan = .8, varianceSpan = .2
-	
-	function getPath(x, y) {
-		x += 3 // so that the cursor is always inside the curve area -> crosshair
-		function bound(l, x, h) { return Math.max(Math.min(x, h), l) }
-		// mouse position x & y, relative to box and forced into margin
-		var rX = bound(left, (x-px)/w, 1-right)
-		var rY = bound(top, (y-py)/h, 1-bottom)
+	var whiteShade = defs.append("linearGradient").attr("id", "whiteShade_"+p)
+	whiteShade.append("stop").style({"stop-color": "#fff", "stop-opacity": (horizontal ? .4 : 0)}).attr("offset", 0)
+	whiteShade.append("stop").style({"stop-color": "#fff", "stop-opacity": (horizontal ? 0 : .4)}).attr("offset", 1)
 		
-		// half y span of ground
-		var vrc = (1-rX)*.5
-		var pre = gMean[p]
-		gMean[p] = (gMax[p] - gMin[p]) * rY
-		console.log(p+" mean: "+pre+" -> "+gMean[p])
-		pre = gVar[p]
-		// 0.3 is a "looks good" approximation
-		gVar[p] = (gMax[p] - gMin[p]) * vrc * 0.3
-		console.log(p+" var: "+pre+" -> "+gVar[p])
-		
-		// the upper and lower extreme cannot go beyond the border,
-		// because it distorts the background pattern & such a distribution
-		// is not logical
-		var vrcUp = vrc
-		var vrcDown = vrc
-		if (rY-vrc < 0)
-			vrcUp = rY
-		if (rY+vrc > 1)
-			vrcDown -= rY+vrc-1
-		
-		// do not overshoot
-//		vrc = Math.min(vrc, (.5 - Math.abs(rY - .5)))
-//		rX = bound(1-vrc*2, rX, 1)
-		
-		// http://www.w3.org/TR/SVG/paths.html#PathData
-		// the start and end point are only needed for the fill (hueScale)
-		// to be aligned correctly
-		// see DistributionSliderPathIllustration.svg
-		return ("M"+px+","+py
-			// upper base point
-			+" L"+px+","+(py+(rY - vrcUp)*h)
-			// base control point
-			+" c0,"+vrcUp*baseSpan*h+" "
-			// peak control point
-			+rX*w+","+(vrcUp*h-Math.min(vrcUp,vrcDown)*h*topSpan)+" "
-			// peak point
-			+rX*w+","+vrcUp*h
-			// base control point
-			+" s-"+rX*w+","+vrcDown*(1-baseSpan)*h
-			// lower base point
-			+" -"+rX*w+","+vrcDown*h
-			+" L"+px+","+(py+h)
-			+"Z")
-	}
-	
-	distributionSliders[p].updateParticles = function() {
-		if (distributionSliders[p].dssvgg !== undefined)
-			distributionSliders[p].dssvgg.remove()
-		distributionSliders[p].dssvgg = svg
-			.append("g").attr("id", "distSliderSVGcircles")
-		
-		if (p === "h")
-			d3.selectAll(".lgrad_hueDependentColour").style({"stop-color":
-				d3.hsl(gMean.h/255*360, 255/255, 125/255)})
-		
-		for (var i=0; i<pls.length; i++) {
-			var yy =  (pls[i][p]._ - gMin[p]) / (gMax[p]-gMin[p]) * h
-			
-			distributionSliders[p].dssvgg.append("path")
-				.attr("d", "M0,"+yy+" L"+ow*perc+","+yy)
-				.style({
-					"stroke": "#fff", // d3.hsl(0/255*360, 0/255, 255/255)
-					"stroke-opacity": .5,
-					"stroke-width": 4,
-					"stroke-linecap": "butt"
-				})
-		}
-	}
+	defs.append("linearGradient")
+		.attr("id", "whiteShadeVert_"+p)
+		.attr("xlink:href", "#whiteShade_"+p)
+		.attr("gradientTransform", "rotate("+(horizontal ? 90 : 0)+")")
 	
 	var drag = d3.behavior.drag()
 		.on("drag", dragmove)
@@ -271,63 +305,65 @@ function setUpDistributionSlider(p) {
 		distributionCurve.attr("d", getPath(d3.event.x, d3.event.y))
 	}
 	
-	svg.append("rect")
-		.attr("class", "dragArea")
-		.attr("x", px)
-		.attr("y", py)
-		.attr("width", w)
-		.attr("height", h)
-		// fill "none" will disable drag
-		.style({"fill": "none", "stroke": "#ccc", "stroke-width": 1})
-		.call(drag)
+	// 6.7 is an approximation
+	var meanDim = (gMean[p] - gMin[p]) / (gMax[p]-gMin[p])
+	var varDim = gVar[p] / (gMax[p]-gMin[p]) * 6.7
 	
 	var distributionCurve = svg.append("path")
 		.attr("class", "distributionCurve")
-		.attr("d", getPath( // 6.7 is an approximation
-			px+w*(1 - gVar[p] / (gMax[p]-gMin[p]) * 6.7),
-			py+h*(gMean[p] - gMin[p]) / (gMax[p]-gMin[p])))
+		.attr("d", getPath( 
+			px+w*(horizontal ? meanDim : 1-varDim),
+			py+h*(horizontal ? varDim : meanDim)))
 		.style({'fill': "url(#lgradVert_"+p+")"})
 		.call(drag)
 	
 	// produces the opacity background pattern
 	if (p === "a") {
-		var side = ow*perc/4
+		var side = (horizontal ? oh : ow)*perc/4
 		for (var i=0; i<4; i++)
-			for (var k=0; k<oh/side; k++)
+			for (var k=0; k<(horizontal ? ow : oh)/side; k++)
 				svg.append("rect")
 					.attr("width", side)
 					.attr("height", side)
-					.attr("x", opx+i*side)
-					.attr("y", opy+k*side)
+					.attr("x", opx+(horizontal ? k : i)*side)
+					.attr("y", py+(horizontal ? h : 0)+(horizontal ? i : k)*side)
 					.style({"fill": (i+k) % 2 ? "#ddd" : "#999"})
 	}
 	
 	svg.append("rect")
 		.attr("class", "scale")
-		.attr("width", ow*perc)
-		.attr("height", oh)
+		.attr("width", ow)
+		.attr("height", oh*perc)
 		.attr("x", opx)
-		.attr("y", opy)
+		.attr("y", opy+(1-perc)*oh)
 		.style({'fill': "url(#lgradVert_"+p+")"})
 	
 	if (p === "g") {
-		svg.append("path").style({'fill': "#ddd"})
-			.attr("d", "M"+opx+","+opy+" L"+opx+","+opy+h+" L"+opx+ow*perc*.5+","+opy)
-		svg.append("path").style({'fill': "#ddd"})
-			.attr("d", "M"+opx+ow*perc+","+opy+" L"+opx+ow*perc+","+opy+h+" L"+opx+ow*perc*.5+","+opy)
+		if (horizontal) {
+			svg.append("path").style({'fill': "#ddd"})
+				.attr("d", "M0,"+(py+h)+" L"+(px+w)+","+(py+h)+" L0,"+(py+h+perc*.5*oh)+" Z")
+			svg.append("path").style({'fill': "#ddd"})
+				.attr("d", "M0,"+(py+oh)+" L"+(px+w)+","+(py+oh)+" L0,"+(py+h+perc*.5*oh)+" Z")
+		} else {
+			svg.append("path").style({'fill': "#ddd"})
+				.attr("d", "M"+opx+","+opy+" L"+opx+","+opy+h+" L"+opx+ow*perc*.5+","+opy)
+			svg.append("path").style({'fill': "#ddd"})
+				.attr("d", "M"+opx+ow*perc+","+opy+" L"+opx+ow*perc+","+opy+h+" L"+opx+ow*perc*.5+","+opy)
+		}
 	}
 
 	svg.append("rect")
 		.attr("class", "whiteOverlay")
-		.attr("width", ow*perc*0.5)
-		.attr("height", oh)
-		.attr("x", opx+ow*perc*0.5)
-		.attr("y", opy)
-		.style({'fill': 'url(#whiteShade)'})
+		.attr("width", horizontal ? ow : ow*perc*0.5)
+		.attr("height", horizontal ? oh*perc*0.5 : oh)
+		.attr("x", horizontal ? opx : opx+ow*perc*0.5)
+		.attr("y", horizontal ? opy+oh*(1-perc) : opy)
+		.style({'fill': "url(#whiteShadeVert_"+p+")"})
 	
 	svg.append("text")
-		.attr("x", opx+ow*(perc+.03))
-		.attr("y", opy+oh*.05)
+		.attr("x", opx+ow*((horizontal ? 0 : perc)+.02))
+		.attr("y", opy+oh*((horizontal ? perc : 0)+.07))
+		.style({"font-family": '"Open Sans",sans-serif', "font-weight": 100})
 		.text(pPropertiesName[p])
 	
 }
@@ -779,43 +815,19 @@ function setUpKShortcuts() {
 	}, false)
 }
 
-function distributionSliderHide(p, hide) {
-	var ds = d3.select("#distSliderSVG_"+p)
-	if (ds.attr("isToggledOn") === "false")
-		ds.classed("hidden", hide)
-}
-
 function distributionSliderToggle(p) {
 	// if toogled, it is visible, because the mouse has to be on the symbol
-	var ds = d3.select("#distSliderSVG_"+p)
-	var toggledOn = ds.attr("isToggledOn") === "false"
-	ds.attr("isToggledOn", toggledOn ? "true" : "false")
-	d3.select("#li_"+p).classed("toggledOn", toggledOn)
-	// effect immediately
-	if (!toggledOn)
-		distributionSliderHide(p, true)
+	var ds = d3.select("#li_"+p)
+//	var toggledOn = ds.attr("isToggledOn") === "false"
+//	ds.attr("isToggledOn", toggledOn ? "true" : "false")
+//	console.log(toggledOn)
+	ds.classed("toggledOn", !ds.classed("toggledOn"))
 }
 
-
-
-bokeh.mouseoverHue = function() { distributionSliderHide("h", false) }
-bokeh.mouseoutHue = function() { distributionSliderHide("h", true) }
 bokeh.clickHue = function() { distributionSliderToggle("h") }
-
-bokeh.mouseoverSaturation = function() { distributionSliderHide("s", false) }
-bokeh.mouseoutSaturation = function() { distributionSliderHide("s", true) }
 bokeh.clickSaturation = function() { distributionSliderToggle("s") }
-
-bokeh.mouseoverGamma = function() { distributionSliderHide("g", false) }
-bokeh.mouseoutGamma = function() { distributionSliderHide("g", true) }
 bokeh.clickGamma = function() { distributionSliderToggle("g") }
-
-bokeh.mouseoverAlpha = function() { distributionSliderHide("a", false) }
-bokeh.mouseoutAlpha = function() { distributionSliderHide("a", true) }
 bokeh.clickAlpha = function() { distributionSliderToggle("a") }
-
-bokeh.mouseoverRadius = function() { distributionSliderHide("r", false) }
-bokeh.mouseoutRadius = function() { distributionSliderHide("r", true) }
 bokeh.clickRadius = function() { distributionSliderToggle("r") }
 
 bokeh.mouseoverBackground = function() {}
