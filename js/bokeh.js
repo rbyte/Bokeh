@@ -2,28 +2,39 @@
 bokeh = function() { // spans everything - not indented
 var bokeh = {}
 
-var svgWidth = 400
-var svgHeight = 300
+var svgViewboxWidth = 400
+var svgViewboxHeight = 300
 var SVGsizeInWindow = 0.2 // percent
 var codeMirror = {inUse: false}
 
-var properties = ["x","y","r","h","s","l","a","g"]
-var propFullName = {x: "Horizonal Position", y: "Vertical Position", r: "Radius",
-	h: "Hue", s: "Saturation", l: "Lightness", a: "Alpha", g: /*Gauss Smoothing*/ "Blur"}
+var pProperties = ["h","s","l","a","g","x","y","r"]
+var pPropertiesName = {
+	h: "Hue", s: "Saturation", l: "Lightness", a: "Alpha",
+	g: /*Gauss Smoothing*/ "Blur", x: "Horizonal Position",
+	y: "Vertical Position", r: "Radius"}
 
-var gMean=	{h: 140,	s: 180,	l: 180,	a: .20,	g: svgWidth*.04,	x: svgWidth*.5,		y: svgHeight*.5,	r: svgWidth*.15}
-var gVar=	{h: 7,		s: 10,	l: 40,	a: .10,	g: svgWidth*.025,	x: svgWidth*.22,	y: svgHeight*.22,	r: svgWidth*.07}
-var gMin=	{h: 0,		s: 0,	l: 0,	a: 0,	g: svgWidth*.002,	x: svgWidth*-.20,	y: svgHeight*-.20,	r: svgWidth*0}
-var gMax=	{h: 255,	s: 255,	l: 255,	a: .8,	g: svgWidth*.1,		x: svgWidth*1.20,	y: svgHeight*1.20,	r: svgWidth*1}
-var actF=	{h: 1,		s: 1,	l: 1,	a: 1,	g: 1, x: 1, y: 1, r: 0.5}
-var bgColor= {h: 151,	s: 77,	l: 111,	a: 0} // TODO
-var distributionSliders = {}
+var gMean=	{h: 140,s: 180,	l: 180,	a: .20,	g: .04,	x: .5,	y: .5,	r: .15}
+var gVar=	{h: 7,	s: 10,	l: 40,	a: .10,	g: .025,x: .22,	y: .22,	r: .07}
+var gMin=	{h: 0,	s: 0,	l: 0,	a: 0,	g: .002,x: -.2,	y: -.2,	r: 0}
+var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .1,	x: 1.2,	y: 1.2,	r: 1}
+// activityFactor
+var actF=	{h: 1,	s: 1,	l: 1,	a: 1,	g: 1,	x: 1,	y: 1,	r: 0.5}
+
+var arr = [gMean, gVar, gMin, gMax]
+arr.forEach(function(e) {
+    e.g *= svgViewboxWidth
+	e.x *= svgViewboxWidth
+	e.y *= svgViewboxHeight
+	e.r *= svgViewboxWidth
+})
 
 // stddeviation/g=0 is not supported in inkscape (circles will not show)
 if (/*disableBlur = */ false) {
 	gMax.g = gMin.g = 0
 }
 
+var bgColor={h: 151,s: 77,	l: 111,	a: 0} // TODO
+var distributionSliders = {}
 var log = {}
 //log.items = [["h", "_", "mean"]]
 //log.items = [["g", "_", "mean"], ["r", "_", "mean"],["a", "_", "mean"], ["x", "_", "mean"], ["y", "_", "mean"]]
@@ -37,8 +48,8 @@ var activityRoundsMax = 150
 var accDeltaAbsMax = 0.02
 var triggerActivityPropability = 0.05 // influenced by number of particles
 var predDampen = 20
-var transition = false
-var transitionDuration = 100
+// if 0, no transition is triggered (just steps)
+var transitionDuration = 0
 var pauseStepping = false
 
 var lastStep
@@ -48,8 +59,13 @@ var lastFPSupdate
 bokeh.run = function () {
 	setUpSVG()
 	codeMirror.init()
-	
 	log.init()
+	setUpSliders()
+	setUpKShortcuts()
+	progressParticleSystem()
+}
+
+function setUpSliders() {
 	setUpDistributionSlider("h")
 	setUpDistributionSlider("s")
 	setUpDistributionSlider("a")
@@ -62,18 +78,42 @@ bokeh.run = function () {
 		.step(1)
 		.value(numberOfParticles)
 		.on("slide", function(evt, value) {
-//			console.log("baal: "+value)
-			if (!isNaN(value))
+			if (!isNaN(value)) {
 				numberOfParticles = value
+				updateParticleSymbolSVG()
+			}
 		})
-	d3.select("#particleSlider").call(shapeScaleSlider)	
+	d3.select("#particleSlider").call(shapeScaleSlider)
+	updateParticleSymbolSVG()
 	
-	setUpKShortcuts()
-	progressParticleSystem()
+	var sizeSlider = d3.slider()
+		.min(0.05)
+		.max(3)
+		.step(0.05)
+		.value(SVGsizeInWindow)
+		.on("slide", function(evt, value) {
+			if (!isNaN(value)) {
+				SVGsizeInWindow = value
+				setSVGSizeInWindow(SVGsizeInWindow)
+			}
+		})
+	d3.select("#sizeSlider").call(sizeSlider)
+	
+	var transitionSlider = d3.slider()
+		.min(0)
+		.max(500)
+		.step(10)
+		.value(transitionDuration)
+		.on("slide", function(evt, value) {
+			if (!isNaN(value)) {
+				transitionDuration = value
+			}
+		})
+	d3.select("#transitionSlider").call(transitionSlider)	
 }
 
 codeMirror.init = function() {
-	if (this.inUse) {
+	if (codeMirror.inUse) {
 		codeMirror._ = CodeMirror(document.body, {
 			value: "",
 			mode: "javascript",
@@ -159,11 +199,11 @@ function setUpDistributionSlider(p) {
 		var vrc = (1-rX)*.5
 		var pre = gMean[p]
 		gMean[p] = (gMax[p] - gMin[p]) * rY
-		console.log(pre+" -> "+gMean[p])
+		console.log(p+" mean: "+pre+" -> "+gMean[p])
 		pre = gVar[p]
 		// 0.3 is a "looks good" approximation
 		gVar[p] = (gMax[p] - gMin[p]) * vrc * 0.3
-		console.log(pre+" -> "+gVar[p])
+		console.log(p+" var: "+pre+" -> "+gVar[p])
 		
 		// the upper and lower extreme cannot go beyond the border,
 		// because it distorts the background pattern & such a distribution
@@ -288,16 +328,16 @@ function setUpDistributionSlider(p) {
 	svg.append("text")
 		.attr("x", opx+ow*(perc+.03))
 		.attr("y", opy+oh*.05)
-		.text(propFullName[p])
+		.text(pPropertiesName[p])
 	
 }
 
 function Particle(pNo) {
 	var p = this
 	p.pNo = pNo
-	for (var i=0; i<properties.length; i++) {
-		p[properties[i]] = {
-			_: gMean[properties[i]]+((Math.random()-0.5)*3)*gVar[properties[i]],
+	for (var i=0; i<pProperties.length; i++) {
+		p[pProperties[i]] = {
+			_: gMean[pProperties[i]]+((Math.random()-0.5)*3)*gVar[pProperties[i]],
 			v: 0, // velocity
 			acc: 0, // acceleration
 			activity: 0,
@@ -337,10 +377,10 @@ function progressParticleSystem() {
 		}
 	}
 
-	for (var i=0; i<properties.length; i++)
+	for (var i=0; i<pProperties.length; i++)
 		// lightness is bound to z-index
-		if (properties[i] !== "l")
-			step(properties[i])
+		if (pProperties[i] !== "l")
+			step(pProperties[i])
 	
 	// additional constrains
 	for (var i=0; i<pls.length; i++) {
@@ -365,7 +405,7 @@ function progressParticleSystem() {
 		var p = pls[i]
 
 		function applyTransition(obj) {
-			if (transition) {
+			if (transitionDuration !== 0) {
 				obj = obj.transition()
 					.duration(transitionDuration)
 					.ease(d3.ease("linear"))
@@ -386,11 +426,11 @@ function progressParticleSystem() {
 			.attr("r", p.r._)
 			.attr("transform", "translate("+p.x._+", "+p.y._+")")
 
-		if (transition && i === pls.length-1)
+		if (transitionDuration !== 0 && i === pls.length-1)
 			t.each("end", progressParticleSystem)
 	}
 	// lets the browser render, then restarts
-	if (!transition)
+	if (transitionDuration === 0)
 		setTimeout(progressParticleSystem, 50)
 }
 
@@ -497,11 +537,31 @@ function updateFpsCounter() {
 	lastStep = curTime
 }
 
+function updateParticleSymbolSVG() {
+	var li_p_svg = d3.select("#li_p_svg")
+	var curPlist = d3.selectAll("#li_p_svg use")[0]
+	// remove if too many
+	for (var i=0; i<curPlist.length-numberOfParticles; i++) {
+		curPlist[i].remove()
+	}
+	// add if missing
+	for (var i=0; i<numberOfParticles-curPlist.length; i++) {
+		var cr = 40
+		// in polar coordinates
+		var theta = (Math.random()-.5)*Math.PI*2
+		var r = Math.random()*cr
+		var x = r*Math.sin(theta)
+		var y = r*Math.cos(theta)
+		
+		li_p_svg.append("use")
+			.attr("x", x+50).attr("y", y+50)
+			.attr("xlink:href", "#s1")
+	}
+}
+
 function setUpSVG() {
 	var svg = d3.select("#svg")
-//	svg.attr("width", svgWidth)
-//	svg.attr("height", svgHeight)
-	svg.attr("viewBox", "0 0 "+svgWidth+" "+svgHeight)
+	svg.attr("viewBox", "0 0 "+svgViewboxWidth+" "+svgViewboxHeight)
 	setSVGSizeInWindow()
 
 	svg.append("rect")
@@ -683,10 +743,13 @@ function round(number) {
 
 function openSVG() {
 	var svg = document.getElementById("svg")
+	var prev = SVGsizeInWindow
+	setSVGSizeInWindow(3)
 	window.open("data:image/svg+xml," + encodeURIComponent(
 	// http://stackoverflow.com/questions/1700870/how-do-i-do-outerhtml-in-firefox
 		svg.outerHTML || new XMLSerializer().serializeToString(svg)
 	))
+	setSVGSizeInWindow(prev)
 }
 
 function pause() {
@@ -728,6 +791,9 @@ function distributionSliderToggle(p) {
 	var toggledOn = ds.attr("isToggledOn") === "false"
 	ds.attr("isToggledOn", toggledOn ? "true" : "false")
 	d3.select("#li_"+p).classed("toggledOn", toggledOn)
+	// effect immediately
+	if (!toggledOn)
+		distributionSliderHide(p, true)
 }
 
 
@@ -752,32 +818,13 @@ bokeh.mouseoverRadius = function() { distributionSliderHide("r", false) }
 bokeh.mouseoutRadius = function() { distributionSliderHide("r", true) }
 bokeh.clickRadius = function() { distributionSliderToggle("r") }
 
-bokeh.mouseoverParticle = function() {}
-bokeh.mouseoutParticle = function() {}
-bokeh.clickParticle = function() {}
-
 bokeh.mouseoverBackground = function() {}
 bokeh.mouseoutBackground = function() {}
 bokeh.clickBackground = function() {}
 
 // right
-bokeh.mouseoverSize = function() {}
-bokeh.mouseoutSize = function() {}
-bokeh.clickSize = function() {}
-
-bokeh.mouseoverTransition = function() {}
-bokeh.mouseoutTransition = function() {}
-bokeh.clickTransition = function() {}
-
-bokeh.mouseoverDownload = function() {}
-bokeh.mouseoutDownload = function() {}
-bokeh.clickDownload = function() {}
-
-bokeh.mouseoverSource = function() {}
-bokeh.mouseoutSource = function() {}
+bokeh.clickDownload = function() { openSVG() }
 bokeh.clickSource = function() {}
-
-
 
 return bokeh
 }()

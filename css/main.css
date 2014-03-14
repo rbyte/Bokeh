@@ -23,10 +23,10 @@ body {
 }
 #fps {
 	position: fixed;
-	color: #ccc;
-	font-size: 200%;
-	bottom: 2%;
-	right: 2%;
+	color: #ddd;
+	font-size: 100%;
+	bottom: 1%;
+	right: 1%;
 }
 .axis path,
 .axis line {
@@ -58,25 +58,18 @@ body {
 
 .menu {
 	position: absolute;
+	list-style: none;
+	display: block;
 	top: 10%;
 	margin: 0;
 	padding: 0;
-	list-style: none;
+	z-index: 3;
 }
-.mLeft {
-	left: 0;
-}
-.mRight {
-	right: 0;
-	opacity: 0.4;
-}
-.menu li img {
-	display: block;
-	border-radius: 5px;
-}
+.mLeft { left: 0; }
+.mRight { right: 0; }
 .menu li {
     position: relative;
-    display: block;
+    /*display: block;*/
 	padding: 5px;
 	background: rgba(0, 0, 0, 0.0);
     white-space: nowrap;
@@ -87,9 +80,31 @@ body {
 .menu li:hover {
 	background: rgba(210, 210, 210, 0.8);
 }
-.menu li:hover div {
-    display: inline-block !important;
+.menu li img {
+	display: block;
+	border-radius: 5px;
 }
+.liSliderWrapper {
+	position: absolute;
+	display: none;
+	width: 215px;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	top: 0;
+	background-color: #eee;
+}
+.sliderLeft { left: 100%; }
+.sliderRight { right: 100%; }
+.liSlider {
+	width: 200px;
+	vertical-align: middle;
+}
+.menu li:hover div {
+    display: inline-block;
+}
+
+
 
 
 .hidden {
@@ -108,20 +123,4 @@ body {
 #dsvg svg {
 	width: 20%;
 	height: 100%;
-}
-#particleSliderWrapper {
-	position: absolute;
-	/*text-align: center;*/
-	left: 100%;
-	top: 0;
-	height: 80%;
-	display: none;
-	background-color: #eee;
-	width: 215px;
-	padding: 10%;
-}
-#particleSlider {
-	width: 200px;
-	height: 80%;
-	vertical-align: middle;
 }

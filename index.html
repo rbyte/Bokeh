@@ -16,55 +16,70 @@
 <body>
 	
 	<ul class="menu mLeft">
+	<!--<ul id="myn" class="mLeft">-->
 		<li id="li_h" title="Hue" onclick="bokeh.clickHue()" onmouseover="bokeh.mouseoverHue()" onmouseout="bokeh.mouseoutHue()"><img src="images/symbols/hue.png" /></li>
 		<li id="li_s" title="Saturation" onclick="bokeh.clickSaturation()" onmouseover="bokeh.mouseoverSaturation()" onmouseout="bokeh.mouseoutSaturation()"><img src="images/symbols/Saturation.png" /></li>
 		<li id="li_g" title="Blur" onclick="bokeh.clickGamma()" onmouseover="bokeh.mouseoverGamma()" onmouseout="bokeh.mouseoutGamma()"><img src="images/symbols/Gamma.png" /></li>
 		<li id="li_a" title="Alpha" onclick="bokeh.clickAlpha()" onmouseover="bokeh.mouseoverAlpha()" onmouseout="bokeh.mouseoutAlpha()"><img src="images/symbols/AlphaSymbol.png" /></li>
 		<li id="li_r" title="Radius" onclick="bokeh.clickRadius()" onmouseover="bokeh.mouseoverRadius()" onmouseout="bokeh.mouseoutRadius()"><img src="images/symbols/Radius.png" /></li>
-		<li title="Number of Particles" onclick="bokeh.clickParticle()" onmouseover="bokeh.mouseoverParticle()" onmouseout="bokeh.mouseoutParticle()"><img src="images/symbols/Particles.png" />
-<!--			<ul><li>-->
-			<div id="particleSliderWrapper">
+		<li id="li_p" title="Number of Particles" onclick="bokeh.clickParticle()" onmouseover="bokeh.mouseoverParticle()" onmouseout="bokeh.mouseoutParticle()">
+			<svg id="li_p_svg"
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 100 100"
+				width="50"
+				height="50"
+			>
+				<defs>
+					<circle id="s1" cx="0" cy="0" r="5" style="fill: #1a72be; fill-opacity: 0.5;" />
+				</defs>
+				<circle cx="50" cy="50" r="45" style="fill: #ddd;" />
+				<!--<use x="30" y="30" xlink:href="#s1"/>-->
+			</svg>
+			
+<!--			<img src="images/symbols/Particles.png" />-->
+			<div class="liSliderWrapper sliderLeft">
 				<span class="helperSpanToAlignImageVertically"></span>
-				<div id="particleSlider"></div>
+				<div id="particleSlider" class="liSlider"></div>
 			</div>
-			<!--</li></ul>-->
 		</li>
 		<li title="Background Colour" onclick="bokeh.clickBackground()" onmouseover="bokeh.mouseoverBackground()" onmouseout="bokeh.mouseoutBackground()"><img src="images/symbols/Background.png" /></li>
 		<!--<li></li>-->
 	</ul>
 	
 	<ul class="menu mRight">
-		<li onclick="bokeh.clickBackground()" onmouseover="bokeh.mouseoverBackground()"><img src="images/symbols/Size.png" /></li> <!-- + - and wheel! -->
-		<li onclick="bokeh.clickTransition()" onmouseover="bokeh.mouseoverTransition()"><img src="images/symbols/Transition.png" /></li>
-		<li onclick="bokeh.clickDownload()" onmouseover="bokeh.mouseoverDownload()"><img src="images/symbols/Download.png" /></li>
-		<li onclick="bokeh.clickSource()" onmouseover="bokeh.mouseoverSource()"><img src="images/symbols/Source.png" /></li>
+		<li title="Zoom">
+			<img src="images/symbols/Size.png" />
+			<div class="liSliderWrapper sliderRight">
+				<span class="helperSpanToAlignImageVertically"></span>
+				<div id="sizeSlider" class="liSlider"></div>
+			</div>
+		</li> <!-- + - and wheel! -->
+		<li title="Speed"><img src="images/symbols/Transition.png" />
+			<div class="liSliderWrapper sliderRight">
+				<span class="helperSpanToAlignImageVertically"></span>
+				<div id="transitionSlider" class="liSlider"></div>
+			</div>
+		</li>
+		<li title="Download SVG" onclick="bokeh.clickDownload()"><img src="images/symbols/Download.png" /></li>
+		<li title="View Source">
+			<a href="https://github.com/rbyte/Kaleidoscope">
+				<img src="images/symbols/Source.png" />
+			</a>
+		</li>
 		<!--<li></li>-->
 	</ul>
 
 <div id="svgWrapper">
 <span class="helperSpanToAlignImageVertically"></span>
-	<!-- is the default setting -->
-	<!--preserveAspectRatio="xMidYMid meet"-->
-<svg id="svg"
-	xmlns="http://www.w3.org/2000/svg"
-	xmlns:xlink="http://www.w3.org/1999/xlink"
->
-
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
     <style type="text/css"><![CDATA[
-
 ]]></style>
-
-	<defs>
-	</defs>
-
+	<defs></defs>
 </svg>
 </div>
 
-
 <div id="fps"></div>
-
 <div id="dsvg"></div>
-
 <script>bokeh.run()</script>
 	
 </body>
