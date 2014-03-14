@@ -16,7 +16,7 @@ var pPropertiesName = {
 var gMean=	{h: 140,s: 180,	l: 180,	a: .20,	g: .04,	x: .5,	y: .5,	r: .15}
 var gVar=	{h: 7,	s: 10,	l: 40,	a: .10,	g: .025,x: .22,	y: .22,	r: .07}
 var gMin=	{h: 0,	s: 0,	l: 0,	a: 0,	g: .002,x: -.2,	y: -.2,	r: 0}
-var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .1,	x: 1.2,	y: 1.2,	r: 1}
+var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .1,	x: 1.2,	y: 1.2,	r: .4}
 // activityFactor
 var actF=	{h: 1,	s: 1,	l: 1,	a: 1,	g: 1,	x: 1,	y: 1,	r: 0.5}
 
@@ -139,10 +139,14 @@ function setUpDistributionSlider(p) {
 	py = opy,
 	w = ow*(horizontal ? 1 : 1-perc),
 	h = oh*(horizontal ? 1-perc : 1),
-	left = horizontal ? .03 : .15,
-	right = .03,
-	top = .03,
-	bottom = horizontal ? .15 : .03,
+	varianceOfVrc = .375,
+	toGroundCutoff = .2,
+	varFactorIntoPath = 5,
+	stdMargin = .03,
+	left = horizontal ? stdMargin : toGroundCutoff,
+	right = stdMargin,
+	top = stdMargin,
+	bottom = horizontal ? toGroundCutoff :stdMargin,
 	topSpan = .3, baseSpan = .8, varianceSpan = .2
 	
 	var svg = distributionSliders[p].svg = d3.select("#li_"+p+"_dsvg")
@@ -160,18 +164,23 @@ function setUpDistributionSlider(p) {
 		else x += 3
 		function bound(l, x, h) { return Math.max(Math.min(x, h), l) }
 		// mouse position x & y, relative to box and forced into margin
-		var rX = bound(left, (x-px)/w, 1-right)
-		var rY = bound(top, (y-py)/h, 1-bottom)
+		var rX = (x-px)/w
+		var rY = (y-py)/h
+		
+		rX = bound(left, rX, 1-right)
+		rY = bound(top, rY, 1-bottom)
 		
 		// half span of ground
-		var vrc = (horizontal ? rY : 1-rX)*.5
-		var pre = gMean[p]
+		var vrc = (horizontal ? rY : 1-rX)*(.5+toGroundCutoff)
+		var preMean = gMean[p]
 		gMean[p] = (gMax[p] - gMin[p]) * (horizontal ? rX : rY)
-		console.log(p+" mean: "+pre+" -> "+gMean[p])
-		pre = gVar[p]
-		// 0.3 is a "looks good" approximation
-		gVar[p] = (gMax[p] - gMin[p]) * vrc * 0.3
-		console.log(p+" var: "+pre+" -> "+gVar[p])
+		preVar = gVar[p]
+		// a "looks good" approximation
+		gVar[p] = (gMax[p] - gMin[p]) * vrc * varianceOfVrc
+		if (false) {
+			console.log(p+" mean: "+preMean+" -> "+gMean[p])
+			console.log(p+" var: "+preVar+" -> "+gVar[p])
+		}
 		
 		// the upper and lower extreme cannot go beyond the border,
 		// because it distorts the background pattern & such a distribution
@@ -278,7 +287,7 @@ function setUpDistributionSlider(p) {
 	
 	var gamma = defs.append("linearGradient").attr("id", "lgrad_g_"+p)
 	gamma.append("stop").style({"stop-color": "#000"}).attr("offset", 0)
-	gamma.append("stop").style({"stop-color": "#fff"}).attr("offset", 1)
+	gamma.append("stop").style({"stop-color": "#ddd"}).attr("offset", 1)
 	
 	var radius = defs.append("linearGradient").attr("id", "lgrad_r_"+p)
 	radius.append("stop").style({"stop-color": d3.hsl(147/255*360, 194/255, 138/255)}).attr("offset", 0)
@@ -305,9 +314,8 @@ function setUpDistributionSlider(p) {
 		distributionCurve.attr("d", getPath(d3.event.x, d3.event.y))
 	}
 	
-	// 6.7 is an approximation
 	var meanDim = (gMean[p] - gMin[p]) / (gMax[p]-gMin[p])
-	var varDim = gVar[p] / (gMax[p]-gMin[p]) * 6.7
+	var varDim = gVar[p] / (gMax[p]-gMin[p]) * varFactorIntoPath
 	
 	var distributionCurve = svg.append("path")
 		.attr("class", "distributionCurve")
