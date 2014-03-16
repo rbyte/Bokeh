@@ -96,7 +96,7 @@ body {
 .toggledOn {
 	border-left: 4px solid #666;
 }
-.menu li:hover {
+.menu li:hover, .menu.mRight li:hover .liKasten svg {
 	background: rgba(0, 0, 0, 0.05);
 }
 .menu li:hover .liKasten, .toggledOn .liKasten {
@@ -120,11 +120,14 @@ body {
 .hidden {
 	display: none;
 }
-
+.draggable {
+	cursor: pointer;
+}
 
 #fps {
 	position: fixed;
-	color: #ddd;
+	color: #000;
+	opacity: 0.15;
 	font-size: 100%;
 	bottom: 1%;
 	right: 1%;

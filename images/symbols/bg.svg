@@ -1,0 +1,51 @@
+<svg id="bg_svg"
+	xmlns="http://www.w3.org/2000/svg"
+	viewBox="0 0 300 100">
+<defs>
+	<linearGradient id="allHues">
+	      <stop style="stop-color:red;" offset="0" />
+	      <stop style="stop-color:yellow;" offset="0.18512578" />
+	      <stop style="stop-color:lime;" offset="0.34256288" />
+	      <stop style="stop-color:aqua;" offset="0.5" />
+	      <stop style="stop-color:blue;" offset="0.65429997" />
+	      <stop style="stop-color:fuchsia;" offset="0.8119877" />
+	      <stop style="stop-color:red;" offset="1" />
+	</linearGradient>
+	<linearGradient id="saturation">
+		<stop style="stop-color:grey;" offset="0" />
+		<stop style="stop-color:red;" offset="1" id="saturationStop" />
+	</linearGradient>
+	<linearGradient id="lightness">
+		<stop style="stop-color:white;" offset="0" />
+		<stop style="stop-color:red;" offset="0.5" id="lightnessStop" />
+		<stop style="stop-color:black;" offset="1" />
+	</linearGradient>
+	<linearGradient id="alpha">
+		<stop style="stop-color:black;stop-opacity: 0" offset="0" class="bgResultColourDep" />
+		<stop style="stop-color:black;" offset="1" class="bgResultColourDep" />
+       </linearGradient>
+					<linearGradient id="sliderGradient"  gradientTransform="rotate(90)">
+						<stop style="stop-color:white;" offset="0" />
+						<stop style="stop-color:black;" offset="1" />
+					</linearGradient>
+	<pattern id="alphaPattern" patternUnits="userSpaceOnUse"
+	width="10" height="10" x="0" y="0">
+		<rect x="0" y="0" width="5" height="5" style="fill: #ddd" />
+		<rect x="5" y="0" width="5" height="5" style="fill: #999" />
+		<rect x="0" y="5" width="5" height="5" style="fill: #999" />
+		<rect x="5" y="5" width="5" height="5" style="fill: #ddd" />
+	</pattern>
+	<rect id="slider" x="0" y= "25" width="5" height="15" style="fill: url(#sliderGradient);" />
+</defs>
+
+<text x="6" y="17" style='font-family: "Open Sans",sans-serif; font-weight: 100"'>Background</text>
+
+<rect x="0" y= "25" width="300" height="15" style="fill:url(#allHues)" />
+<rect x="0" y= "45" width="300" height="15" style="fill:url(#saturation)" />
+<rect x="0" y= "65" width="300" height="15" style="fill:url(#lightness)" />
+<rect x="0" y="85" width="300" height="15" fill="url(#alphaPattern)" />
+<rect x="0" y= "85" width="300" height="15" style="fill:url(#alpha)" />
+
+<use id="bgHueSlider" x="10" y="0" xlink:href="#slider" />
+
+</svg>

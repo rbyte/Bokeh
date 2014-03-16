@@ -5,9 +5,7 @@
 	<title>Bokeh</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css"/>
 	<link rel="stylesheet" type="text/css" href="codemirror/lib/codemirror.css">
-	<link rel="stylesheet" type="text/css" href="css/d3.slider.css"/>
 	<script type="text/javascript" src='js/d3.v3.min.js'></script>
-	<script type="text/javascript" src="js/d3.slider.js"></script>
 	<script type="text/javascript" src="codemirror/lib/codemirror.js"></script>
 	<script type="text/javascript" src="codemirror/mode/javascript/javascript.js"></script>
 	<script type="text/javascript" src='js/bokeh.js'></script>
@@ -175,16 +173,16 @@
 				
 				<text x="6" y="17" style='font-family: "Open Sans",sans-serif; font-weight: 100;'>Background</text>
 				
-				<rect id="bgHue" x="0" y= "25" width="300" height="15" style="fill:url(#allHues)" />
-				<rect id="bgSaturation" x="0" y= "45" width="300" height="15" style="fill:url(#saturation)" />
-				<rect id="bgLightness" x="0" y= "65" width="300" height="15" style="fill:url(#lightness)" />
+				<rect id="bgHue" class="draggable" x="0" y= "25" width="300" height="15" style="fill:url(#allHues)" />
+				<rect id="bgSaturation" class="draggable" x="0" y= "45" width="300" height="15" style="fill:url(#saturation)" />
+				<rect id="bgLightness" class="draggable" x="0" y= "65" width="300" height="15" style="fill:url(#lightness)" />
 				<rect x="0" y="85" width="300" height="15" fill="url(#alphaPattern)" />
-				<rect id="bgOpacity" x="0" y= "85" width="300" height="15" style="fill:url(#alpha)" />
+				<rect id="bgOpacity" class="draggable" x="0" y= "85" width="300" height="15" style="fill:url(#alpha)" />
 				
-				<use id="bgHueSlider" x="10" y="0" xlink:href="#slider" />
-				<use id="bgSaturationSlider" x="15" y="20" xlink:href="#slider" />
-				<use id="bgLightnessSlider" x="40" y="40" xlink:href="#slider" />
-				<use id="bgOpacitySlider" x="50" y="60" xlink:href="#slider" />
+				<use id="bgHueSlider" x="10" y="0" xlink:href="#slider" class="draggable" />
+				<use id="bgSaturationSlider" x="15" y="20" xlink:href="#slider" class="draggable" />
+				<use id="bgLightnessSlider" x="40" y="40" xlink:href="#slider" class="draggable" />
+				<use id="bgOpacitySlider" x="50" y="60" xlink:href="#slider" class="draggable" />
 				</svg>
 			</div>
 		</li>
@@ -208,21 +206,144 @@
 				<!--<use x="30" y="30" xlink:href="#s1"/>-->
 			</svg>
 			<div class="liKasten right">
-				<span class="helperSpanToAlignImageVertically"></span>
-				<div id="particleSlider" class="liSlider"></div>
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xml:space="preserve"
+	preserveAspectRatio="xMaxYMid meet"
+	viewBox="-15 -5 130 20">
+<defs>
+	<style type="text/css">
+	.fader           {stroke:#989B9F}
+	.faderBackground {fill:url(#lightFaderGradient)}
+	.faderForeground {fill:url(#darkFaderGradient)}
+	.faderKnob       {fill:url(#knobGradient)}
+	</style>
+	<linearGradient id="darkFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+		<stop offset="0" stop-color="#D7D9DC"/>
+		<stop offset="1" stop-color="#42494C"/>
+	</linearGradient>
+	<linearGradient id="lightFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+		<stop offset="0" stop-color="white"/>
+		<stop offset="1" stop-color="#D7D9DC"/>
+	</linearGradient>
+	<linearGradient id="knobGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+		<stop offset="0" stop-color="white"/>
+		<stop offset="1" stop-color="#D7D9DC"/>
+	</linearGradient>
+</defs>
+	<g id="numberOfParticles_myFader" class="fader">
+		<rect class="faderBackground" width="100" height="10" rx="5"/>
+		<rect class="faderForeground" width="50" height="10" rx="5"/>
+		<circle class="faderKnob draggable" cy="5" cx="50" r="7"/>
+	</g>
+</svg>
+
 			</div>
 		</li>
 		<li title="Zoom">
 			<img src="images/symbols/Size.svg" />
 			<div class="liKasten right">
-				<span class="helperSpanToAlignImageVertically"></span>
-				<div id="sizeSlider" class="liSlider"></div>
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xml:space="preserve"
+	preserveAspectRatio="xMaxYMid meet"
+	viewBox="-15 -5 130 20">
+<defs>
+	<style type="text/css">
+	.fader           {stroke:#989B9F}
+	.faderBackground {fill:url(#lightFaderGradient)}
+	.faderForeground {fill:url(#darkFaderGradient)}
+	.faderKnob       {fill:url(#knobGradient)}
+	</style>
+	<linearGradient id="darkFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+		<stop offset="0" stop-color="#D7D9DC"/>
+		<stop offset="1" stop-color="#42494C"/>
+	</linearGradient>
+	<linearGradient id="lightFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+		<stop offset="0" stop-color="white"/>
+		<stop offset="1" stop-color="#D7D9DC"/>
+	</linearGradient>
+	<linearGradient id="knobGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+		<stop offset="0" stop-color="white"/>
+		<stop offset="1" stop-color="#D7D9DC"/>
+	</linearGradient>
+</defs>
+	<g id="SVGsizeInWindow_myFader" class="fader">
+		<rect class="faderBackground" width="100" height="10" rx="5"/>
+		<rect class="faderForeground" width="50" height="10" rx="5"/>
+		<circle class="faderKnob draggable" cy="5" cx="50" r="7"/>
+	</g>
+</svg>
 			</div>
-		</li> <!-- + - and wheel! -->
-		<li title="Speed"><img src="images/symbols/Transition.svg" />
+		</li>
+		<li title="Speed">
+<!--			<img src="images/symbols/Transition.svg" />-->
+			<svg id="li_size_svg"
+				class="symbolSVG"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   viewBox="0 0 442.57144 442.57144">
+
+  <g transform="translate(-147.99998,-108.93361)">
+    <path
+       d="m 178,202.07144 a 71.5,71.5 0 1 1 -143,0 71.5,71.5 0 1 1 143,0 z"
+       transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,425.18593,-79.393668)"
+       id="path3829"
+       style="color:#000000;fill:none;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;" />
+    <path
+       d="m 142.25,140.15063 a 71.5,71.5 0 0 1 0,123.84163"
+       transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,474.636,-29.943615)"
+       class="sizeSVGspeedIndicator"
+       style="color:#000000;fill:none;stroke:#000000;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;" />
+    <path
+       d="m 157.05813,151.5133 a 71.5,71.5 0 0 1 0,101.11628"
+       transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,512.58604,8.006431)"
+       class="sizeSVGspeedIndicator"
+       style="color:#000000;fill:none;stroke:#000000;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;" />
+    <path
+       d="m 168.42082,166.32144 a 71.5,71.5 0 0 1 0,71.5"
+       transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,549.38609,44.806468)"
+       class="sizeSVGspeedIndicator"
+       style="color:#000000;fill:none;stroke:#000000;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;" />
+  </g>
+</svg>
+
+			
 			<div class="liKasten right">
-				<span class="helperSpanToAlignImageVertically"></span>
-				<div id="transitionSlider" class="liSlider"></div>
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xml:space="preserve"
+	preserveAspectRatio="xMaxYMid meet"
+	viewBox="-15 -5 130 20">
+<defs>
+	<style type="text/css">
+	.fader           {stroke:#989B9F}
+	.faderBackground {fill:url(#lightFaderGradient)}
+	.faderForeground {fill:url(#darkFaderGradient)}
+	.faderKnob       {fill:url(#knobGradient)}
+	</style>
+	<linearGradient id="darkFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+		<stop offset="0" stop-color="#D7D9DC"/>
+		<stop offset="1" stop-color="#42494C"/>
+	</linearGradient>
+	<linearGradient id="lightFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+		<stop offset="0" stop-color="white"/>
+		<stop offset="1" stop-color="#D7D9DC"/>
+	</linearGradient>
+	<linearGradient id="knobGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+		<stop offset="0" stop-color="white"/>
+		<stop offset="1" stop-color="#D7D9DC"/>
+	</linearGradient>
+</defs>
+	<g id="transitionDuration_myFader" class="fader">
+		<rect class="faderBackground" width="100" height="10" rx="5"/>
+		<rect class="faderForeground" width="50" height="10" rx="5"/>
+		<circle class="faderKnob draggable" cy="5" cx="50" r="7"/>
+	</g>
+</svg>
 			</div>
 		</li>
 		<li title="Download SVG" onclick="bokeh.clickDownload()"><img src="images/symbols/Download.svg" /></li>
@@ -244,7 +365,7 @@
 </svg>
 </div>
 
-<div id="fps"></div>
+<div id="fps" title="steps per second, an indication of rendering speed"></div>
 <div id="dsvg"></div>
 <script>bokeh.run()</script>
 	

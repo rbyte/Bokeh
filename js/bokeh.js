@@ -4,7 +4,6 @@ var bokeh = {}
 
 var svgViewboxWidth = 400
 var svgViewboxHeight = 300
-var SVGsizeInWindow = 0.2 // percent
 var codeMirror = {inUse: false}
 
 var pProperties = ["h","s","l","a","g","x","y","r"]
@@ -15,8 +14,8 @@ var pPropertiesName = {
 
 var gMean=	{h: 140,s: 180,	l: 180,	a: .20,	g: .04,	x: .5,	y: .5,	r: .15}
 var gVar=	{h: 7,	s: 10,	l: 40,	a: .10,	g: .025,x: .22,	y: .22,	r: .07}
-var gMin=	{h: 0,	s: 0,	l: 0,	a: 0,	g: .002,x: -.2,	y: -.2,	r: 0}
-var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .1,	x: 1.2,	y: 1.2,	r: .4}
+var gMin=	{h: 0,	s: 0,	l: 0,	a: 0,	g: .002,x: -.2,	y: -.2,	r: 0, transitionDuration: 0, numberOfParticles: 1, SVGsizeInWindow: 0.01}
+var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .1,	x: 1.2,	y: 1.2,	r: .4, transitionDuration: 1000, numberOfParticles: 100, SVGsizeInWindow: 2}
 // activityFactor
 var actF=	{h: 1,	s: 1,	l: 1,	a: 1,	g: 1,	x: 1,	y: 1,	r: 0.5}
 
@@ -42,15 +41,16 @@ var log = {}
 log.items = []
 
 var pls = [] // particle list
+var SVGsizeInWindow = 0.2 // percent
 var numberOfParticles = 20
+// if 0, no transition is triggered (just steps)
+var transitionDuration = 0
 var kissenSize = 0.02 // [0, 0.5]
 var activityFactor = 1/2000
 var activityRoundsMax = 150
 var accDeltaAbsMax = 0.02
 var triggerActivityPropability = 0.05 // influenced by number of particles
 var predDampen = 20
-// if 0, no transition is triggered (just steps)
-var transitionDuration = 0
 var pauseStepping = false
 
 var lastStep
@@ -72,45 +72,6 @@ function setUpSliders() {
 	setUpDistributionSlider("a")
 	setUpDistributionSlider("g")
 	setUpDistributionSlider("r")
-	
-	var shapeScaleSlider = d3.slider()
-		.min(1)
-		.max(100)
-		.step(1)
-		.value(numberOfParticles)
-		.on("slide", function(evt, value) {
-			if (!isNaN(value)) {
-				numberOfParticles = value
-				updateParticleSymbolSVG()
-			}
-		})
-	d3.select("#particleSlider").call(shapeScaleSlider)
-	updateParticleSymbolSVG()
-	
-	var sizeSlider = d3.slider()
-		.min(0.05)
-		.max(3)
-		.step(0.05)
-		.value(SVGsizeInWindow)
-		.on("slide", function(evt, value) {
-			if (!isNaN(value)) {
-				SVGsizeInWindow = value
-				setSVGSizeInWindow(SVGsizeInWindow)
-			}
-		})
-	d3.select("#sizeSlider").call(sizeSlider)
-	
-	var transitionSlider = d3.slider()
-		.min(0)
-		.max(500)
-		.step(10)
-		.value(transitionDuration)
-		.on("slide", function(evt, value) {
-			if (!isNaN(value)) {
-				transitionDuration = value
-			}
-		})
-	d3.select("#transitionSlider").call(transitionSlider)
 	
 	var bgSliderProps = ["h", "s", "l", "a"]
 	var lightnessStop = d3.selectAll("#lightnessStop")
@@ -141,7 +102,43 @@ function setUpSliders() {
 		}))
 	})
 	
+	var sliders = ["numberOfParticles", "transitionDuration", "SVGsizeInWindow"]
+	updateParticleSymbolSVG()
+	var barW = 100
 	
+	sliders.forEach(function(e) {
+		var knob = d3.select("#"+e+"_myFader .faderKnob")
+		var faderForeground = d3.select("#"+e+"_myFader .faderForeground")
+		var rX = eval(e) / gMax[e]
+//		if (e === "numberOfParticles") val = numberOfParticles
+		if (e === "transitionDuration") {
+			rX = 1 - rX
+			d3.selectAll(".sizeSVGspeedIndicator").style({"stroke-opacity": rX})
+		}
+//		if (e === "SVGsizeInWindow") val = SVGsizeInWindow
+		
+		knob.attr("cx", rX*barW)
+		faderForeground.attr("width", rX*barW)
+		
+		knob.call(d3.behavior.drag().on("drag", function (d) {
+			var rX = bound(0, d3.event.x, barW) / barW
+			
+			if (e === "numberOfParticles") {
+				numberOfParticles = Math.max(gMin[e], Math.round(rX*gMax[e]))
+				updateParticleSymbolSVG()
+			}
+			if (e === "transitionDuration") {
+				transitionDuration = Math.max(gMin[e], (1-rX)*gMax[e])
+				d3.selectAll(".sizeSVGspeedIndicator").style({"stroke-opacity": rX})
+			}
+			if (e === "SVGsizeInWindow") {
+				SVGsizeInWindow = Math.max(gMin[e], rX*gMax[e])
+				setSVGSizeInWindow(SVGsizeInWindow)
+			}
+			knob.attr("cx", rX*barW)
+			faderForeground.attr("width", rX*barW)
+		}))
+	})
 }
 
 codeMirror.init = function() {
@@ -508,7 +505,7 @@ function progressParticleSystem() {
 	}
 	// lets the browser render, then restarts
 	if (transitionDuration === 0)
-		setTimeout(progressParticleSystem, 50)
+		setTimeout(progressParticleSystem, 20)
 }
 
 function step(attr) {
@@ -856,25 +853,19 @@ function setUpKShortcuts() {
 	}, false)
 }
 
-function distributionSliderToggle(p) {
-	// if toogled, it is visible, because the mouse has to be on the symbol
+function toogleMenuEntrySticky(p) {
 	var ds = d3.select("#li_"+p)
-//	var toggledOn = ds.attr("isToggledOn") === "false"
-//	ds.attr("isToggledOn", toggledOn ? "true" : "false")
-//	console.log(toggledOn)
 	ds.classed("toggledOn", !ds.classed("toggledOn"))
 }
 
-bokeh.clickHue = function() { distributionSliderToggle("h") }
-bokeh.clickSaturation = function() { distributionSliderToggle("s") }
-bokeh.clickGamma = function() { distributionSliderToggle("g") }
-bokeh.clickAlpha = function() { distributionSliderToggle("a") }
-bokeh.clickRadius = function() { distributionSliderToggle("r") }
-bokeh.clickBackground = function() { distributionSliderToggle("bg") }
+bokeh.clickHue = function() { toogleMenuEntrySticky("h") }
+bokeh.clickSaturation = function() { toogleMenuEntrySticky("s") }
+bokeh.clickGamma = function() { toogleMenuEntrySticky("g") }
+bokeh.clickAlpha = function() { toogleMenuEntrySticky("a") }
+bokeh.clickRadius = function() { toogleMenuEntrySticky("r") }
+bokeh.clickBackground = function() { toogleMenuEntrySticky("bg") }
 
-// right
 bokeh.clickDownload = function() { openSVG() }
-bokeh.clickSource = function() {}
 
 return bokeh
 }()

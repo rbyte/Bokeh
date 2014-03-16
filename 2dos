@@ -1,32 +1,33 @@
-ui elements -> add menu on side penal
-	svg size adjustment -> slider (& + -)
-	show/hide fps
-	fullscreen -> switch
-	show current svg (freeze) -> link
-	// https://developer.mozilla.org/en-US/docs/HTML/Canvas/Drawing_DOM_objects_into_a_canvas
-	(save as png -> link), resolution selection?
-	
-alter simulation
-	background colour picker -> hsl
-	add dSlider for h,r,s,a,g -> switch with preview
-	number of particles -> slider
-	transition duration -> slider -> 0 = off (for slowing)
 
-hilfe? info?
-
+hilfe info
+	for dragging -> and what it means
+	and what the hell this is in the first place
 alpha does not react to variance
  -> combine mean and variance adjustment calculation!
+fullscreen -> switch
 
-set initial dSlider to mean & var
-	find way to calc vcr from given var
-	dSlider variance can create ground beyond scale
-abstract dSlider to enable other properties
+remove code mirror
+clean up css
+code refactoring
+testing!
 github hochladen
+	fix download link
 veröffentlichen
 	tell wallpaper guy
 
+sliders on right side: write title into svg
+right side: reduce transition duration
+css: disable mouse cursor change on dSliderSVG text + z-index low!
+background sliders are buggy
 
 maybe:
+during dragging, menu should not unhover in case of overshoot
+added particles overlay white rects
+keyboard only option
+background colour picker: make simple click working
+size with  + - and wheel! -> update slider too
+// https://developer.mozilla.org/en-US/docs/HTML/Canvas/Drawing_DOM_objects_into_a_canvas
+save as png -> link, resolution selection?
 alpha dSlider pattern: turn to real pattern def
 distribution slider vertical: there are still flaws
 removing particles does not remove their blur filters in defs
