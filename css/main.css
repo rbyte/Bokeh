@@ -103,7 +103,8 @@ body {
 	/*background: rgba(0, 0, 0, 0.05);*/
 	pointer-events: auto;
 }
-.menu li:hover img, .menu li:hover .symbolSVG, .toggledOn img, .toggledOn .symbolSVG {
+.menu.mLeft li:hover img, .menu.mLeft li:hover .symbolSVG,
+.toggledOn img, .toggledOn .symbolSVG {
 	width: 150px !important;
 	height: 150px !important;
 }

@@ -33,7 +33,8 @@ if (/*disableBlur = */ false) {
 	gMax.g = gMin.g = 0
 }
 
-var bgColor={h: 151,s: 77,	l: 111,	a: 0} // TODO
+var bgColor={h: 151,s: 77,	l: 111,	a: 1} // TODO
+var bgColorMax={h: 255,s: 255,	l: 255,	a: 1}
 var distributionSliders = {}
 var log = {}
 //log.items = [["h", "_", "mean"]]
@@ -109,7 +110,38 @@ function setUpSliders() {
 				transitionDuration = value
 			}
 		})
-	d3.select("#transitionSlider").call(transitionSlider)	
+	d3.select("#transitionSlider").call(transitionSlider)
+	
+	var bgSliderProps = ["h", "s", "l", "a"]
+	var lightnessStop = d3.selectAll("#lightnessStop")
+	var saturationStop = d3.selectAll("#saturationStop")
+	var bgResultColourDep = d3.selectAll(".bgResultColourDep")
+	var bgSymbolPath = d3.selectAll("#bgSymbolPath")
+	var bgSymbolPathForAlpha = d3.selectAll("#bgSymbolPathForAlpha")
+	var barW = 300-3 // -3 for slider width
+	
+	bgSliderProps.forEach(function(e) {
+		var pName = pPropertiesName[e]
+		var slider = d3.select("#bg"+pName+"Slider")
+		var rX = bgColor[e] / bgColorMax[e] // in [0,1]
+		function set(rX) {
+			slider.attr("x", rX * barW)
+			saturationStop.style({"stop-color": d3.hsl(bgColor.h/255*360, 1, .5)})
+			lightnessStop.style({"stop-color": d3.hsl(bgColor.h/255*360, bgColor.s/255, .5)})
+			var color = d3.hsl(bgColor.h/255*360, bgColor.s/255, bgColor.l/255)
+			bgResultColourDep.style({"stop-color": color})
+			bgSymbolPath.style({"fill": color})
+			bgSymbolPathForAlpha.style({"fill-opacity": 1-bgColor.a})
+		}
+		set(rX)
+		d3.select("#bg"+pName).call(d3.behavior.drag().on("drag", function (d) {
+			var rX = bound(0, d3.event.x, barW) / barW
+			bgColor[e] = rX * bgColorMax[e]
+			set(rX)
+		}))
+	})
+	
+	
 }
 
 codeMirror.init = function() {
@@ -124,6 +156,8 @@ codeMirror.init = function() {
 		codeMirror._.on("change", function() {})
 	}
 }
+
+function bound(l, x, h) { return Math.max(Math.min(x, h), l) }
 
 function setUpDistributionSlider(p) {
 //	var svg = d3.select("#distSliderSVG")
@@ -162,7 +196,6 @@ function setUpDistributionSlider(p) {
 		// so that the cursor is always inside the curve area -> crosshair
 		if (horizontal) y -= 3
 		else x += 3
-		function bound(l, x, h) { return Math.max(Math.min(x, h), l) }
 		// mouse position x & y, relative to box and forced into margin
 		var rX = (x-px)/w
 		var rY = (y-py)/h
@@ -837,10 +870,7 @@ bokeh.clickSaturation = function() { distributionSliderToggle("s") }
 bokeh.clickGamma = function() { distributionSliderToggle("g") }
 bokeh.clickAlpha = function() { distributionSliderToggle("a") }
 bokeh.clickRadius = function() { distributionSliderToggle("r") }
-
-bokeh.mouseoverBackground = function() {}
-bokeh.mouseoutBackground = function() {}
-bokeh.clickBackground = function() {}
+bokeh.clickBackground = function() { distributionSliderToggle("bg") }
 
 // right
 bokeh.clickDownload = function() { openSVG() }

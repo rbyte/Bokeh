@@ -27,7 +27,9 @@ veröffentlichen
 
 
 maybe:
+alpha dSlider pattern: turn to real pattern def
 distribution slider vertical: there are still flaws
+removing particles does not remove their blur filters in defs
 correlate size more with z-index
 performance improvement
 	Gauss Radius Reduzieren in feFilter
