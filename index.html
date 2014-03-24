@@ -86,7 +86,75 @@
 			<div id="li_g_dsvg" class="liKasten left"></div>
 		</li>
 		<li id="li_a">
-			<img src="images/symbols/AlphaSymbol2.svg" onclick="bokeh.clickAlpha()" />
+			<svg id="li_a_svg" class="symbolSVG" onclick="bokeh.clickAlpha()"
+				viewBox="0 0 400 400"
+			   xmlns="http://www.w3.org/2000/svg"
+			   xmlns:xlink="http://www.w3.org/1999/xlink">
+			  <defs>
+				<pattern id="li_g_alphaPattern" patternUnits="userSpaceOnUse"
+				width="160" height="160" x="0" y="0"> <!-- 400/5 = 80 -->
+					<rect x="0" y="0" width="80" height="80" style="fill: #fff" />
+					<rect x="80" y="0" width="80" height="80" style="fill: #aaa" />
+					<rect x="0" y="80" width="80" height="80" style="fill: #aaa" />
+					<rect x="80" y="80" width="80" height="80" style="fill: #fff" />
+				</pattern>
+
+				<radialGradient cx="200" cy="200" r="200" fx="200" fy="200"
+				   id="radialGradient4203-1"
+				   xlink:href="#linearGradient4197-7" 
+				   gradientUnits="userSpaceOnUse" />
+				<linearGradient id="linearGradient4197-7"> 
+				  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
+				  <stop style="stop-color:#000000;stop-opacity:0" offset="0.79792744" />
+				  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
+				</linearGradient>
+				<radialGradient cx="200" cy="200" r="200" fx="200" fy="200"
+				   id="radialGradient3819" 
+				   xlink:href="#linearGradient4197-7"
+				   gradientUnits="userSpaceOnUse" />
+				<linearGradient x1="300" y1="482.36218" x2="300" y2="152.36218"
+				   id="linearGradient3895-0"
+				   xlink:href="#linearGradient3889-4" 
+				   gradientUnits="userSpaceOnUse" />
+				<linearGradient id="linearGradient3889-4"> 
+				  <stop style="stop-color:#000;stop-opacity:1" offset="0" />
+				  <stop style="stop-color:#000;stop-opacity:0.5" offset="0.5" id="li_a_svg_stopFadeMiddle" />
+				  <stop style="stop-color:#000;stop-opacity:0" offset="1" />
+				</linearGradient>
+				<linearGradient x1="300" y1="482.36218" x2="300" y2="152.36218"
+				   id="linearGradient3855" 
+				   xlink:href="#linearGradient3889-4"
+				   gradientUnits="userSpaceOnUse" />
+				<mask
+				   id="mask3913">
+				  <path
+					 d="m 400,200 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
+					 transform="translate(100.00004,102.36217)"
+					 id="path3915"
+					 style="fill:#fff;" />
+				</mask>
+			  </defs>
+
+			  <g
+				 id="layer2">
+				<path
+				   d="m 400,200 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
+				   transform="translate(0,-2.6171875e-6)"
+				   style="color:#000000;fill:url(#li_g_alphaPattern);" />
+				<path
+				   d="m 400,200 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
+				   transform="translate(0,-2.6171875e-6)"
+				   id="path4195"
+				   style="color:#000000;fill:url(#radialGradient3819);" />
+				<path
+				   d="m 500,302.36218 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
+				   transform="translate(-100,-102.36219)"
+				   id="path3887"
+				   style="color:#000000;fill:url(#linearGradient3855);" />
+			  </g>
+			</svg>
+			
+			<!--<img src="images/symbols/AlphaSymbol2.svg" onclick="bokeh.clickAlpha()" />-->
 			<div id="li_a_dsvg" class="liKasten left"></div>
 		</li>
 		<li id="li_r">
@@ -105,12 +173,8 @@
 				  <stop style="stop-color:#000000;stop-opacity:0" offset="0.8" />
 				  <stop style="stop-color:#000000;stop-opacity:0.11764706" offset="1" />
 				</linearGradient>
-				<radialGradient
-				   cx="190.71428"
-				   cy="217.57144"
-				   r="110.71429"
-				   fx="190.71428"
-				   fy="217.57144"
+				<radialGradient cx="190.71428" cy="217.57144" r="110.71429"
+				   fx="190.71428" fy="217.57144"
 				   id="radialGradient3782"
 				   xlink:href="#linearGradient3776"
 				   gradientUnits="userSpaceOnUse" />
@@ -128,9 +192,10 @@
 				<use x="0" y="0" xlink:href="#bgSymbolInnerCircle" style="fill:url(#radialGradient3782);" />
 			  </g>
 			</svg>
-
+			
 			<div class="liKasten left">
 				<svg id="bg_svg"
+					preserveAspectRatio="xMinYMid meet"
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 300 100">
 				<defs>
@@ -160,7 +225,7 @@
 						<stop style="stop-color: #fff;" offset="0" />
 						<stop style="stop-color: #555;" offset="1" />
 					</linearGradient>
-					<pattern id="alphaPattern" patternUnits="userSpaceOnUse"
+					<pattern id="bg_svg_alphaPattern" patternUnits="userSpaceOnUse"
 					width="10" height="10" x="0" y="0">
 						<rect x="0" y="0" width="5" height="5" style="fill: #ddd" />
 						<rect x="5" y="0" width="5" height="5" style="fill: #999" />
@@ -176,7 +241,7 @@
 				<rect id="bgHue" class="draggable" x="0" y= "25" width="300" height="15" style="fill:url(#allHues)" />
 				<rect id="bgSaturation" class="draggable" x="0" y= "45" width="300" height="15" style="fill:url(#saturation)" />
 				<rect id="bgLightness" class="draggable" x="0" y= "65" width="300" height="15" style="fill:url(#lightness)" />
-				<rect x="0" y="85" width="300" height="15" fill="url(#alphaPattern)" />
+				<rect x="0" y="85" width="300" height="15" fill="url(#bg_svg_alphaPattern)" />
 				<rect id="bgOpacity" class="draggable" x="0" y= "85" width="300" height="15" style="fill:url(#alpha)" />
 				
 				<use id="bgHueSlider" x="10" y="0" xlink:href="#slider" class="draggable" />

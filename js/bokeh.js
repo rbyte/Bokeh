@@ -14,10 +14,8 @@ var pPropertiesName = {
 
 var gMean=	{h: 140,s: 180,	l: 180,	a: .20,	g: .04,	x: .5,	y: .5,	r: .15}
 var gVar=	{h: 7,	s: 10,	l: 40,	a: .10,	g: .025,x: .22,	y: .22,	r: .07}
-var gMin=	{h: 0,	s: 0,	l: 0,	a: 0,	g: .002,x: -.2,	y: -.2,	r: 0, transitionDuration: 0, numberOfParticles: 1, SVGsizeInWindow: 0.01}
+var gMin=	{h: 0,	s: 0,	l: 0,	a: 0,	g: .001,x: -.2,	y: -.2,	r: 0, transitionDuration: 0, numberOfParticles: 1, SVGsizeInWindow: 0.01}
 var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .1,	x: 1.2,	y: 1.2,	r: .4, transitionDuration: 1000, numberOfParticles: 100, SVGsizeInWindow: 2}
-// activityFactor
-var actF=	{h: 1,	s: 1,	l: 1,	a: 1,	g: 1,	x: 1,	y: 1,	r: 0.5}
 
 var arr = [gMean, gVar, gMin, gMax]
 arr.forEach(function(e) {
@@ -36,7 +34,7 @@ var bgColor={h: 151,s: 77,	l: 111,	a: 1} // TODO
 var bgColorMax={h: 255,s: 255,	l: 255,	a: 1}
 var distributionSliders = {}
 var log = {}
-//log.items = [["h", "_", "mean"]]
+//log.items = [["h", "_", "mean"], ["h", "_", "var"]]
 //log.items = [["g", "_", "mean"], ["r", "_", "mean"],["a", "_", "mean"], ["x", "_", "mean"], ["y", "_", "mean"]]
 log.items = []
 
@@ -45,12 +43,12 @@ var SVGsizeInWindow = 0.2 // percent
 var numberOfParticles = 20
 // if 0, no transition is triggered (just steps)
 var transitionDuration = 0
-var kissenSize = 0.02 // [0, 0.5]
-var activityFactor = 1/2000
-var activityRoundsMax = 150
-var accDeltaAbsMax = 0.02
-var triggerActivityPropability = 0.05 // influenced by number of particles
-var predDampen = 20
+const kissenSize = 0.02 // [0, 0.5]
+const globalActivityFactor = 1
+const activityRoundsMax = 150
+const accDeltaAbsMax = 0.25
+const triggerActivityPropability = 0.1 // TODO influenced by number of particles
+const predDampen = 9
 var pauseStepping = false
 
 var lastStep
@@ -79,9 +77,9 @@ function setUpSliders() {
 	var bgResultColourDep = d3.selectAll(".bgResultColourDep")
 	var bgSymbolPath = d3.selectAll("#bgSymbolPath")
 	var bgSymbolPathForAlpha = d3.selectAll("#bgSymbolPathForAlpha")
-	var barW = 300-3 // -3 for slider width
 	
 	bgSliderProps.forEach(function(e) {
+		var barW = 300-3 // -3 for slider width
 		var pName = pPropertiesName[e]
 		var slider = d3.select("#bg"+pName+"Slider")
 		var rX = bgColor[e] / bgColorMax[e] // in [0,1]
@@ -96,6 +94,7 @@ function setUpSliders() {
 		}
 		set(rX)
 		d3.select("#bg"+pName).call(d3.behavior.drag().on("drag", function (d) {
+			console.log(d3.event.x)
 			var rX = bound(0, d3.event.x, barW) / barW
 			bgColor[e] = rX * bgColorMax[e]
 			set(rX)
@@ -104,9 +103,9 @@ function setUpSliders() {
 	
 	var sliders = ["numberOfParticles", "transitionDuration", "SVGsizeInWindow"]
 	updateParticleSymbolSVG()
-	var barW = 100
 	
 	sliders.forEach(function(e) {
+		var barW = 100
 		var knob = d3.select("#"+e+"_myFader .faderKnob")
 		var faderForeground = d3.select("#"+e+"_myFader .faderForeground")
 		var rX = eval(e) / gMax[e]
@@ -203,7 +202,7 @@ function setUpDistributionSlider(p) {
 		// half span of ground
 		var vrc = (horizontal ? rY : 1-rX)*(.5+toGroundCutoff)
 		var preMean = gMean[p]
-		gMean[p] = (gMax[p] - gMin[p]) * (horizontal ? rX : rY)
+		gMean[p] = gMin[p] + (gMax[p] - gMin[p]) * (horizontal ? rX : rY)
 		preVar = gVar[p]
 		// a "looks good" approximation
 		gVar[p] = (gMax[p] - gMin[p]) * vrc * varianceOfVrc
@@ -273,10 +272,14 @@ function setUpDistributionSlider(p) {
 		if (p === "h")
 			d3.selectAll(".lgrad_hueDependentColour").style({"stop-color":
 				d3.hsl(gMean.h/255*360, 255/255, 127/255)})
-		
 		if (p === "g")
 			d3.select("#li_g_svg_feGaussianBlur")
 				.attr("stdDeviation", Math.sqrt((gMean.g-gMin.g) / (gMax.g-gMin.g))*50)
+		if (p === "a") {
+			var val = 0.25 + (gMean.a-gMin.a) / (gMax.a*2-gMin.a)
+			d3.select("#li_a_svg_stopFadeMiddle")
+				.style("stop-opacity", val).attr("offset", val)
+		}
 		
 		for (var i=0; i<pls.length; i++) {
 			var z =  (pls[i][p]._ - gMin[p]) / (gMax[p]-gMin[p])
@@ -295,33 +298,44 @@ function setUpDistributionSlider(p) {
 	}
 	
 	var defs = svg.append("defs")
-	// every distributionSlider has defs for all types
-	// if one svg is display: hidden, its def ids cannot be referenced anymore
-	// therefore, the ids have to be specific to each svg
-	var allHues = defs.append("linearGradient").attr("id", "lgrad_h_"+p)
-	allHues.append("stop").style({"stop-color": "#ff0000"}).attr("offset", 0)
-	allHues.append("stop").style({"stop-color": "#ffff00"}).attr("offset", 0.18512578)
-	allHues.append("stop").style({"stop-color": "#00ff00"}).attr("offset", 0.34256288)
-	allHues.append("stop").style({"stop-color": "#00ffff"}).attr("offset", 0.5)
-	allHues.append("stop").style({"stop-color": "#0000ff"}).attr("offset", 0.65429997)
-	allHues.append("stop").style({"stop-color": "#ff00ff"}).attr("offset", 0.8119877)
-	allHues.append("stop").style({"stop-color": "#ff0000"}).attr("offset", 1)
-	
-	var saturation = defs.append("linearGradient").attr("id", "lgrad_s_"+p)
-	saturation.append("stop").style({"stop-color": "#888"}).attr("offset", 0)
-	saturation.append("stop").style({"stop-color": "#f00"}).attr("offset", 1).attr("class", "lgrad_hueDependentColour")
-	
-	var alpha = defs.append("linearGradient").attr("id", "lgrad_a_"+p)
-	alpha.append("stop").style({"stop-color": "#888", "stop-opacity": "0"}).attr("offset", 0).attr("class", "lgrad_hueDependentColour")
-	alpha.append("stop").style({"stop-color": "#f00"}).attr("offset", 1).attr("class", "lgrad_hueDependentColour")
-	
-	var gamma = defs.append("linearGradient").attr("id", "lgrad_g_"+p)
-	gamma.append("stop").style({"stop-color": "#000"}).attr("offset", 0)
-	gamma.append("stop").style({"stop-color": "#ddd"}).attr("offset", 1)
-	
-	var radius = defs.append("linearGradient").attr("id", "lgrad_r_"+p)
-	radius.append("stop").style({"stop-color": d3.hsl(147/255*360, 194/255, 138/255)}).attr("offset", 0)
-	radius.append("stop").style({"stop-color": "#fff"}).attr("offset", 1)
+	if (p == "h") {
+		var allHues = defs.append("linearGradient").attr("id", "lgrad_h_"+p)
+		allHues.append("stop").style({"stop-color": "#ff0000"}).attr("offset", 0)
+		allHues.append("stop").style({"stop-color": "#ffff00"}).attr("offset", 0.18512578)
+		allHues.append("stop").style({"stop-color": "#00ff00"}).attr("offset", 0.34256288)
+		allHues.append("stop").style({"stop-color": "#00ffff"}).attr("offset", 0.5)
+		allHues.append("stop").style({"stop-color": "#0000ff"}).attr("offset", 0.65429997)
+		allHues.append("stop").style({"stop-color": "#ff00ff"}).attr("offset", 0.8119877)
+		allHues.append("stop").style({"stop-color": "#ff0000"}).attr("offset", 1)
+	}
+	if (p == "s") {
+		var saturation = defs.append("linearGradient").attr("id", "lgrad_s_"+p)
+		saturation.append("stop").style({"stop-color": "#888"}).attr("offset", 0)
+		saturation.append("stop").style({"stop-color": "#f00"}).attr("offset", 1).attr("class", "lgrad_hueDependentColour")
+	}
+	if (p == "a") {
+		var alpha = defs.append("linearGradient").attr("id", "lgrad_a_"+p)
+		alpha.append("stop").style({"stop-color": "#888", "stop-opacity": "0"}).attr("offset", 0).attr("class", "lgrad_hueDependentColour")
+		alpha.append("stop").style({"stop-color": "#f00"}).attr("offset", 1).attr("class", "lgrad_hueDependentColour")
+	}
+	if (p == "g") {
+		var gamma = defs.append("linearGradient").attr("id", "lgrad_g_"+p)
+		gamma.append("stop").style({"stop-color": "#000"}).attr("offset", 0)
+		gamma.append("stop").style({"stop-color": "#ddd"}).attr("offset", 1)
+	}
+	if (p == "r") {
+		var radius = defs.append("linearGradient").attr("id", "lgrad_r_"+p)
+		radius.append("stop").style({"stop-color": d3.hsl(147/255*360, 194/255, 138/255)}).attr("offset", 0)
+		radius.append("stop").style({"stop-color": "#fff"}).attr("offset", 1)
+	}
+	if (p == "a") {
+		var alphaPattern = defs.append("pattern").attr("id", "alphaPattern_"+p)
+			.attr("width", 5).attr("height", 5).attr("x", 0).attr("y", 0).attr("patternUnits", "userSpaceOnUse")
+		alphaPattern.append("rect").style({"fill": "#fff"}).attr("x", 0).attr("y", 0).attr("width", 2.5).attr("height", 2.5)
+		alphaPattern.append("rect").style({"fill": "#aaa"}).attr("x", 2.5).attr("y", 0).attr("width", 2.5).attr("height", 2.5)
+		alphaPattern.append("rect").style({"fill": "#aaa"}).attr("x", 0).attr("y", 2.5).attr("width", 2.5).attr("height", 2.5)
+		alphaPattern.append("rect").style({"fill": "#fff"}).attr("x", 2.5).attr("y", 2.5).attr("width", 2.5).attr("height", 2.5)
+	}
 	
 	defs.append("linearGradient")
 		.attr("id", "lgradVert_"+p)
@@ -357,15 +371,23 @@ function setUpDistributionSlider(p) {
 	
 	// produces the opacity background pattern
 	if (p === "a") {
-		var side = (horizontal ? oh : ow)*perc/4
-		for (var i=0; i<4; i++)
-			for (var k=0; k<(horizontal ? ow : oh)/side; k++)
-				svg.append("rect")
-					.attr("width", side)
-					.attr("height", side)
-					.attr("x", opx+(horizontal ? k : i)*side)
-					.attr("y", py+(horizontal ? h : 0)+(horizontal ? i : k)*side)
-					.style({"fill": (i+k) % 2 ? "#ddd" : "#999"})
+		
+		svg.append("rect")
+			.attr("width", ow)
+			.attr("height", oh*perc)
+			.attr("x", opx)
+			.attr("y", opy+(1-perc)*oh)
+			.style({'fill': "url(#alphaPattern_"+p+")"})
+		
+//		var side = (horizontal ? oh : ow)*perc/4
+//		for (var i=0; i<4; i++)
+//			for (var k=0; k<(horizontal ? ow : oh)/side; k++)
+//				svg.append("rect")
+//					.attr("width", side)
+//					.attr("height", side)
+//					.attr("x", opx+(horizontal ? k : i)*side)
+//					.attr("y", py+(horizontal ? h : 0)+(horizontal ? i : k)*side)
+//					.style({"fill": (i+k) % 2 ? "#ddd" : "#999"})
 	}
 	
 	svg.append("rect")
@@ -459,16 +481,16 @@ function progressParticleSystem() {
 	// additional constrains
 	for (var i=0; i<pls.length; i++) {
 		// increasing radius decreases opacity and increases blur
-		var rAct = pls[i].r.activity
-		if (rAct > 0 && pls[i].r.activityRounds > 0) {
-			pls[i].a.acc -= rAct*activityFactor*gVar.a/10
-			pls[i].g.acc += rAct*activityFactor*gVar.g
-		}
+//		var rAct = pls[i].r.activity
+//		if (rAct > 0 && pls[i].r.activityRounds > 0) {
+//			pls[i].a.acc -= rAct*globalActivityFactor*gVar.a/10
+//			pls[i].g.acc += rAct*globalActivityFactor*gVar.g
+//		}
 		// increasing sharpness decreases opacity
-		var gAct = pls[i].g.activity
-		if (gAct < 0 && pls[i].g.activityRounds > 0) {
-			pls[i].a.acc -= gAct*activityFactor*gVar.a/10
-		}
+//		var gAct = pls[i].g.activity
+//		if (gAct < 0 && pls[i].g.activityRounds > 0) {
+//			pls[i].a.acc -= gAct*globalActivityFactor*gVar.a/10
+//		}
 	}
 
 	log.updateLog()
@@ -509,61 +531,79 @@ function progressParticleSystem() {
 }
 
 function step(attr) {
-	var mean_ = mean(plsList(attr))
-	var var_ = variance(plsList(attr))
-	var mean_v = mean(plsList(attr, "v"))
-
-	if (Math.random() < triggerActivityPropability) {
-		var p = pls[Math.round(Math.random()*(pls.length-1))]
-
-		p[attr].activity = Math.random()-0.5
-		p[attr].activityRounds += Math.round(Math.random()*activityRoundsMax)
+	var currentMean = mean(plsList(attr))
+	var currentVariance = variance(plsList(attr))
+	var pSpan = gMax[attr] - gMin[attr]
+	var relativeDifferenceToGoalMean = (gMean[attr] - currentMean) / pSpan
+	// positive for spreading, negative for contraction
+	var relativeDifferenceToGoalVariance = (gVar[attr] - currentVariance) / pSpan
+	var currentMeanVelocity = mean(plsList(attr, "v"))
+	// linear prediction
+	// steps it takes @ current v to reach goal Mean
+	// the less steps to go, the more I dampen acceleration
+	var prediction = currentMeanVelocity === 0 ? 1000
+		: (gMean[attr] - currentMean)/currentMeanVelocity
+	
+	// maximum min-max-span of all properties
+	var maxPspan = 0
+	for (var i=0; i<pProperties.length; i++) {
+		var p = pProperties[i]
+		var span = gMax[p] - gMin[p]
+		if (maxPspan < span)
+			maxPspan = span
+	}
+	const accBaseScaled = accDeltaAbsMax * pSpan / maxPspan
+	
+	if (Math.random() < triggerActivityPropability * numberOfParticles) {
+		var randomP = pls[Math.round(Math.random()*(pls.length-1))]
+		
+		randomP[attr].activity = (Math.random()-0.5)
+		randomP[attr].activityRounds += Math.round(Math.random()*activityRoundsMax)
 		// couple movements
 		if (attr === "x" || attr === "y")
-			p[attr === "x" ? "y" : "x"].activityRounds += Math.round(Math.random()*activityRoundsMax)
+			randomP[attr === "x" ? "y" : "x"].activityRounds += Math.round(Math.random()*activityRoundsMax)
 		// the closest circles (z-index) should have a small radius
-		if (attr === "r")
-			p[attr].activity += p.pNo/numberOfParticles/3
+		// TODO
+//		if (attr === "r")
+//			p[attr].activity += p.pNo/numberOfParticles/3
 	}
-
+	
 	for (var i=0; i<pls.length; i++) {
 		var pa = pls[i][attr]
-		var dMean = gMean[attr] - mean_
-		var dVar = gVar[attr] - var_
-
-		// linear prediction
-		// steps it takes @ current v to reach g_mean_h
-		var prediction = mean_v === 0 ? 1000 : dMean/mean_v
-		// the less steps to go, the more I dampen acceleration
-		// below this number, accDelta is 0, increasing above, to *1 (max)
-
-		// the max
-		var accDeltaAbs = accDeltaAbsMax
-		if (Math.abs(dMean) < 10)
-			accDeltaAbs *= Math.abs(dMean)/10
+		// pulls all particles to goal mean (with same acceleration)
+		var accDelta = accBaseScaled*relativeDifferenceToGoalMean
+		// dampen acceleration based on linear prediction
 		if (prediction >= 0 && prediction <= predDampen)
-			accDeltaAbs = 0
+			accDelta = 0
 		if (prediction > predDampen)
-			accDeltaAbs *= 1-predDampen/prediction
-
-		var accDelta = (dMean < 0 ? -1 : 1) * accDeltaAbs
+			accDelta *= 1-predDampen/prediction
+		
+		// spread or contract around current mean to reach goal variance
+		var localRelativeDifferenceToCurrentMean = (currentMean - pa._) / currentVariance
+		accDelta -= accBaseScaled * 0.8
+			* relativeDifferenceToGoalVariance
+			* localRelativeDifferenceToCurrentMean
+		
+		// add random activity
 		if (pa.activityRounds > 0) {
 			pa.activityRounds--
-			accDelta += pa.activity*activityFactor*actF[attr]*gVar[attr]
+			accDelta += accBaseScaled
+				* globalActivityFactor
+				* pa.activity
+				* (gVar[attr]/pSpan)
 		}
-
+		
 		// accelerate to reach goal variance
-		var d_mean = pa._ - mean_
-		var cor_var_sign = (var_ < gVar[attr] && d_mean > 0)
-			|| (var_ > gVar[attr] && d_mean < 0) ? 1 : -1
-		if (Math.abs(dVar) > 3
-			&& ((cor_var_sign > 0 && mean_v <= 0)
-			|| (cor_var_sign < 0 && mean_v >= 0)))
-			accDelta += cor_var_sign * 0.01
-
+//		var localDifferenceToCurrentMean = pa._ - mean_
+//		var cor_var_sign = (var_ < gVar[attr] && localDifferenceToCurrentMean > 0)
+//			|| (var_ > gVar[attr] && localDifferenceToCurrentMean < 0) ? 1 : -1
+//		if (Math.abs(dVar) > 3
+//			&& ((cor_var_sign > 0 && mean_v <= 0)
+//			|| (cor_var_sign < 0 && mean_v >= 0)))
+//			accDelta += cor_var_sign * 0.01
+		
 		pa.acc += accDelta
-
-
+		
 		// always dampen accelation & speed
 		pa.acc *= 0.90
 		pa.v += pa.acc
