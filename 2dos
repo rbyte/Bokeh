@@ -4,7 +4,6 @@ hilfe info
 	and what the hell this is in the first place
 fullscreen -> switch
 
-remove code mirror
 clean up css
 code refactoring
 testing!
@@ -13,14 +12,11 @@ github hochladen
 veröffentlichen
 	tell wallpaper guy
 
-sliders on right side: write title into svg
-right side: reduce transition duration
-css: disable mouse cursor change on dSliderSVG text + z-index low!
+chromium: dSlider cursor during drag is not a crosshair - fix
 
 
 MAYBE:
 during dragging, menu should not unhover in case of overshoot
-added particles overlay white rects
 keyboard only option
 background colour picker: make simple click working
 size with  + - and wheel! -> update slider too

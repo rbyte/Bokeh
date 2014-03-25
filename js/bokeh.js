@@ -4,7 +4,6 @@ var bokeh = {}
 
 var svgViewboxWidth = 400
 var svgViewboxHeight = 300
-var codeMirror = {inUse: false}
 
 var pProperties = ["h","s","l","a","g","x","y","r"]
 var pPropertiesName = {
@@ -57,7 +56,6 @@ var lastFPSupdate
 
 bokeh.run = function () {
 	setUpSVG()
-	codeMirror.init()
 	log.init()
 	setUpSliders()
 	setUpKShortcuts()
@@ -107,15 +105,29 @@ function setUpSliders() {
 	sliders.forEach(function(e) {
 		var barW = 100
 		var knob = d3.select("#"+e+"_myFader .faderKnob")
+		var svgText = d3.select("#"+e+"_myFader text")
 		var faderForeground = d3.select("#"+e+"_myFader .faderForeground")
 		var rX = eval(e) / gMax[e]
-//		if (e === "numberOfParticles") val = numberOfParticles
+		svgText.updateText = function() {}
+		if (e === "numberOfParticles") {
+//			svgText.text("Particles: "+numberOfParticles)
+			svgText.updateText = function() {
+				this.text("Particles: "+numberOfParticles)
+			}
+		}
 		if (e === "transitionDuration") {
 			rX = 1 - rX
 			d3.selectAll(".sizeSVGspeedIndicator").style({"stroke-opacity": rX})
+			svgText.updateText = function() {
+				this.text("Speed: "+Math.round((1-transitionDuration/gMax[e])*100)+"%")
+			}
 		}
-//		if (e === "SVGsizeInWindow") val = SVGsizeInWindow
-		
+		if (e === "SVGsizeInWindow") {
+			svgText.updateText = function() {
+				this.text("Size: "+Math.round(SVGsizeInWindow*100)+"%")
+			}
+		}
+		svgText.updateText()
 		knob.attr("cx", rX*barW)
 		faderForeground.attr("width", rX*barW)
 		
@@ -128,29 +140,18 @@ function setUpSliders() {
 			}
 			if (e === "transitionDuration") {
 				transitionDuration = Math.max(gMin[e], (1-rX)*gMax[e])
-				d3.selectAll(".sizeSVGspeedIndicator").style({"stroke-opacity": rX})
+				d3.selectAll(".sizeSVGspeedIndicator").style(
+					{"stroke-opacity": Math.max(.1, rX)})
 			}
 			if (e === "SVGsizeInWindow") {
 				SVGsizeInWindow = Math.max(gMin[e], rX*gMax[e])
 				setSVGSizeInWindow(SVGsizeInWindow)
 			}
+			svgText.updateText()
 			knob.attr("cx", rX*barW)
 			faderForeground.attr("width", rX*barW)
 		}))
 	})
-}
-
-codeMirror.init = function() {
-	if (codeMirror.inUse) {
-		codeMirror._ = CodeMirror(document.body, {
-			value: "",
-			mode: "javascript",
-			indentWithTabs: true,
-			lineNumbers: true
-			/*matchBrackets: true*/
-		})
-		codeMirror._.on("change", function() {})
-	}
 }
 
 function bound(l, x, h) { return Math.max(Math.min(x, h), l) }
@@ -452,15 +453,6 @@ function progressParticleSystem() {
 
 	updateFpsCounter()
 	
-	if (codeMirror.inUse) {
-		try {
-			eval(codeMirror._.getValue())
-		} catch(e) {
-//			if (e instanceof SyntaxError) {
-			console.log(e)
-		}
-	}
-
 	for (var i=1; pls.length - numberOfParticles !== 0; i++) {
 		if (pls.length > numberOfParticles) {
 			pls.shift().obj.deleteParticle()
@@ -539,7 +531,7 @@ function step(attr) {
 	var relativeDifferenceToGoalVariance = (gVar[attr] - currentVariance) / pSpan
 	var currentMeanVelocity = mean(plsList(attr, "v"))
 	// linear prediction
-	// steps it takes @ current v to reach goal Mean
+	// steps it takes @ current velocity to reach goal Mean
 	// the less steps to go, the more I dampen acceleration
 	var prediction = currentMeanVelocity === 0 ? 1000
 		: (gMean[attr] - currentMean)/currentMeanVelocity
@@ -579,8 +571,7 @@ function step(attr) {
 			accDelta *= 1-predDampen/prediction
 		
 		// spread or contract around current mean to reach goal variance
-		// currentVariance may be 0
-		
+		// this also pressures outliers towards mean
 		var localRelativeDifferenceToCurrentMean = currentVariance == 0 ? 0
 			: (currentMean - pa._) / currentVariance
 		accDelta -= accBaseScaled * 0.8
@@ -595,16 +586,6 @@ function step(attr) {
 				* pa.activity
 				* (gVar[attr]/pSpan)
 		}
-		
-		
-		// accelerate to reach goal variance
-//		var localDifferenceToCurrentMean = pa._ - mean_
-//		var cor_var_sign = (var_ < gVar[attr] && localDifferenceToCurrentMean > 0)
-//			|| (var_ > gVar[attr] && localDifferenceToCurrentMean < 0) ? 1 : -1
-//		if (Math.abs(dVar) > 3
-//			&& ((cor_var_sign > 0 && mean_v <= 0)
-//			|| (cor_var_sign < 0 && mean_v >= 0)))
-//			accDelta += cor_var_sign * 0.01
 		
 		pa.acc += accDelta
 		

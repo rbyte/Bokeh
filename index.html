@@ -4,10 +4,7 @@
 	<meta charset="utf-8">
 	<title>Bokeh</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css"/>
-	<link rel="stylesheet" type="text/css" href="codemirror/lib/codemirror.css">
 	<script type="text/javascript" src='js/d3.v3.min.js'></script>
-	<script type="text/javascript" src="codemirror/lib/codemirror.js"></script>
-	<script type="text/javascript" src="codemirror/mode/javascript/javascript.js"></script>
 	<script type="text/javascript" src='js/bokeh.js'></script>
 </head>
 
@@ -15,498 +12,497 @@
 
 <div class="vertAlign">
 <span class="helperSpanToAlignImageVertically"></span>
-	<ul class="menu mLeft">
-		<li id="li_h">
-			<svg id="li_h_svg" onclick="bokeh.clickHue()"
-				class="symbolSVG"
-				xmlns="http://www.w3.org/2000/svg"
-				xmlns:xlink="http://www.w3.org/1999/xlink"
-				viewBox="0 0 224 224"
-			>
-			  <defs>
-				<linearGradient id="linearGradient3763">
-				  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
-				  <stop style="stop-color:#000000;stop-opacity:0" offset="0.79792744" />
-				  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
-				</linearGradient>
-				<clipPath id="clipPath6762">
-				  <path d="m 98.03125,23.191212 c -41.492132,1.05238 -74.84375,35.06824 -74.84375,76.812498 0,42.40687 34.405632,76.8125 76.8125,76.8125 42.40687,0 76.8125,-34.40563 76.8125,-76.8125 0,-42.406866 -34.40563,-76.812498 -76.8125,-76.812498 -0.662607,0 -1.310145,-0.0167 -1.96875,0 z M 100,50.659962 c 27.24464,0 49.34375,22.099114 49.34375,49.343748 -1e-5,27.24464 -22.09911,49.34375 -49.34375,49.34375 -27.244636,-1e-5 -49.34375,-22.09911 -49.34375,-49.34375 0,-27.244634 22.099114,-49.343748 49.34375,-49.343748 z"
-					 id="path6764"
-					 style="fill:none;stroke:#000000;" />
-				</clipPath>
-				<radialGradient cx="103.43348" cy="102.54077" r="104.29185" fx="103.43348" fy="102.54077"
-				   id="radialGradient3769"
-				   xlink:href="#linearGradient3763"
-				   gradientUnits="userSpaceOnUse" />
-				<filter
-				   color-interpolation-filters="sRGB"
-				   id="filter3813">
-				  <feGaussianBlur id="feGaussianBlur3815" stdDeviation="8" />
-				</filter>
-				<mask id="mask3764">
-				  <path d="m 207.72533,102.54077 a 104.29185,104.29185 0 1 1 -208.58369792,0 104.29185,104.29185 0 1 1 208.58369792,0 z"
-					 transform="matrix(0.73781468,0,0,0.73781468,34.762902,34.522448)"
-					 id="path3766"
-					 style="color:#000000;fill:#ffffff;" />
-				</mask>
-				<filter id="filter3783">
-				  <feGaussianBlur stdDeviation="4" id="feGaussianBlur3785" />
-				</filter>
-			  </defs>
-			  <image xlink:href="images/symbols/hue.png"
-				 x="11.077647" y="10.17854" width="200" height="200"
-				 transform="matrix(1.4202946,0,0,1.4202946,-44.86445,-43.879601)"
-				 mask="url(#mask3764)"
-				 id="image6568"
-				 style="filter:url(#filter3783)" />
-			  <path
-				 d="m 207.72533,102.54077 a 104.29185,104.29185 0 1 1 -208.58369792,0 104.29185,104.29185 0 1 1 208.58369792,0 z"
-				 id="path3761"
-				 style="fill:url(#radialGradient3769);"
-				 transform="matrix(1.0479142,0,0,1.0479142,4.5091114,5.1524455)" />
-			</svg>
-			
-			<div id="li_h_dsvg" class="liKasten left"></div>
-		</li>
-		<li id="li_s">
-			<svg id="li_s_svg" onclick="bokeh.clickSaturation()"
-				class="symbolSVG"
-				xmlns="http://www.w3.org/2000/svg"
-				xmlns:xlink="http://www.w3.org/1999/xlink"
-				viewBox="0 0 442.57144 442.57144">
-			  <defs>
-				<linearGradient id="linearGradient3767">
-				  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
-				  <stop style="stop-color:#000000;stop-opacity:0" offset="0.80310881" />
-				  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
-				</linearGradient>
-				<linearGradient id="linearGradient3755">
-				  <stop class="lgrad_hueDependentColour"
-					 style="stop-color:#fe0000;stop-opacity:1" offset="0" />
-				  <stop style="stop-color:#7f7f7f;stop-opacity:1" offset="1" />
-				</linearGradient>
-				<linearGradient x1="369.28552" y1="109.93343" x2="369.28552"
-				   y2="548.83179" id="linearGradient3761"
-				   xlink:href="#linearGradient3755" gradientUnits="userSpaceOnUse" />
-				<radialGradient cx="369.28571" cy="330.21933" r="220.28572"
-				   fx="369.28571" fy="330.21933" id="radialGradient3765"
-				   xlink:href="#linearGradient3767"
-				   gradientUnits="userSpaceOnUse" />
-			  </defs>
+<ul class="menu mLeft">
+<li id="li_h">
+	<svg id="li_h_svg" onclick="bokeh.clickHue()"
+		class="symbolSVG"
+		xmlns="http://www.w3.org/2000/svg"
+		xmlns:xlink="http://www.w3.org/1999/xlink"
+		viewBox="0 0 224 224"
+	>
+	  <defs>
+		<linearGradient id="linearGradient3763">
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0.79792744" />
+		  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
+		</linearGradient>
+		<clipPath id="clipPath6762">
+		  <path d="m 98.03125,23.191212 c -41.492132,1.05238 -74.84375,35.06824 -74.84375,76.812498 0,42.40687 34.405632,76.8125 76.8125,76.8125 42.40687,0 76.8125,-34.40563 76.8125,-76.8125 0,-42.406866 -34.40563,-76.812498 -76.8125,-76.812498 -0.662607,0 -1.310145,-0.0167 -1.96875,0 z M 100,50.659962 c 27.24464,0 49.34375,22.099114 49.34375,49.343748 -1e-5,27.24464 -22.09911,49.34375 -49.34375,49.34375 -27.244636,-1e-5 -49.34375,-22.09911 -49.34375,-49.34375 0,-27.244634 22.099114,-49.343748 49.34375,-49.343748 z"
+			 id="path6764"
+			 style="fill:none;stroke:#000000;" />
+		</clipPath>
+		<radialGradient cx="103.43348" cy="102.54077" r="104.29185" fx="103.43348" fy="102.54077"
+		   id="radialGradient3769"
+		   xlink:href="#linearGradient3763"
+		   gradientUnits="userSpaceOnUse" />
+		<filter
+		   color-interpolation-filters="sRGB"
+		   id="filter3813">
+		  <feGaussianBlur id="feGaussianBlur3815" stdDeviation="8" />
+		</filter>
+		<mask id="mask3764">
+		  <path d="m 207.72533,102.54077 a 104.29185,104.29185 0 1 1 -208.58369792,0 104.29185,104.29185 0 1 1 208.58369792,0 z"
+			 transform="matrix(0.73781468,0,0,0.73781468,34.762902,34.522448)"
+			 id="path3766"
+			 style="color:#000000;fill:#ffffff;" />
+		</mask>
+		<filter id="filter3783">
+		  <feGaussianBlur stdDeviation="4" id="feGaussianBlur3785" />
+		</filter>
+	  </defs>
+	  <image xlink:href="images/hue.png"
+		 x="11.077647" y="10.17854" width="200" height="200"
+		 transform="matrix(1.4202946,0,0,1.4202946,-44.86445,-43.879601)"
+		 mask="url(#mask3764)"
+		 id="image6568"
+		 style="filter:url(#filter3783)" />
+	  <path
+		 d="m 207.72533,102.54077 a 104.29185,104.29185 0 1 1 -208.58369792,0 104.29185,104.29185 0 1 1 208.58369792,0 z"
+		 id="path3761"
+		 style="fill:url(#radialGradient3769);"
+		 transform="matrix(1.0479142,0,0,1.0479142,4.5091114,5.1524455)" />
+	</svg>
 
-			  <g
-				 transform="translate(-147.99998,-108.93361)"
-				 id="layer1">
-				<path
-				   d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
-				   style="fill:url(#linearGradient3761)" />
-				<path
-				   d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
-				   style="fill:url(#radialGradient3765)" />
-			  </g>
-			</svg>
-			<div id="li_s_dsvg" class="liKasten left"></div>
-		</li>
-		<li id="li_g">
-			<svg id="li_g_svg" class="symbolSVG" onclick="bokeh.clickGamma()"
-			   xmlns="http://www.w3.org/2000/svg"
-			  viewBox="0 0 354.60001 354.60001">
-			  <defs>
-				<filter
-				   x="-0.43113771"
-				   y="-0.43113771"
-				   width="1.8622754"
-				   height="1.8622754"
-				   id="filter4307">
-				  <feGaussianBlur id="li_g_svg_feGaussianBlur"
-					 stdDeviation="35.928144" />
-				</filter>
-			  </defs>
-			  <g
-				 transform="translate(-122.69925,-97.76218)"
-				 id="layer1">
-				<path
-				   d="m 300,200 a 100,100 0 1 1 -200,0 100,100 0 1 1 200,0 z"
-				   transform="matrix(-0.91013649,0,0,-0.91013649,481.52276,459.09018)"
-				   style="fill:#000000;filter:url(#filter4307);" />
-			  </g>
-			</svg>
-			<div id="li_g_dsvg" class="liKasten left"></div>
-		</li>
-		<li id="li_a">
-			<svg id="li_a_svg" class="symbolSVG" onclick="bokeh.clickAlpha()"
-				viewBox="0 0 400 400"
-			   xmlns="http://www.w3.org/2000/svg"
-			   xmlns:xlink="http://www.w3.org/1999/xlink">
-			  <defs>
-				<pattern id="li_g_alphaPattern" patternUnits="userSpaceOnUse"
-				width="160" height="160" x="0" y="0"> <!-- 400/5 = 80 -->
-					<rect x="0" y="0" width="80" height="80" style="fill: #fff" />
-					<rect x="80" y="0" width="80" height="80" style="fill: #aaa" />
-					<rect x="0" y="80" width="80" height="80" style="fill: #aaa" />
-					<rect x="80" y="80" width="80" height="80" style="fill: #fff" />
-				</pattern>
+	<div id="li_h_dsvg" class="liKasten left"></div>
+</li>
+<li id="li_s">
+	<svg id="li_s_svg" onclick="bokeh.clickSaturation()"
+		class="symbolSVG"
+		xmlns="http://www.w3.org/2000/svg"
+		xmlns:xlink="http://www.w3.org/1999/xlink"
+		viewBox="0 0 442.57144 442.57144">
+	  <defs>
+		<linearGradient id="linearGradient3767">
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0.80310881" />
+		  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
+		</linearGradient>
+		<linearGradient id="linearGradient3755">
+		  <stop class="lgrad_hueDependentColour"
+			 style="stop-color:#fe0000;stop-opacity:1" offset="0" />
+		  <stop style="stop-color:#7f7f7f;stop-opacity:1" offset="1" />
+		</linearGradient>
+		<linearGradient x1="369.28552" y1="109.93343" x2="369.28552"
+		   y2="548.83179" id="linearGradient3761"
+		   xlink:href="#linearGradient3755" gradientUnits="userSpaceOnUse" />
+		<radialGradient cx="369.28571" cy="330.21933" r="220.28572"
+		   fx="369.28571" fy="330.21933" id="radialGradient3765"
+		   xlink:href="#linearGradient3767"
+		   gradientUnits="userSpaceOnUse" />
+	  </defs>
 
-				<radialGradient cx="200" cy="200" r="200" fx="200" fy="200"
-				   id="radialGradient4203-1"
-				   xlink:href="#linearGradient4197-7" 
-				   gradientUnits="userSpaceOnUse" />
-				<linearGradient id="linearGradient4197-7"> 
-				  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
-				  <stop style="stop-color:#000000;stop-opacity:0" offset="0.79792744" />
-				  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
-				</linearGradient>
-				<radialGradient cx="200" cy="200" r="200" fx="200" fy="200"
-				   id="radialGradient3819" 
-				   xlink:href="#linearGradient4197-7"
-				   gradientUnits="userSpaceOnUse" />
-				<linearGradient x1="300" y1="482.36218" x2="300" y2="152.36218"
-				   id="linearGradient3895-0"
-				   xlink:href="#linearGradient3889-4" 
-				   gradientUnits="userSpaceOnUse" />
-				<linearGradient id="linearGradient3889-4"> 
-				  <stop style="stop-color:#000;stop-opacity:1" offset="0" />
-				  <stop style="stop-color:#000;stop-opacity:0.5" offset="0.5" id="li_a_svg_stopFadeMiddle" />
-				  <stop style="stop-color:#000;stop-opacity:0" offset="1" />
-				</linearGradient>
-				<linearGradient x1="300" y1="482.36218" x2="300" y2="152.36218"
-				   id="linearGradient3855" 
-				   xlink:href="#linearGradient3889-4"
-				   gradientUnits="userSpaceOnUse" />
-				<mask
-				   id="mask3913">
-				  <path
-					 d="m 400,200 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
-					 transform="translate(100.00004,102.36217)"
-					 id="path3915"
-					 style="fill:#fff;" />
-				</mask>
-			  </defs>
+	  <g
+		 transform="translate(-147.99998,-108.93361)"
+		 id="layer1">
+		<path
+		   d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
+		   style="fill:url(#linearGradient3761)" />
+		<path
+		   d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
+		   style="fill:url(#radialGradient3765)" />
+	  </g>
+	</svg>
+	
+	<div id="li_s_dsvg" class="liKasten left"></div>
+</li>
+<li id="li_g">
+	<svg id="li_g_svg" class="symbolSVG" onclick="bokeh.clickGamma()"
+	   xmlns="http://www.w3.org/2000/svg"
+	  viewBox="0 0 354.60001 354.60001">
+	  <defs>
+		<filter
+		   x="-0.43113771"
+		   y="-0.43113771"
+		   width="1.8622754"
+		   height="1.8622754"
+		   id="filter4307">
+		  <feGaussianBlur id="li_g_svg_feGaussianBlur"
+			 stdDeviation="35.928144" />
+		</filter>
+	  </defs>
+	  <g
+		 transform="translate(-122.69925,-97.76218)"
+		 id="layer1">
+		<path
+		   d="m 300,200 a 100,100 0 1 1 -200,0 100,100 0 1 1 200,0 z"
+		   transform="matrix(-0.91013649,0,0,-0.91013649,481.52276,459.09018)"
+		   style="fill:#000000;filter:url(#filter4307);" />
+	  </g>
+	</svg>
+	<div id="li_g_dsvg" class="liKasten left"></div>
+</li>
+<li id="li_a">
+	<svg id="li_a_svg" class="symbolSVG" onclick="bokeh.clickAlpha()"
+		viewBox="0 0 400 400"
+	   xmlns="http://www.w3.org/2000/svg"
+	   xmlns:xlink="http://www.w3.org/1999/xlink">
+	  <defs>
+		<pattern id="li_g_alphaPattern" patternUnits="userSpaceOnUse"
+		width="160" height="160" x="0" y="0"> <!-- 400/5 = 80 -->
+			<rect x="0" y="0" width="80" height="80" style="fill: #fff" />
+			<rect x="80" y="0" width="80" height="80" style="fill: #aaa" />
+			<rect x="0" y="80" width="80" height="80" style="fill: #aaa" />
+			<rect x="80" y="80" width="80" height="80" style="fill: #fff" />
+		</pattern>
 
-			  <g
-				 id="layer2">
-				<path
-				   d="m 400,200 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
-				   transform="translate(0,-2.6171875e-6)"
-				   style="color:#000000;fill:url(#li_g_alphaPattern);" />
-				<path
-				   d="m 400,200 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
-				   transform="translate(0,-2.6171875e-6)"
-				   id="path4195"
-				   style="color:#000000;fill:url(#radialGradient3819);" />
-				<path
-				   d="m 500,302.36218 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
-				   transform="translate(-100,-102.36219)"
-				   id="path3887"
-				   style="color:#000000;fill:url(#linearGradient3855);" />
-			  </g>
-			</svg>
-			
-			<!--<img src="images/symbols/AlphaSymbol2.svg" onclick="bokeh.clickAlpha()" />-->
-			<div id="li_a_dsvg" class="liKasten left"></div>
-		</li>
-		<li id="li_r">
-			<svg id="li_r_svg" class="symbolSVG" onclick="bokeh.clickRadius()"
-				viewBox="0 0 442.57144 442.57144"
-			   xmlns="http://www.w3.org/2000/svg"
-			   xmlns:xlink="http://www.w3.org/1999/xlink">
-			  <defs>
-				<linearGradient id="linearGradient3767">
-				  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
-				  <stop style="stop-color:#000000;stop-opacity:0" offset="0.80310881" />
-				  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
-				</linearGradient>
-				<linearGradient id="linearGradient3755">
-				  <stop style="stop-color:#fe0000;stop-opacity:1" offset="0" />
-				  <stop style="stop-color:#7f7f7f;stop-opacity:1" offset="1" />
-				</linearGradient>
-				<radialGradient cx="369.28571" cy="330.21933" r="220.28572" fx="369.28571" fy="330.21933"
-				   id="radialGradient3765"
-				   xlink:href="#linearGradient3767"
-				   gradientUnits="userSpaceOnUse" />
-			  </defs>
+		<radialGradient cx="200" cy="200" r="200" fx="200" fy="200"
+		   id="radialGradient4203-1"
+		   xlink:href="#linearGradient4197-7" 
+		   gradientUnits="userSpaceOnUse" />
+		<linearGradient id="linearGradient4197-7"> 
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0.79792744" />
+		  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
+		</linearGradient>
+		<radialGradient cx="200" cy="200" r="200" fx="200" fy="200"
+		   id="radialGradient3819" 
+		   xlink:href="#linearGradient4197-7"
+		   gradientUnits="userSpaceOnUse" />
+		<linearGradient x1="300" y1="482.36218" x2="300" y2="152.36218"
+		   id="linearGradient3895-0"
+		   xlink:href="#linearGradient3889-4" 
+		   gradientUnits="userSpaceOnUse" />
+		<linearGradient id="linearGradient3889-4"> 
+		  <stop style="stop-color:#000;stop-opacity:1" offset="0" />
+		  <stop style="stop-color:#000;stop-opacity:0.5" offset="0.5" id="li_a_svg_stopFadeMiddle" />
+		  <stop style="stop-color:#000;stop-opacity:0" offset="1" />
+		</linearGradient>
+		<linearGradient x1="300" y1="482.36218" x2="300" y2="152.36218"
+		   id="linearGradient3855" 
+		   xlink:href="#linearGradient3889-4"
+		   gradientUnits="userSpaceOnUse" />
+		<mask
+		   id="mask3913">
+		  <path
+			 d="m 400,200 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
+			 transform="translate(100.00004,102.36217)"
+			 id="path3915"
+			 style="fill:#fff;" />
+		</mask>
+	  </defs>
 
-			  <g transform="translate(-147.99998,-108.93361)">
-				<path d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
-				   transform="matrix(0.92964828,0,0,0.92964828,26.809717,23.231498)"
-				   style="color:#000000;fill:#e6e6e6;" />
-				<path d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
-				   transform="matrix(0.92964828,0,0,0.92964828,26.809717,23.231498)"
-				   style="color:#000000;fill:url(#radialGradient3765);" />
-				<path d="m 370.91237,330.50107 201.86647,0"
-				   style="fill:none;stroke:#000000;stroke-width:18.59296417;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-				<path d="m 244.28571,222.57144 a 20.714285,20.714285 0 1 1 -41.42857,0 20.714285,20.714285 0 1 1 41.42857,0 z"
-				   transform="matrix(0.92964828,0,0,0.92964828,164.39764,123.58792)"
-				   style="fill:#1da9ff;" />
-				<path d="m 244.28571,222.57144 a 20.714285,20.714285 0 1 1 -41.42857,0 20.714285,20.714285 0 1 1 41.42857,0 z"
-				   transform="matrix(0.92964828,0,0,0.92964828,363.21466,123.58792)"
-				   style="fill:#1da9ff;" />
-			  </g>
-			</svg>
+	  <g
+		 id="layer2">
+		<path
+		   d="m 400,200 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
+		   transform="translate(0,-2.6171875e-6)"
+		   style="color:#000000;fill:url(#li_g_alphaPattern);" />
+		<path
+		   d="m 400,200 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
+		   transform="translate(0,-2.6171875e-6)"
+		   id="path4195"
+		   style="color:#000000;fill:url(#radialGradient3819);" />
+		<path
+		   d="m 500,302.36218 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
+		   transform="translate(-100,-102.36219)"
+		   id="path3887"
+		   style="color:#000000;fill:url(#linearGradient3855);" />
+	  </g>
+	</svg>
 
-			
-			
-			
-			<div id="li_r_dsvg" class="liKasten left"></div>
-		</li>
-		<li id="li_bg">
-			<svg id="li_bg_svg" onclick="bokeh.clickBackground()"
-				class="symbolSVG"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 442.57144 442.57144"
-			>
-			  <defs>
-				<linearGradient id="linearGradient3776">
-				  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
-				  <stop style="stop-color:#000000;stop-opacity:0" offset="0.8" />
-				  <stop style="stop-color:#000000;stop-opacity:0.11764706" offset="1" />
-				</linearGradient>
-				<radialGradient cx="190.71428" cy="217.57144" r="110.71429"
-				   fx="190.71428" fy="217.57144"
-				   id="radialGradient3782"
-				   xlink:href="#linearGradient3776"
-				   gradientUnits="userSpaceOnUse" />
-				<path id ="bgSymbolInnerCircle"
-				   d="m 301.42857,217.57144 a 110.71429,110.71429 0 1 1 -221.428578,0 110.71429,110.71429 0 1 1 221.428578,0 z"
-				   transform="matrix(1.4354949,0,0,1.4354949,97.64835,17.95879)" />
-			  </defs>
+	<div id="li_a_dsvg" class="liKasten left"></div>
+</li>
+<li id="li_r">
+	<svg id="li_r_svg" class="symbolSVG" onclick="bokeh.clickRadius()"
+		viewBox="0 0 442.57144 442.57144"
+	   xmlns="http://www.w3.org/2000/svg"
+	   xmlns:xlink="http://www.w3.org/1999/xlink">
+	  <defs>
+		<linearGradient id="linearGradient3767">
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0.80310881" />
+		  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
+		</linearGradient>
+		<linearGradient id="linearGradient3755">
+		  <stop style="stop-color:#fe0000;stop-opacity:1" offset="0" />
+		  <stop style="stop-color:#7f7f7f;stop-opacity:1" offset="1" />
+		</linearGradient>
+		<radialGradient cx="369.28571" cy="330.21933" r="220.28572" fx="369.28571" fy="330.21933"
+		   id="radialGradient3765"
+		   xlink:href="#linearGradient3767"
+		   gradientUnits="userSpaceOnUse" />
+	  </defs>
 
-			  <g transform="translate(-147.99998,-108.93361)">
-				<path
-				   d="m 568.78093,285.19673 c -0.34759,-6.36327 -4.21303,-13.95121 -11.78061,-26.86512 -8.77959,-14.98237 -10.12754,-18.20198 -10.04522,-24.22868 0.0784,-5.77081 1.74648,-10.73316 12.34795,-37.07721 4.4237,-10.99287 8.43031,-21.93283 8.94392,-24.29542 3.31967,-15.27157 -11.01168,-29.73097 -32.4384,-32.672 -8.0347,-1.10285 -14.63715,0.34788 -32.57188,7.10841 -29.4378,11.09663 -30.73763,11.14075 -64.70992,2.97018 -34.1395,-8.2108 -47.61298,-10.27884 -67.07939,-10.27884 -18.95254,-5e-5 -34.05438,2.26315 -61.80648,9.21091 -37.87366,9.48156 -41.52954,9.34953 -71.78496,-2.3361 -16.60059,-6.41159 -22.85249,-7.76585 -30.80313,-6.67456 -16.78296,2.30366 -29.71907,11.78866 -32.47175,23.76145 -1.45228,6.3165 -0.63279,9.09945 10.44569,34.84123 7.7465,17.99969 10.60162,27.54023 10.61256,35.54207 0.0126,8.72019 -2.37071,13.98691 -11.04641,24.49565 -14.07766,17.05239 -14.08209,21.96219 -0.10002,43.8519 8.43403,13.2042 11.14652,20.01119 11.14652,27.93306 4e-5,7.78725 -2.43922,13.06298 -11.14652,23.79484 -14.2183,17.52428 -14.10808,21.66631 1.6019,48.72433 8.57474,14.7686 9.54462,17.10835 9.54462,23.12737 -0.001,5.64753 -1.90369,11.55118 -11.98084,36.94372 -4.45731,11.23159 -8.52763,22.34856 -9.04404,24.72927 -3.3206,15.31028 10.99052,29.76145 32.43839,32.70537 8.07606,1.10854 14.49203,-0.27424 33.53969,-7.37539 18.5086,-6.9 24.83605,-8.57044 32.40502,-8.51008 6.58998,0.0526 11.87485,1.045 35.1416,6.54108 31.67114,7.48124 45.51506,9.57801 63.30825,9.57801 18.35138,0 29.21846,-1.69871 64.70993,-10.04523 36.48976,-8.58137 38.62637,-8.48749 68.88152,3.17042 16.59386,6.39398 22.82885,7.73112 30.76974,6.64119 17.21895,-2.36346 29.74445,-11.73436 32.50515,-24.32879 1.23905,-5.65273 -0.33268,-11.13742 -8.07623,-28.26679 -11.91517,-26.35693 -15.26924,-39.32439 -12.6483,-48.65758 1.68805,-6.01159 3.34699,-8.63574 12.2812,-19.58985 12.4348,-15.24621 12.03534,-21.42315 -2.76995,-43.45143 -7.23424,-10.76375 -9.98936,-17.57416 -10.14533,-25.16312 -0.19245,-9.35732 1.08056,-12.02852 12.38131,-26.09755 6.12721,-7.62832 9.33205,-12.66867 9.44451,-18.52192 0.007,-0.41461 0.0232,-0.81058 0,-1.2348 z"
-				   style="fill:#525252;" />
-				<use id="bgSymbolPath" x="0" y="0" xlink:href="#bgSymbolInnerCircle" style="fill:#fff;" />
-				<use id="bgSymbolPathForAlpha" x="0" y="0" xlink:href="#bgSymbolInnerCircle" style="fill:#fff;fill-opacity:0" />
-				<use x="0" y="0" xlink:href="#bgSymbolInnerCircle" style="fill:url(#radialGradient3782);" />
-			  </g>
-			</svg>
-			
-			<div class="liKasten left">
-				<svg id="bg_svg"
-					preserveAspectRatio="xMinYMid meet"
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 300 100">
-				<defs>
-					<linearGradient id="allHues">
-						  <stop style="stop-color:red;" offset="0" />
-						  <stop style="stop-color:yellow;" offset="0.18512578" />
-						  <stop style="stop-color:lime;" offset="0.34256288" />
-						  <stop style="stop-color:aqua;" offset="0.5" />
-						  <stop style="stop-color:blue;" offset="0.65429997" />
-						  <stop style="stop-color:fuchsia;" offset="0.8119877" />
-						  <stop style="stop-color:red;" offset="1" />
-					</linearGradient>
-					<linearGradient id="saturation">
-						<stop style="stop-color:grey;" offset="0" />
-						<stop style="stop-color:red;" offset="1" id="saturationStop" />
-					</linearGradient>
-					<linearGradient id="lightness">
-						<stop style="stop-color:black;" offset="0" />
-						<stop style="stop-color:red;" offset="0.5" id="lightnessStop" />
-						<stop style="stop-color:white;" offset="1" />
-					</linearGradient>
-					<linearGradient id="alpha">
-						<stop style="stop-color:black;stop-opacity: 0" offset="0" class="bgResultColourDep" />
-						<stop style="stop-color:black;" offset="1" class="bgResultColourDep" />
-					</linearGradient>
-					<linearGradient id="sliderGradient" gradientTransform="rotate(90)">
-						<stop style="stop-color: #fff;" offset="0" />
-						<stop style="stop-color: #555;" offset="1" />
-					</linearGradient>
-					<pattern id="bg_svg_alphaPattern" patternUnits="userSpaceOnUse"
-					width="10" height="10" x="0" y="0">
-						<rect x="0" y="0" width="5" height="5" style="fill: #ddd" />
-						<rect x="5" y="0" width="5" height="5" style="fill: #999" />
-						<rect x="0" y="5" width="5" height="5" style="fill: #999" />
-						<rect x="5" y="5" width="5" height="5" style="fill: #ddd" />
-					</pattern>
-					<rect id="slider" x="0" y="25" width="3" height="15" style="fill: url(#sliderGradient);" />
-					
-				</defs>
-				
-				<text x="6" y="17" style='font-family: "Open Sans",sans-serif; font-weight: 100;'>Background</text>
-				
-				<rect id="bgHue" class="draggable" x="0" y= "25" width="300" height="15" style="fill:url(#allHues)" />
-				<rect id="bgSaturation" class="draggable" x="0" y= "45" width="300" height="15" style="fill:url(#saturation)" />
-				<rect id="bgLightness" class="draggable" x="0" y= "65" width="300" height="15" style="fill:url(#lightness)" />
-				<rect x="0" y="85" width="300" height="15" fill="url(#bg_svg_alphaPattern)" />
-				<rect id="bgOpacity" class="draggable" x="0" y= "85" width="300" height="15" style="fill:url(#alpha)" />
-				
-				<use id="bgHueSlider" x="10" y="0" xlink:href="#slider" class="draggable" />
-				<use id="bgSaturationSlider" x="15" y="20" xlink:href="#slider" class="draggable" />
-				<use id="bgLightnessSlider" x="40" y="40" xlink:href="#slider" class="draggable" />
-				<use id="bgOpacitySlider" x="50" y="60" xlink:href="#slider" class="draggable" />
-				</svg>
-			</div>
-		</li>
-		<!--<li></li>-->
-	</ul>
+	  <g transform="translate(-147.99998,-108.93361)">
+		<path d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
+		   transform="matrix(0.92964828,0,0,0.92964828,26.809717,23.231498)"
+		   style="color:#000000;fill:#e6e6e6;" />
+		<path d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
+		   transform="matrix(0.92964828,0,0,0.92964828,26.809717,23.231498)"
+		   style="color:#000000;fill:url(#radialGradient3765);" />
+		<path d="m 370.91237,330.50107 201.86647,0"
+		   style="fill:none;stroke:#000000;stroke-width:18.59296417;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+		<path d="m 244.28571,222.57144 a 20.714285,20.714285 0 1 1 -41.42857,0 20.714285,20.714285 0 1 1 41.42857,0 z"
+		   transform="matrix(0.92964828,0,0,0.92964828,164.39764,123.58792)"
+		   style="fill:#1da9ff;" />
+		<path d="m 244.28571,222.57144 a 20.714285,20.714285 0 1 1 -41.42857,0 20.714285,20.714285 0 1 1 41.42857,0 z"
+		   transform="matrix(0.92964828,0,0,0.92964828,363.21466,123.58792)"
+		   style="fill:#1da9ff;" />
+	  </g>
+	</svg>
+	
+	<div id="li_r_dsvg" class="liKasten left"></div>
+</li>
+<li id="li_bg">
+	<svg id="li_bg_svg" onclick="bokeh.clickBackground()"
+		class="symbolSVG"
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 442.57144 442.57144"
+	>
+	  <defs>
+		<linearGradient id="linearGradient3776">
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0.8" />
+		  <stop style="stop-color:#000000;stop-opacity:0.11764706" offset="1" />
+		</linearGradient>
+		<radialGradient cx="190.71428" cy="217.57144" r="110.71429"
+		   fx="190.71428" fy="217.57144"
+		   id="radialGradient3782"
+		   xlink:href="#linearGradient3776"
+		   gradientUnits="userSpaceOnUse" />
+		<path id ="bgSymbolInnerCircle"
+		   d="m 301.42857,217.57144 a 110.71429,110.71429 0 1 1 -221.428578,0 110.71429,110.71429 0 1 1 221.428578,0 z"
+		   transform="matrix(1.4354949,0,0,1.4354949,97.64835,17.95879)" />
+	  </defs>
+
+	  <g transform="translate(-147.99998,-108.93361)">
+		<path
+		   d="m 568.78093,285.19673 c -0.34759,-6.36327 -4.21303,-13.95121 -11.78061,-26.86512 -8.77959,-14.98237 -10.12754,-18.20198 -10.04522,-24.22868 0.0784,-5.77081 1.74648,-10.73316 12.34795,-37.07721 4.4237,-10.99287 8.43031,-21.93283 8.94392,-24.29542 3.31967,-15.27157 -11.01168,-29.73097 -32.4384,-32.672 -8.0347,-1.10285 -14.63715,0.34788 -32.57188,7.10841 -29.4378,11.09663 -30.73763,11.14075 -64.70992,2.97018 -34.1395,-8.2108 -47.61298,-10.27884 -67.07939,-10.27884 -18.95254,-5e-5 -34.05438,2.26315 -61.80648,9.21091 -37.87366,9.48156 -41.52954,9.34953 -71.78496,-2.3361 -16.60059,-6.41159 -22.85249,-7.76585 -30.80313,-6.67456 -16.78296,2.30366 -29.71907,11.78866 -32.47175,23.76145 -1.45228,6.3165 -0.63279,9.09945 10.44569,34.84123 7.7465,17.99969 10.60162,27.54023 10.61256,35.54207 0.0126,8.72019 -2.37071,13.98691 -11.04641,24.49565 -14.07766,17.05239 -14.08209,21.96219 -0.10002,43.8519 8.43403,13.2042 11.14652,20.01119 11.14652,27.93306 4e-5,7.78725 -2.43922,13.06298 -11.14652,23.79484 -14.2183,17.52428 -14.10808,21.66631 1.6019,48.72433 8.57474,14.7686 9.54462,17.10835 9.54462,23.12737 -0.001,5.64753 -1.90369,11.55118 -11.98084,36.94372 -4.45731,11.23159 -8.52763,22.34856 -9.04404,24.72927 -3.3206,15.31028 10.99052,29.76145 32.43839,32.70537 8.07606,1.10854 14.49203,-0.27424 33.53969,-7.37539 18.5086,-6.9 24.83605,-8.57044 32.40502,-8.51008 6.58998,0.0526 11.87485,1.045 35.1416,6.54108 31.67114,7.48124 45.51506,9.57801 63.30825,9.57801 18.35138,0 29.21846,-1.69871 64.70993,-10.04523 36.48976,-8.58137 38.62637,-8.48749 68.88152,3.17042 16.59386,6.39398 22.82885,7.73112 30.76974,6.64119 17.21895,-2.36346 29.74445,-11.73436 32.50515,-24.32879 1.23905,-5.65273 -0.33268,-11.13742 -8.07623,-28.26679 -11.91517,-26.35693 -15.26924,-39.32439 -12.6483,-48.65758 1.68805,-6.01159 3.34699,-8.63574 12.2812,-19.58985 12.4348,-15.24621 12.03534,-21.42315 -2.76995,-43.45143 -7.23424,-10.76375 -9.98936,-17.57416 -10.14533,-25.16312 -0.19245,-9.35732 1.08056,-12.02852 12.38131,-26.09755 6.12721,-7.62832 9.33205,-12.66867 9.44451,-18.52192 0.007,-0.41461 0.0232,-0.81058 0,-1.2348 z"
+		   style="fill:#525252;" />
+		<use id="bgSymbolPath" x="0" y="0" xlink:href="#bgSymbolInnerCircle" style="fill:#fff;" />
+		<use id="bgSymbolPathForAlpha" x="0" y="0" xlink:href="#bgSymbolInnerCircle" style="fill:#fff;fill-opacity:0" />
+		<use x="0" y="0" xlink:href="#bgSymbolInnerCircle" style="fill:url(#radialGradient3782);" />
+	  </g>
+	</svg>
+
+	<div class="liKasten left">
+		<svg id="bg_svg"
+			preserveAspectRatio="xMinYMid meet"
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 300 100">
+		<defs>
+			<linearGradient id="allHues">
+				  <stop style="stop-color:red;" offset="0" />
+				  <stop style="stop-color:yellow;" offset="0.18512578" />
+				  <stop style="stop-color:lime;" offset="0.34256288" />
+				  <stop style="stop-color:aqua;" offset="0.5" />
+				  <stop style="stop-color:blue;" offset="0.65429997" />
+				  <stop style="stop-color:fuchsia;" offset="0.8119877" />
+				  <stop style="stop-color:red;" offset="1" />
+			</linearGradient>
+			<linearGradient id="saturation">
+				<stop style="stop-color:grey;" offset="0" />
+				<stop style="stop-color:red;" offset="1" id="saturationStop" />
+			</linearGradient>
+			<linearGradient id="lightness">
+				<stop style="stop-color:black;" offset="0" />
+				<stop style="stop-color:red;" offset="0.5" id="lightnessStop" />
+				<stop style="stop-color:white;" offset="1" />
+			</linearGradient>
+			<linearGradient id="alpha">
+				<stop style="stop-color:black;stop-opacity: 0" offset="0" class="bgResultColourDep" />
+				<stop style="stop-color:black;" offset="1" class="bgResultColourDep" />
+			</linearGradient>
+			<linearGradient id="sliderGradient" gradientTransform="rotate(90)">
+				<stop style="stop-color: #fff;" offset="0" />
+				<stop style="stop-color: #555;" offset="1" />
+			</linearGradient>
+			<pattern id="bg_svg_alphaPattern" patternUnits="userSpaceOnUse"
+			width="10" height="10" x="0" y="0">
+				<rect x="0" y="0" width="5" height="5" style="fill: #ddd" />
+				<rect x="5" y="0" width="5" height="5" style="fill: #999" />
+				<rect x="0" y="5" width="5" height="5" style="fill: #999" />
+				<rect x="5" y="5" width="5" height="5" style="fill: #ddd" />
+			</pattern>
+			<rect id="slider" x="0" y="25" width="3" height="15" style="fill: url(#sliderGradient);" />
+
+		</defs>
+
+		<text x="6" y="17" style='font-family: "Open Sans",sans-serif; font-weight: 100;'>Background</text>
+
+		<rect id="bgHue" class="draggable" x="0" y= "25" width="300" height="15" style="fill:url(#allHues)" />
+		<rect id="bgSaturation" class="draggable" x="0" y= "45" width="300" height="15" style="fill:url(#saturation)" />
+		<rect id="bgLightness" class="draggable" x="0" y= "65" width="300" height="15" style="fill:url(#lightness)" />
+		<rect x="0" y="85" width="300" height="15" fill="url(#bg_svg_alphaPattern)" />
+		<rect id="bgOpacity" class="draggable" x="0" y= "85" width="300" height="15" style="fill:url(#alpha)" />
+
+		<use id="bgHueSlider" x="10" y="0" xlink:href="#slider" class="draggable" />
+		<use id="bgSaturationSlider" x="15" y="20" xlink:href="#slider" class="draggable" />
+		<use id="bgLightnessSlider" x="40" y="40" xlink:href="#slider" class="draggable" />
+		<use id="bgOpacitySlider" x="50" y="60" xlink:href="#slider" class="draggable" />
+		</svg>
+	</div>
+</li>
+</ul>
 </div>
 
 <div class="vertAlign alignRight">
 <span class="helperSpanToAlignImageVertically"></span>
-	<ul class="menu mRight">
-		<li id="li_p" title="Number of Particles">
-			<svg id="li_p_svg" onclick="bokeh.clickParticle()"
-				class="symbolSVG"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 100 100"
-			>
-				<defs>
-					<circle id="s1" cx="0" cy="0" r="5" style="fill: #000; fill-opacity: 0.4;" />
-				</defs>
-				<circle cx="50" cy="50" r="45" style="fill: none; stroke: #000; stroke-width: 5;" />
-				<!--<use x="30" y="30" xlink:href="#s1"/>-->
-			</svg>
-			<div class="liKasten right">
-<svg
-	xmlns="http://www.w3.org/2000/svg"
-	xmlns:xlink="http://www.w3.org/1999/xlink"
-	xml:space="preserve"
-	preserveAspectRatio="xMaxYMid meet"
-	viewBox="-15 -5 130 20">
-<defs>
-	<style type="text/css">
-	.fader           {stroke:#989B9F}
-	.faderBackground {fill:url(#lightFaderGradient)}
-	.faderForeground {fill:url(#darkFaderGradient)}
-	.faderKnob       {fill:url(#knobGradient)}
-	</style>
-	<linearGradient id="darkFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
-		<stop offset="0" stop-color="#D7D9DC"/>
-		<stop offset="1" stop-color="#42494C"/>
-	</linearGradient>
-	<linearGradient id="lightFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
-		<stop offset="0" stop-color="white"/>
-		<stop offset="1" stop-color="#D7D9DC"/>
-	</linearGradient>
-	<linearGradient id="knobGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
-		<stop offset="0" stop-color="white"/>
-		<stop offset="1" stop-color="#D7D9DC"/>
-	</linearGradient>
-</defs>
-	<g id="numberOfParticles_myFader" class="fader">
-		<rect class="faderBackground" width="100" height="10" rx="5"/>
-		<rect class="faderForeground" width="50" height="10" rx="5"/>
-		<circle class="faderKnob draggable" cy="5" cx="50" r="7"/>
-	</g>
-</svg>
+<ul class="menu mRight">
+<li id="li_p" desc="Number of Particles">
+	<svg id="li_p_svg" onclick="bokeh.clickParticle()"
+		class="symbolSVG"
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 100 100"
+	>
+		<defs>
+			<circle id="s1" cx="0" cy="0" r="5" style="fill: #000; fill-opacity: 0.4;" />
+		</defs>
+		<circle cx="50" cy="50" r="45" style="fill: none; stroke: #000; stroke-width: 5;" />
+		<!--<use x="30" y="30" xlink:href="#s1"/>-->
+	</svg>
+	<div class="liKasten right">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			xmlns:xlink="http://www.w3.org/1999/xlink"
+			xml:space="preserve"
+			preserveAspectRatio="xMaxYMid meet"
+			viewBox="-15 -5 130 40">
+		<defs>
+			<style type="text/css">
+			.fader           {stroke:#989B9F}
+			.faderBackground {fill:url(#lightFaderGradient)}
+			.faderForeground {fill:url(#darkFaderGradient)}
+			.faderKnob       {fill:url(#knobGradient)}
+			</style>
+			<linearGradient id="darkFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+				<stop offset="0" stop-color="#D7D9DC"/>
+				<stop offset="1" stop-color="#42494C"/>
+			</linearGradient>
+			<linearGradient id="lightFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+				<stop offset="0" stop-color="white"/>
+				<stop offset="1" stop-color="#D7D9DC"/>
+			</linearGradient>
+			<linearGradient id="knobGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+				<stop offset="0" stop-color="white"/>
+				<stop offset="1" stop-color="#D7D9DC"/>
+			</linearGradient>
+		</defs>
+			<g id="numberOfParticles_myFader" class="fader">
+				<text x="5" y="7" style='stroke: none; font-size: 50%; font-family: "Open Sans",sans-serif; font-weight: 100'>Particles
+				</text>
+				<rect class="faderBackground" width="100" height="10" y="15" rx="5"/>
+				<rect class="faderForeground" width="50" height="10" y="15" rx="5"/>
+				<circle class="faderKnob draggable" cy="20" cx="50" r="7"/>
+			</g>
+		</svg>
+	</div>
+</li>
+<li desc="Zoom">
+	<img src="images/Size.svg" />
+	<div class="liKasten right">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			xmlns:xlink="http://www.w3.org/1999/xlink"
+			xml:space="preserve"
+			preserveAspectRatio="xMaxYMid meet"
+			viewBox="-15 -5 130 40">
+		<defs>
+			<style type="text/css">
+			.fader           {stroke:#989B9F}
+			.faderBackground {fill:url(#lightFaderGradient)}
+			.faderForeground {fill:url(#darkFaderGradient)}
+			.faderKnob       {fill:url(#knobGradient)}
+			</style>
+			<linearGradient id="darkFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+				<stop offset="0" stop-color="#D7D9DC"/>
+				<stop offset="1" stop-color="#42494C"/>
+			</linearGradient>
+			<linearGradient id="lightFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+				<stop offset="0" stop-color="white"/>
+				<stop offset="1" stop-color="#D7D9DC"/>
+			</linearGradient>
+			<linearGradient id="knobGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+				<stop offset="0" stop-color="white"/>
+				<stop offset="1" stop-color="#D7D9DC"/>
+			</linearGradient>
+		</defs>
+			<g id="SVGsizeInWindow_myFader" class="fader">
+				<text x="5" y="7" style='stroke: none; font-size: 50%; font-family: "Open Sans",sans-serif; font-weight: 100'>Size
+				</text>
+				<rect class="faderBackground" width="100" height="10" y="15" rx="5"/>
+				<rect class="faderForeground" width="50" height="10" y="15" rx="5"/>
+				<circle class="faderKnob draggable" cy="20" cx="50" r="7"/>
+			</g>
+		</svg>
+	</div>
+</li>
+<li desc="Speed">
+	<svg id="li_size_svg"
+		class="symbolSVG"
+	   xmlns="http://www.w3.org/2000/svg"
+	   xmlns:xlink="http://www.w3.org/1999/xlink"
+	   viewBox="0 0 442.57144 442.57144">
 
-			</div>
-		</li>
-		<li title="Zoom">
-			<img src="images/symbols/Size.svg" />
-			<div class="liKasten right">
-<svg
-	xmlns="http://www.w3.org/2000/svg"
-	xmlns:xlink="http://www.w3.org/1999/xlink"
-	xml:space="preserve"
-	preserveAspectRatio="xMaxYMid meet"
-	viewBox="-15 -5 130 20">
-<defs>
-	<style type="text/css">
-	.fader           {stroke:#989B9F}
-	.faderBackground {fill:url(#lightFaderGradient)}
-	.faderForeground {fill:url(#darkFaderGradient)}
-	.faderKnob       {fill:url(#knobGradient)}
-	</style>
-	<linearGradient id="darkFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
-		<stop offset="0" stop-color="#D7D9DC"/>
-		<stop offset="1" stop-color="#42494C"/>
-	</linearGradient>
-	<linearGradient id="lightFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
-		<stop offset="0" stop-color="white"/>
-		<stop offset="1" stop-color="#D7D9DC"/>
-	</linearGradient>
-	<linearGradient id="knobGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
-		<stop offset="0" stop-color="white"/>
-		<stop offset="1" stop-color="#D7D9DC"/>
-	</linearGradient>
-</defs>
-	<g id="SVGsizeInWindow_myFader" class="fader">
-		<rect class="faderBackground" width="100" height="10" rx="5"/>
-		<rect class="faderForeground" width="50" height="10" rx="5"/>
-		<circle class="faderKnob draggable" cy="5" cx="50" r="7"/>
-	</g>
-</svg>
-			</div>
-		</li>
-		<li title="Speed">
-<!--			<img src="images/symbols/Transition.svg" />-->
-			<svg id="li_size_svg"
-				class="symbolSVG"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   viewBox="0 0 442.57144 442.57144">
-
-  <g transform="translate(-147.99998,-108.93361)">
-    <path
-       d="m 178,202.07144 a 71.5,71.5 0 1 1 -143,0 71.5,71.5 0 1 1 143,0 z"
-       transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,425.18593,-79.393668)"
-       id="path3829"
-       style="color:#000000;fill:none;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;" />
-    <path
-       d="m 142.25,140.15063 a 71.5,71.5 0 0 1 0,123.84163"
-       transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,474.636,-29.943615)"
-       class="sizeSVGspeedIndicator"
-       style="color:#000000;fill:none;stroke:#000000;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;" />
-    <path
-       d="m 157.05813,151.5133 a 71.5,71.5 0 0 1 0,101.11628"
-       transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,512.58604,8.006431)"
-       class="sizeSVGspeedIndicator"
-       style="color:#000000;fill:none;stroke:#000000;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;" />
-    <path
-       d="m 168.42082,166.32144 a 71.5,71.5 0 0 1 0,71.5"
-       transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,549.38609,44.806468)"
-       class="sizeSVGspeedIndicator"
-       style="color:#000000;fill:none;stroke:#000000;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;" />
-  </g>
-</svg>
-
-			
-			<div class="liKasten right">
-<svg
-	xmlns="http://www.w3.org/2000/svg"
-	xmlns:xlink="http://www.w3.org/1999/xlink"
-	xml:space="preserve"
-	preserveAspectRatio="xMaxYMid meet"
-	viewBox="-15 -5 130 20">
-<defs>
-	<style type="text/css">
-	.fader           {stroke:#989B9F}
-	.faderBackground {fill:url(#lightFaderGradient)}
-	.faderForeground {fill:url(#darkFaderGradient)}
-	.faderKnob       {fill:url(#knobGradient)}
-	</style>
-	<linearGradient id="darkFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
-		<stop offset="0" stop-color="#D7D9DC"/>
-		<stop offset="1" stop-color="#42494C"/>
-	</linearGradient>
-	<linearGradient id="lightFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
-		<stop offset="0" stop-color="white"/>
-		<stop offset="1" stop-color="#D7D9DC"/>
-	</linearGradient>
-	<linearGradient id="knobGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
-		<stop offset="0" stop-color="white"/>
-		<stop offset="1" stop-color="#D7D9DC"/>
-	</linearGradient>
-</defs>
-	<g id="transitionDuration_myFader" class="fader">
-		<rect class="faderBackground" width="100" height="10" rx="5"/>
-		<rect class="faderForeground" width="50" height="10" rx="5"/>
-		<circle class="faderKnob draggable" cy="5" cx="50" r="7"/>
-	</g>
-</svg>
-			</div>
-		</li>
-		<li title="Download SVG" onclick="bokeh.clickDownload()"><img src="images/symbols/Download.svg" /></li>
-		<li title="View Source">
-			<a href="https://github.com/rbyte/Kaleidoscope">
-				<img src="images/symbols/Source.svg" />
-			</a>
-		</li>
-		<!--<li></li>-->
-	</ul>
+	  <g transform="translate(-147.99998,-108.93361)">
+		<path
+		   d="m 178,202.07144 a 71.5,71.5 0 1 1 -143,0 71.5,71.5 0 1 1 143,0 z"
+		   transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,425.18593,-79.393668)"
+		   id="path3829"
+		   style="color:#000000;fill:none;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;" />
+		<path
+		   d="m 142.25,140.15063 a 71.5,71.5 0 0 1 0,123.84163"
+		   transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,474.636,-29.943615)"
+		   class="sizeSVGspeedIndicator"
+		   style="color:#000000;fill:none;stroke:#000000;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;" />
+		<path
+		   d="m 157.05813,151.5133 a 71.5,71.5 0 0 1 0,101.11628"
+		   transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,512.58604,8.006431)"
+		   class="sizeSVGspeedIndicator"
+		   style="color:#000000;fill:none;stroke:#000000;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;" />
+		<path
+		   d="m 168.42082,166.32144 a 71.5,71.5 0 0 1 0,71.5"
+		   transform="matrix(1.1500013,1.1500013,-1.1500013,1.1500013,549.38609,44.806468)"
+		   class="sizeSVGspeedIndicator"
+		   style="color:#000000;fill:none;stroke:#000000;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;" />
+	  </g>
+	</svg>
+	<div class="liKasten right">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			xmlns:xlink="http://www.w3.org/1999/xlink"
+			xml:space="preserve"
+			preserveAspectRatio="xMaxYMid meet"
+			viewBox="-15 -5 130 40">
+		<defs>
+			<style type="text/css">
+			.fader           {stroke:#989B9F}
+			.faderBackground {fill:url(#lightFaderGradient)}
+			.faderForeground {fill:url(#darkFaderGradient)}
+			.faderKnob       {fill:url(#knobGradient)}
+			</style>
+			<linearGradient id="darkFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+				<stop offset="0" stop-color="#D7D9DC"/>
+				<stop offset="1" stop-color="#42494C"/>
+			</linearGradient>
+			<linearGradient id="lightFaderGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+				<stop offset="0" stop-color="white"/>
+				<stop offset="1" stop-color="#D7D9DC"/>
+			</linearGradient>
+			<linearGradient id="knobGradient" gradientUnits="objectBoundingBox" x2="0" y2="1">
+				<stop offset="0" stop-color="white"/>
+				<stop offset="1" stop-color="#D7D9DC"/>
+			</linearGradient>
+		</defs>
+			<g id="transitionDuration_myFader" class="fader">
+				<text x="5" y="7" style='stroke: none; font-size: 50%; font-family: "Open Sans",sans-serif; font-weight: 100'>Speed
+				</text>
+				<rect class="faderBackground" width="100" height="10" y="15" rx="5"/>
+				<rect class="faderForeground" width="50" height="10" y="15" rx="5"/>
+				<circle class="faderKnob draggable" cy="20" cx="50" r="7"/>
+			</g>
+		</svg>
+	</div>
+</li>
+<li title="Download SVG" onclick="bokeh.clickDownload()">
+	<img src="images/Download.svg" />
+</li>
+<li title="View Source">
+	<a href="https://github.com/rbyte/Kaleidoscope">
+		<img src="images/Source.svg" />
+	</a>
+</li>
+</ul>
 </div>
 		
 <div id="svgWrapper">
