@@ -16,9 +16,9 @@ veröffentlichen
 sliders on right side: write title into svg
 right side: reduce transition duration
 css: disable mouse cursor change on dSliderSVG text + z-index low!
-background sliders are buggy
 
-maybe:
+
+MAYBE:
 during dragging, menu should not unhover in case of overshoot
 added particles overlay white rects
 keyboard only option

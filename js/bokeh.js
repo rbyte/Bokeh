@@ -203,7 +203,7 @@ function setUpDistributionSlider(p) {
 		var vrc = (horizontal ? rY : 1-rX)*(.5+toGroundCutoff)
 		var preMean = gMean[p]
 		gMean[p] = gMin[p] + (gMax[p] - gMin[p]) * (horizontal ? rX : rY)
-		preVar = gVar[p]
+		var preVar = gVar[p]
 		// a "looks good" approximation
 		gVar[p] = (gMax[p] - gMin[p]) * vrc * varianceOfVrc
 		if (false) {
@@ -463,7 +463,7 @@ function progressParticleSystem() {
 
 	for (var i=1; pls.length - numberOfParticles !== 0; i++) {
 		if (pls.length > numberOfParticles) {
-			pls.shift().obj.remove()
+			pls.shift().obj.deleteParticle()
 		} else {
 			var p = new Particle(numberOfParticles+i)
 			pls.push(p)
@@ -472,7 +472,7 @@ function progressParticleSystem() {
 			p.l._ *= ((1-lvar)+i/numberOfParticles*(lvar*2))
 		}
 	}
-
+	
 	for (var i=0; i<pProperties.length; i++)
 		// lightness is bound to z-index
 		if (pProperties[i] !== "l")
@@ -579,7 +579,10 @@ function step(attr) {
 			accDelta *= 1-predDampen/prediction
 		
 		// spread or contract around current mean to reach goal variance
-		var localRelativeDifferenceToCurrentMean = (currentMean - pa._) / currentVariance
+		// currentVariance may be 0
+		
+		var localRelativeDifferenceToCurrentMean = currentVariance == 0 ? 0
+			: (currentMean - pa._) / currentVariance
 		accDelta -= accBaseScaled * 0.8
 			* relativeDifferenceToGoalVariance
 			* localRelativeDifferenceToCurrentMean
@@ -592,6 +595,7 @@ function step(attr) {
 				* pa.activity
 				* (gVar[attr]/pSpan)
 		}
+		
 		
 		// accelerate to reach goal variance
 //		var localDifferenceToCurrentMean = pa._ - mean_
@@ -619,7 +623,6 @@ function step(attr) {
 			if (intoMaxKissen < 1 && pa.v > 0)
 				pa.v *= intoMaxKissen
 		}
-
 		pa._ += pa.v
 
 		// force into min max bounds
@@ -674,9 +677,10 @@ function updateParticleSymbolSVG() {
 }
 
 function setUpSVG() {
-	var svg = d3.select("#svg")
+	var svg = d3.select("#bokehSvg")
 	svg.attr("viewBox", "0 0 "+svgViewboxWidth+" "+svgViewboxHeight)
 	setSVGSizeInWindow()
+	svg.append("defs")
 
 	svg.append("rect")
 		.attr("id", "backgroundRect")
@@ -686,16 +690,19 @@ function setUpSVG() {
 		.attr("height", "100%")
 		.style("fill", d3.hsl(bgColor.h/255*360, bgColor.s/255, bgColor.l/255) )
 		.style("fill-opacity", bgColor.a)
-
+		
+	svg.append("g").attr("id", "particlesGroup")
+	
 	// in chrome, the svg viewbox aspect is not honored. the svg is stretched to
 	// width and height 100% of the parent and "overflow" (objects outside of the viewbox)
 	// are visible
 	// surround viewbox with white rectangles
-	svg.append("rect").attr("x", "100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
-	svg.append("rect").attr("x", "-100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
-	svg.append("rect").attr("x", "0%").attr("y", "-100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
-	svg.append("rect").attr("x", "0%").attr("y", "100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
-
+	var viewboxWhiteFrame = svg.append("g").attr("id", "viewboxWhiteFrame")
+	viewboxWhiteFrame.append("rect").attr("x", "100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
+	viewboxWhiteFrame.append("rect").attr("x", "-100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
+	viewboxWhiteFrame.append("rect").attr("x", "0%").attr("y", "-100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
+	viewboxWhiteFrame.append("rect").attr("x", "0%").attr("y", "100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
+	
 }
 
 log.contains = function(prop, attr) {
@@ -826,19 +833,19 @@ var sum = function(list) {
 }
 
 function createSVGcircle(x, y, r, h, s, l, a, g) {
+	var c = d3.select("#particlesGroup").append("circle")
 	var filterName = Math.random().toString(36).substring(7)
-	var feGaussianBlur = d3.select("#svg defs")
+	c.filter = d3.select("#bokehSvg defs")
 		.append("filter")
 		.attr("id", filterName)
 		.attr("x", -3)
 		.attr("y", -3)
 		.attr("width", 8)
 		.attr("height", 8)
-		.append("feGaussianBlur")
+	c.feGaussianBlur = c.filter.append("feGaussianBlur")
 		.attr("stdDeviation", g)
 	
-	var c = d3.select("#svg").append("circle")
-		.attr("cx", 0)
+	c.attr("cx", 0)
 		.attr("cy", 0)
 		.attr("r", r)
 		.attr("transform", "translate("+x+", "+y+")") //  scale("+1+")
@@ -847,7 +854,10 @@ function createSVGcircle(x, y, r, h, s, l, a, g) {
 			"fill-opacity": a,
 			"filter": "url(#"+filterName+")"
 		})
-	c.feGaussianBlur = feGaussianBlur
+	c.deleteParticle = function() {
+		c.filter.remove()
+		c.remove()
+	}
 	return c
 }
 
@@ -856,7 +866,7 @@ function round(number) {
 }
 
 function openSVG() {
-	var svg = document.getElementById("svg")
+	var svg = document.getElementById("bokehSvg")
 	var prev = SVGsizeInWindow
 	setSVGSizeInWindow(3)
 	window.open("data:image/svg+xml," + encodeURIComponent(
@@ -877,7 +887,7 @@ function setSVGSizeInWindow(percent) {
 		SVGsizeInWindow = Math.max(percent, 0.05)
 	// 1/3* because the wrappers size is 300%
 	// this allows the zooming of the svg beyond the page borders
-	d3.select("#svg")
+	d3.select("#bokehSvg")
 		.style("max-height", 1/3*100*SVGsizeInWindow+"%")
 		.style("max-width", 1/3*100*SVGsizeInWindow+"%")
 }
