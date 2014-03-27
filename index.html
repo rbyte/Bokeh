@@ -93,9 +93,7 @@
 		   gradientUnits="userSpaceOnUse" />
 	  </defs>
 
-	  <g
-		 transform="translate(-147.99998,-108.93361)"
-		 id="layer1">
+	  <g transform="translate(-147.99998,-108.93361)">
 		<path
 		   d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
 		   style="fill:url(#linearGradient3761)" />
@@ -106,6 +104,45 @@
 	</svg>
 	
 	<div id="li_s_dsvg" class="liKasten left"></div>
+</li>
+<li id="li_l">
+	<svg id="li_l_svg" onclick="bokeh.clickLightness()"
+		class="symbolSVG"
+		xmlns="http://www.w3.org/2000/svg"
+		xmlns:xlink="http://www.w3.org/1999/xlink"
+		viewBox="0 0 442.57144 442.57144">
+	  <defs>
+		<linearGradient id="linearGradient3468">
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0" />
+		  <stop style="stop-color:#000000;stop-opacity:0" offset="0.80310881" />
+		  <stop style="stop-color:#000000;stop-opacity:0.07843138" offset="1" />
+		</linearGradient>
+		<linearGradient id="linearGradient3715">
+		  <stop style="stop-color:#fff;stop-opacity:1" offset="0" />
+		  <stop class="lgrad_hueDependentColour lgrad_saturationDependentColour"
+			 style="stop-color:#fe0000;stop-opacity:1" offset=".5" />
+		  <stop style="stop-color:#444;stop-opacity:1" offset="1" />
+		</linearGradient>
+		<linearGradient x1="369.28552" y1="109.93343" x2="369.28552"
+		   y2="548.83179" id="linearGradient7462"
+		   xlink:href="#linearGradient3715" gradientUnits="userSpaceOnUse" />
+		<radialGradient cx="369.28571" cy="330.21933" r="220.28572"
+		   fx="369.28571" fy="330.21933" id="radialGradient3468"
+		   xlink:href="#linearGradient3767"
+		   gradientUnits="userSpaceOnUse" />
+	  </defs>
+
+	  <g transform="translate(-147.99998,-108.93361)">
+		<path
+		   d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
+		   style="fill:url(#linearGradient7462)" />
+		<path
+		   d="m 588.57143,330.21933 a 219.28572,219.28572 0 1 1 -438.57145,0 219.28572,219.28572 0 1 1 438.57145,0 z"
+		   style="fill:url(#radialGradient3468)" />
+	  </g>
+	</svg>
+	
+	<div id="li_l_dsvg" class="liKasten left"></div>
 </li>
 <li id="li_g">
 	<svg id="li_g_svg" class="symbolSVG" onclick="bokeh.clickGamma()"
@@ -123,9 +160,7 @@
 			 stdDeviation="35.928144" />
 		</filter>
 	  </defs>
-	  <g
-		 transform="translate(-122.69925,-97.76218)"
-		 id="layer1">
+	  <g transform="translate(-122.69925,-97.76218)">
 		<path
 		   d="m 300,200 a 100,100 0 1 1 -200,0 100,100 0 1 1 200,0 z"
 		   transform="matrix(-0.91013649,0,0,-0.91013649,481.52276,459.09018)"
@@ -167,8 +202,8 @@
 		   gradientUnits="userSpaceOnUse" />
 		<linearGradient id="linearGradient3889-4"> 
 		  <stop style="stop-color:#000;stop-opacity:1" offset="0" />
-		  <stop style="stop-color:#000;stop-opacity:0.5" offset="0.5" id="li_a_svg_stopFadeMiddle" />
-		  <stop style="stop-color:#000;stop-opacity:0" offset="1" />
+		  <stop style="stop-color:#222;stop-opacity:0.5" offset="0.5" id="li_a_svg_stopFadeMiddle" />
+		  <stop style="stop-color:#444;stop-opacity:0" offset="1" />
 		</linearGradient>
 		<linearGradient x1="300" y1="482.36218" x2="300" y2="152.36218"
 		   id="linearGradient3855" 
@@ -500,9 +535,15 @@
 		</svg>
 	</div>
 </li>
+
+<li title="Fast Forward" onclick="bokeh.roleTheDice()">
+	<img src="images/dice.svg" />
+</li>
+
 <li title="Download SVG" onclick="bokeh.clickDownload()">
 	<img src="images/Download.svg" />
 </li>
+
 <li title="View Source">
 	<a href="https://github.com/rbyte/Kaleidoscope">
 		<img src="images/Source.svg" />

@@ -11,10 +11,15 @@ var pPropertiesName = {
 	g: /*Gauss Smoothing*/ "Blur", x: "Horizonal Position",
 	y: "Vertical Position", r: "Radius"}
 
-var gMean=	{h: 140,s: 180,	l: 200,	a: .20,	g: .05,	x: .5,	y: .5,	r: .15}
-var gVar=	{h: 5,	s: 10,	l: 40,	a: .05,	g: .025,x: .22,	y: .22,	r: .07}
-var gMin=	{h: 0,	s: 0,	l: 0,	a: .05,	g: .001,x: -.2,	y: -.2,	r: .01, transitionDuration: 0, numberOfParticles: 1, SVGsizeInWindow: 0.01}
-var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .1,	x: 1.2,	y: 1.2,	r: .4, transitionDuration: 1000, numberOfParticles: 100, SVGsizeInWindow: 2}
+// defaults
+var gMean=	{h: 140,s: 220,	l: 210,	a: .22,	g: .070,x: .5,	y: .5,	r: .18}
+var gVar=	{h: 4,	s: 8,	l: 15,	a: .03,	g: .025,x: .22,	y: .22,	r: .07}
+var gMin=	{h: 0,	s: 0,	l: 0,	a: .04,	g: .004,x: -.2,	y: -.2,	r: .01, transitionDuration: 0, numberOfParticles: 1, SVGsizeInWindow: 0.005}
+var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .16,	x: 1.2,	y: 1.2,	r: .45, transitionDuration: 1000, numberOfParticles: 100, SVGsizeInWindow: 2}
+var zDep=	{h: 0,	s: 0,	l: 1,	a: 1,	g: -1,	x: 0,	y: 0,	r: -1}
+// zDep is z-index dependency of attribute: direction and factor
+// blur and radius shall increase for particles in the back,
+// while lightness and alpha increase for particles in the front
 
 var arr = [gMean, gVar, gMin, gMax]
 arr.forEach(function(e) {
@@ -25,11 +30,10 @@ arr.forEach(function(e) {
 })
 
 // stddeviation/g=0 is not supported in inkscape (circles will not show)
-if (/*disableBlur = */ false) {
+if (/*disableBlur = */ false)
 	gMax.g = gMin.g = 0
-}
 
-var bgColor={h: 151,s: 77,	l: 111,	a: 1} // TODO
+var bgColor={h: 151,s: 120,	l: 90,	a: 1}
 var bgColorMax={h: 255,s: 255,	l: 255,	a: 1}
 var distributionSliders = {}
 var log = {}
@@ -39,14 +43,14 @@ log.items = []
 
 var pls = [] // particle list
 var SVGsizeInWindow = 0.2 // percent
-var numberOfParticles = 20
+var numberOfParticles = 30
 // if 0, no transition is triggered (just steps)
 var transitionDuration = 0
 const kissenSize = 0.02 // [0, 0.5]
-const globalActivityFactor = 1
-const activityRoundsMax = 150
+const globalActivityFactor = 1 // 4 is violent
+const activityRoundsMax = 200
 const accDeltaAbsMax = 0.25
-const triggerActivityPropability = 0.1 // TODO influenced by number of particles
+const triggerActivityPropability = 0.1
 const predDampen = 9
 const fontFamily = '"Open Sans Light", "Open Sans", sans-serif';
 
@@ -66,7 +70,7 @@ bokeh.run = function () {
 	log.init()
 	setUpSliders()
 	setUpKShortcuts()
-	progressParticleSystem()
+	progressParticleSystem("for the first time")
 }
 
 function updateScreenElemsSize() {
@@ -78,7 +82,7 @@ function updateScreenElemsSize() {
 	
 	var menuSymbolBaseSize = size * 0.06
 	// the more items are sticky, the smaller all get, in order to fit
-	var menuSymbolEnlargedSize = menuSymbolBaseSize*(4-Math.max(1,numberOfStickyMenuEntries)/3)
+	var menuSymbolEnlargedSize = menuSymbolBaseSize*(3.6-Math.max(1,numberOfStickyMenuEntries)/3)
 	// https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration
 	var mysheet = document.styleSheets[0]
 	var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules
@@ -95,11 +99,10 @@ function updateScreenElemsSize() {
 }
 
 function setUpSliders() {
-	setUpDistributionSlider("h")
-	setUpDistributionSlider("s")
-	setUpDistributionSlider("a")
-	setUpDistributionSlider("g")
-	setUpDistributionSlider("r")
+	var sliders = ["h", "s", "l", "a", "g", "r"]
+	sliders.forEach(function(e) {
+		setUpDistributionSlider(e)
+	})
 	
 	var bgSliderProps = ["h", "s", "l", "a"]
 	var lightnessStop = d3.selectAll("#lightnessStop")
@@ -315,11 +318,17 @@ function setUpDistributionSlider(p) {
 		if (p === "h")
 			d3.selectAll(".lgrad_hueDependentColour").style({"stop-color":
 				d3.hsl(gMean.h/255*360, 255/255, 127/255)})
+		if (p === "s")
+			d3.selectAll(".lgrad_saturationDependentColour").style({"stop-color":
+				d3.hsl(gMean.h/255*360, gMean.s/255, 127/255)})
+		if (p === "l")
+			d3.selectAll(".lgrad_lightnessDependentColour").style({"stop-color":
+				d3.hsl(gMean.h/255*360, gMean.s/255, gMean.l/255)})
 		if (p === "g")
 			d3.select("#li_g_svg_feGaussianBlur")
 				.attr("stdDeviation", Math.sqrt((gMean.g-gMin.g) / (gMax.g-gMin.g))*50)
 		if (p === "a") {
-			var val = 0.25 + (gMean.a-gMin.a) / (gMax.a*2-gMin.a)
+			var val = 0.35 + (gMean.a-gMin.a) / (gMax.a*3-gMin.a)
 			d3.select("#li_a_svg_stopFadeMiddle")
 				.style("stop-opacity", val).attr("offset", val)
 		}
@@ -356,10 +365,25 @@ function setUpDistributionSlider(p) {
 		saturation.append("stop").style({"stop-color": "#888"}).attr("offset", 0)
 		saturation.append("stop").style({"stop-color": "#f00"}).attr("offset", 1).attr("class", "lgrad_hueDependentColour")
 	}
+	if (p == "l") {
+		var lightness = defs.append("linearGradient").attr("id", "lgrad_l_"+p)
+		lightness.append("stop").style({"stop-color": "#000"}).attr("offset", 0)
+		lightness.append("stop").style({"stop-color": "#f00"}).attr("offset", .5).attr("class", "lgrad_hueDependentColour lgrad_saturationDependentColour")
+		lightness.append("stop").style({"stop-color": "#fff"}).attr("offset", 1)
+	}
 	if (p == "a") {
 		var alpha = defs.append("linearGradient").attr("id", "lgrad_a_"+p)
-		alpha.append("stop").style({"stop-color": "#888", "stop-opacity": "0"}).attr("offset", 0).attr("class", "lgrad_hueDependentColour")
-		alpha.append("stop").style({"stop-color": "#f00"}).attr("offset", 1).attr("class", "lgrad_hueDependentColour")
+		alpha.append("stop").style({"stop-color": "#888", "stop-opacity": ".1"}).attr("offset", 0)
+			.attr("class", "lgrad_hueDependentColour lgrad_saturationDependentColour lgrad_lightnessDependentColour")
+		alpha.append("stop").style({"stop-color": "#f00"}).attr("offset", 0.96)
+			.attr("class", "lgrad_hueDependentColour lgrad_saturationDependentColour lgrad_lightnessDependentColour")
+			
+		var alphaPattern = defs.append("pattern").attr("id", "alphaPattern_"+p)
+			.attr("width", 5).attr("height", 5).attr("x", 0).attr("y", 0).attr("patternUnits", "userSpaceOnUse")
+		alphaPattern.append("rect").style({"fill": "#fff"}).attr("x", 0).attr("y", 0).attr("width", 2.5).attr("height", 2.5)
+		alphaPattern.append("rect").style({"fill": "#aaa"}).attr("x", 2.5).attr("y", 0).attr("width", 2.5).attr("height", 2.5)
+		alphaPattern.append("rect").style({"fill": "#aaa"}).attr("x", 0).attr("y", 2.5).attr("width", 2.5).attr("height", 2.5)
+		alphaPattern.append("rect").style({"fill": "#fff"}).attr("x", 2.5).attr("y", 2.5).attr("width", 2.5).attr("height", 2.5)
 	}
 	if (p == "g") {
 		var gamma = defs.append("linearGradient").attr("id", "lgrad_g_"+p)
@@ -370,14 +394,6 @@ function setUpDistributionSlider(p) {
 		var radius = defs.append("linearGradient").attr("id", "lgrad_r_"+p)
 		radius.append("stop").style({"stop-color": d3.hsl(147/255*360, 194/255, 138/255)}).attr("offset", 0)
 		radius.append("stop").style({"stop-color": "#fff"}).attr("offset", 1)
-	}
-	if (p == "a") {
-		var alphaPattern = defs.append("pattern").attr("id", "alphaPattern_"+p)
-			.attr("width", 5).attr("height", 5).attr("x", 0).attr("y", 0).attr("patternUnits", "userSpaceOnUse")
-		alphaPattern.append("rect").style({"fill": "#fff"}).attr("x", 0).attr("y", 0).attr("width", 2.5).attr("height", 2.5)
-		alphaPattern.append("rect").style({"fill": "#aaa"}).attr("x", 2.5).attr("y", 0).attr("width", 2.5).attr("height", 2.5)
-		alphaPattern.append("rect").style({"fill": "#aaa"}).attr("x", 0).attr("y", 2.5).attr("width", 2.5).attr("height", 2.5)
-		alphaPattern.append("rect").style({"fill": "#fff"}).attr("x", 2.5).attr("y", 2.5).attr("width", 2.5).attr("height", 2.5)
 	}
 	
 	defs.append("linearGradient")
@@ -402,7 +418,7 @@ function setUpDistributionSlider(p) {
 			d3.selectAll(".dragIndicationTriangle, .dragIndicationText, .distributionText")
 				.transition()
 				.duration(600)
-				.style({"fill-opacity": 0})
+				.style({"fill-opacity": 0, "stroke-opacity": 0})
 				.remove()
 			
 			wasDraggedOnce = true
@@ -478,16 +494,16 @@ function setUpDistributionSlider(p) {
 		
 	svg.append("path")
 		.attr("class", "dragIndicationTriangle")
-		.style({'fill': "#555"}) // , stroke: "#ccc", "stroke-width": .5
+		.style({'fill': "#fff", stroke: "#333", "stroke-width": .4}) // 
 		.attr("d",
-		  "M"+(peakX+10)+","+(peakY+0)
-		+" L"+(peakX+10)+","+(peakY+6)
-		+" L"+(peakX+5)+","+(peakY+3)+" Z")
+		  "M"+(peakX+13)+","+(peakY+3)
+		+" L"+(peakX+13)+","+(peakY+7)
+		+" L"+(peakX+8)+","+(peakY+5)+" Z")
 	
 	svg.append("text")
 		.attr("class", "dragIndicationText")
-		.attr("x", peakX+13)
-		.attr("y", peakY+6)
+		.attr("x", peakX+16)
+		.attr("y", peakY+8)
 		.style({"font-family": fontFamily, "font-size": "50%", "font-weight": 100})
 		.text("drag")
 	
@@ -497,8 +513,10 @@ function Particle(pNo) {
 	var p = this
 	p.pNo = pNo
 	for (var i=0; i<pProperties.length; i++) {
-		p[pProperties[i]] = {
-			_: gMean[pProperties[i]]+((Math.random()-0.5)*3)*gVar[pProperties[i]],
+		var pp = pProperties[i]
+		var random = randomPressuredIntoZ_Order(pNo, pp)
+		p[pp] = {
+			_: bound(gMin[pp], gMean[pp]+(random*4)*gVar[pp], gMax[pp]),
 			v: 0, // velocity
 			acc: 0, // acceleration
 			activity: 0,
@@ -511,7 +529,7 @@ function Particle(pNo) {
 	return p
 }
 
-function progressParticleSystem() {
+function progressParticleSystem(firstTime) {
 	if (pauseStepping)
 		return
 
@@ -521,26 +539,29 @@ function progressParticleSystem() {
 		if (pls.length > numberOfParticles) {
 			pls.shift().obj.deleteParticle()
 		} else {
-			var p = new Particle(numberOfParticles+i)
-			pls.push(p)
-			// particles in front are brighter
-			var lvar = gVar.l/255
-			p.l._ *= ((1-lvar)+i/numberOfParticles*(lvar*2))
+			pls.push(new Particle(pls.length))
 		}
 	}
 	
+	// the initial distribution is not very good, so ...
+	if (firstTime !== undefined)
+		bokeh.roleTheDice()
+	
 	for (var i=0; i<pProperties.length; i++)
-		// lightness is bound to z-index
-		if (pProperties[i] !== "l")
-			step(pProperties[i])
-
+		step(pProperties[i])
+	
 	log.updateLog()
 	for(var prop in distributionSliders)
 		distributionSliders[prop].updateParticles()
 	
+//	console.clear()
 	for (var i=0; i<pls.length; i++) {
 		var p = pls[i]
-
+//		console.log(p.pNo+": g "+Math.round(p.g._)
+//			+",\tr "+Math.round(p.r._)
+//			+",\tl "+Math.round(p.l._)
+//			+",\ta "+Math.round(p.a._*255))
+		
 		function applyTransition(obj) {
 			if (transitionDuration !== 0) {
 				obj = obj.transition()
@@ -549,17 +570,19 @@ function progressParticleSystem() {
 			}
 			return obj
 		}
-
+		
+		// larger particles have larger blur
 		applyTransition(p.obj.feGaussianBlur)
-			.attr("stdDeviation", p.g._)
-
+			.attr("stdDeviation", p.g._) // *(p.r._/gMax.r*0.95+0.05)
+		
 		applyTransition(d3.select("#backgroundRect"))
 			.style("fill", d3.hsl(bgColor.h/255*360, bgColor.s/255, bgColor.l/255) )
 			.style("fill-opacity", bgColor.a)
-
+		
 		var t = applyTransition(p.obj)
 			.style("fill", d3.hsl(p.h._/255*360, p.s._/255, p.l._/255) )
-			.style("fill-opacity", p.a._)
+			// larger particles have lower opacity
+			.style("fill-opacity", p.a._) // *(1 - p.r._/gMax.r*0.5)
 			.attr("r", p.r._)
 			.attr("transform", "translate("+p.x._+", "+p.y._+")")
 
@@ -569,6 +592,19 @@ function progressParticleSystem() {
 	// lets the browser render, then restarts
 	if (transitionDuration === 0)
 		setTimeout(progressParticleSystem, 20)
+}
+
+function randomPressuredIntoZ_Order(pNo, attr) {
+	var x = Math.random()-.5
+	var factor = zDep[attr]
+	if (factor === 0)
+		return x
+	var multiplier = (factor < 0 ? -1 : 1) * Math.pow(pNo/numberOfParticles, 1/Math.abs(factor))
+	if (x > 0)
+		x *= multiplier
+	else
+		x *= 1-multiplier
+	return x
 }
 
 function step(attr) {
@@ -597,16 +633,11 @@ function step(attr) {
 	
 	if (Math.random() < triggerActivityPropability * numberOfParticles) {
 		var randomP = pls[Math.round(Math.random()*(pls.length-1))]
-		
-		randomP[attr].activity = (Math.random()-0.5)
-		randomP[attr].activityRounds += Math.round(activityRoundsMax/3 + Math.random()*activityRoundsMax)
-		// additional constraints/tendencies
-		// couple movements
+		randomP[attr].activity = randomPressuredIntoZ_Order(randomP.pNo, attr)
+		randomP[attr].activityRounds += Math.round(Math.random()*activityRoundsMax)
+		// couple x & y movements
 		if (attr === "x" || attr === "y")
 			randomP[attr === "x" ? "y" : "x"].activityRounds += Math.round(Math.random()*activityRoundsMax)
-		// the closest circles (z-index) should tend to have a small radius & blur
-		if ((attr === "r" || attr === "g") && randomP[attr].activity > 0)
-			randomP[attr].activity *= 1-randomP.pNo/numberOfParticles
 	}
 	
 	for (var i=0; i<pls.length; i++) {
@@ -915,7 +946,7 @@ function pause(y) {
 
 function setSVGSizeInWindow(percent) {
 	if (percent !== undefined)
-		SVGsizeInWindow = Math.max(percent, 0.05)
+		SVGsizeInWindow = Math.max(percent, gMin.SVGsizeInWindow)
 	// 1/3* because the wrappers size is 300%
 	// this allows the zooming of the svg beyond the page borders
 	d3.select("#bokehSvg")
@@ -923,18 +954,24 @@ function setSVGSizeInWindow(percent) {
 		.style("max-width", 1/3*100*SVGsizeInWindow+"%")
 }
 
+bokeh.roleTheDice = function() {
+	// step without drawing, fast forwarding particle system to random state
+	for (var k=0; k<100; k++)
+		for (var i=0; i<pProperties.length; i++)
+			step(pProperties[i])
+}
+
 function setUpKShortcuts() {
 	document.addEventListener("keydown", function (evt) {
 		switch(evt.keyCode) {
-			case 83: /*s*/ openSVG(); break
+			case 83: /*s*/ bokeh.roleTheDice(); break
 			case 69: /*e*/ pause(!pauseStepping); /*switch*/ break
 			case 107:/*+*/ setSVGSizeInWindow(SVGsizeInWindow*1.1); break
+			case 109:/*-*/ setSVGSizeInWindow(SVGsizeInWindow*0.9); break
 			case 109:/*-*/ setSVGSizeInWindow(SVGsizeInWindow*0.9); break
 		}
 	}, false)
 }
-
-
 
 function toogleMenuEntrySticky(p) {
 	var ds = d3.select("#li_"+p)
@@ -946,6 +983,7 @@ function toogleMenuEntrySticky(p) {
 
 bokeh.clickHue = function() { toogleMenuEntrySticky("h") }
 bokeh.clickSaturation = function() { toogleMenuEntrySticky("s") }
+bokeh.clickLightness = function() { toogleMenuEntrySticky("l") }
 bokeh.clickGamma = function() { toogleMenuEntrySticky("g") }
 bokeh.clickAlpha = function() { toogleMenuEntrySticky("a") }
 bokeh.clickRadius = function() { toogleMenuEntrySticky("r") }

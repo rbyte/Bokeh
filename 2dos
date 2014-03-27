@@ -8,8 +8,8 @@ github hochladen
 veröffentlichen
 	tell wallpaper guy
 
-
 MAYBE:
+chromium: frame white rects overlay title
 info: and what the hell this is in the first place
 on download svg, chromium shows it, but without the blur applied
 open sans light into css
@@ -34,3 +34,4 @@ by default, log n steps
 interactivity (mouse playing)
 	hover highlights particle in dSliders
 pick individual particles in distribution slider and drag their value
+automatically adjust initial bokeh svg size according to browser rending speed (test)
