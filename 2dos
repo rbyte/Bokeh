@@ -1,10 +1,6 @@
 
-hilfe info
-	for dragging -> and what it means
-	and what the hell this is in the first place
 fullscreen -> switch
 
-clean up css
 code refactoring
 testing!
 github hochladen
@@ -12,10 +8,15 @@ github hochladen
 veröffentlichen
 	tell wallpaper guy
 
-chromium: dSlider cursor during drag is not a crosshair - fix
-
 
 MAYBE:
+info: and what the hell this is in the first place
+on download svg, chromium shows it, but without the blur applied
+open sans light into css
+chromium: dSlider cursor during drag is not a crosshair - fix
+display lock symbol if menu item is clicked
+improve calculations (additions) to look more like bokeh bg image
+lightness?
 during dragging, menu should not unhover in case of overshoot
 keyboard only option
 background colour picker: make simple click working

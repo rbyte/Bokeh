@@ -11,9 +11,9 @@ var pPropertiesName = {
 	g: /*Gauss Smoothing*/ "Blur", x: "Horizonal Position",
 	y: "Vertical Position", r: "Radius"}
 
-var gMean=	{h: 140,s: 180,	l: 180,	a: .20,	g: .04,	x: .5,	y: .5,	r: .15}
-var gVar=	{h: 7,	s: 10,	l: 40,	a: .10,	g: .025,x: .22,	y: .22,	r: .07}
-var gMin=	{h: 0,	s: 0,	l: 0,	a: 0,	g: .001,x: -.2,	y: -.2,	r: 0, transitionDuration: 0, numberOfParticles: 1, SVGsizeInWindow: 0.01}
+var gMean=	{h: 140,s: 180,	l: 200,	a: .20,	g: .05,	x: .5,	y: .5,	r: .15}
+var gVar=	{h: 5,	s: 10,	l: 40,	a: .05,	g: .025,x: .22,	y: .22,	r: .07}
+var gMin=	{h: 0,	s: 0,	l: 0,	a: .05,	g: .001,x: -.2,	y: -.2,	r: .01, transitionDuration: 0, numberOfParticles: 1, SVGsizeInWindow: 0.01}
 var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .1,	x: 1.2,	y: 1.2,	r: .4, transitionDuration: 1000, numberOfParticles: 100, SVGsizeInWindow: 2}
 
 var arr = [gMean, gVar, gMin, gMax]
@@ -48,18 +48,50 @@ const activityRoundsMax = 150
 const accDeltaAbsMax = 0.25
 const triggerActivityPropability = 0.1 // TODO influenced by number of particles
 const predDampen = 9
-var pauseStepping = false
+const fontFamily = '"Open Sans Light", "Open Sans", sans-serif';
 
+var pauseStepping = false
+var numberOfStickyMenuEntries = 0
 var lastStep
 var timeDeltaBetweenSteps = []
 var lastFPSupdate
 
 bokeh.run = function () {
+	window.onresize = function(event) {
+		updateScreenElemsSize()
+	}
+	window.onresize()
+	
 	setUpSVG()
 	log.init()
 	setUpSliders()
 	setUpKShortcuts()
 	progressParticleSystem()
+}
+
+function updateScreenElemsSize() {
+	var winW = document.body.clientWidth
+	var winH = window.innerHeight
+	var size = Math.round((winW < winH ? winW : winH))
+	
+	d3.select("#title").attr("style", "font-size: "+size+"% !important;")
+	
+	var menuSymbolBaseSize = size * 0.06
+	// the more items are sticky, the smaller all get, in order to fit
+	var menuSymbolEnlargedSize = menuSymbolBaseSize*(4-Math.max(1,numberOfStickyMenuEntries)/3)
+	// https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration
+	var mysheet = document.styleSheets[0]
+	var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules
+	for (var i=0; i<myrules.length; i++) {
+		if (myrules[i].selectorText === '.mLeft li:hover img, .mLeft li:hover .symbolSVG, .toggledOn img, .toggledOn .symbolSVG') {
+			myrules[i].style.setProperty("width", menuSymbolEnlargedSize+"px", "important")
+			myrules[i].style.setProperty("height", menuSymbolEnlargedSize+"px", "important")
+		}
+		if (myrules[i].selectorText === '.menu li img, .menu li .symbolSVG') {
+			myrules[i].style.setProperty("width", (menuSymbolBaseSize)+"px")
+			myrules[i].style.setProperty("height", (menuSymbolBaseSize)+"px")
+		}
+	}
 }
 
 function setUpSliders() {
@@ -91,7 +123,8 @@ function setUpSliders() {
 			bgSymbolPathForAlpha.style({"fill-opacity": 1-bgColor.a})
 		}
 		set(rX)
-		d3.select("#bg"+pName).call(d3.behavior.drag().on("drag", function (d) {
+		d3.selectAll("#bg"+pName+", #bg"+pName+"Slider")
+			.call(d3.behavior.drag().on("drag", function (d) {
 			console.log(d3.event.x)
 			var rX = bound(0, d3.event.x, barW) / barW
 			bgColor[e] = rX * bgColorMax[e]
@@ -110,7 +143,6 @@ function setUpSliders() {
 		var rX = eval(e) / gMax[e]
 		svgText.updateText = function() {}
 		if (e === "numberOfParticles") {
-//			svgText.text("Particles: "+numberOfParticles)
 			svgText.updateText = function() {
 				this.text("Particles: "+numberOfParticles)
 			}
@@ -141,7 +173,8 @@ function setUpSliders() {
 			if (e === "transitionDuration") {
 				transitionDuration = Math.max(gMin[e], (1-rX)*gMax[e])
 				d3.selectAll(".sizeSVGspeedIndicator").style(
-					{"stroke-opacity": Math.max(.1, rX)})
+					{"stroke-opacity": rX})
+				pause(rX === 0)
 			}
 			if (e === "SVGsizeInWindow") {
 				SVGsizeInWindow = Math.max(gMin[e], rX*gMax[e])
@@ -163,7 +196,8 @@ function setUpDistributionSlider(p) {
 	
 	const opx = 0, opy = 0, ow = 300, oh = 100,
 	// percent of width the scale takes
-	perc = .10,
+	perc = .1,
+	// TODO false does not work yet
 	horizontal = true,
 	// the drag area rectangle (a portion of outer)
 	px = opx+(horizontal ? 0 : ow*perc),
@@ -179,6 +213,9 @@ function setUpDistributionSlider(p) {
 	top = stdMargin,
 	bottom = horizontal ? toGroundCutoff :stdMargin,
 	topSpan = .3, baseSpan = .8, varianceSpan = .2
+	
+	var wasDraggedOnce = false
+	var peakX, peakY
 	
 	var svg = distributionSliders[p].svg = d3.select("#li_"+p+"_dsvg")
 		.append("svg")
@@ -230,8 +267,27 @@ function setUpDistributionSlider(p) {
 		// the start and end point are only needed for the fill (hueScale)
 		// to be aligned correctly
 		// see DistributionSliderPathIllustration.svg
-		return (!horizontal ?
-		("M"+px+","+py
+		var horBasePointX = (px+(rX - vrcUp)*w)
+		peakX = horBasePointX+vrcUp*w
+		peakY = rY*h
+		
+		var horizontalPath = ("M"+px+","+py+h
+			// upper base point
+			+" L"+horBasePointX+","+(py+h)
+			// base control point
+			+" c"+vrcUp*baseSpan*w+",0 "
+			// peak control point
+			+(vrcUp*w-Math.min(vrcUp,vrcDown)*w*topSpan)+",-"+(1-rY)*h+" "
+			// peak point
+			+vrcUp*w+",-"+(1-rY)*h
+			// base control point
+			+" s"+vrcDown*(1-baseSpan)*w+","+(1-rY)*h
+			// lower base point
+			+" "+vrcDown*w+","+(1-rY)*h
+			+" L"+(px+w)+","+(py+h)
+			+"Z")
+		
+		var verticalPath = ("M"+px+","+py
 			// upper base point
 			+" L"+px+","+(py+(rY - vrcUp)*h)
 			// base control point
@@ -246,22 +302,8 @@ function setUpDistributionSlider(p) {
 			+" -"+rX*w+","+vrcDown*h
 			+" L"+px+","+(py+h)
 			+"Z")
-		: ("M"+px+","+py+h
-			// upper base point
-			+" L"+(px+(rX - vrcUp)*w)+","+(py+h)
-			// base control point
-			+" c"+vrcUp*baseSpan*w+",0 "
-			// peak control point
-			+(vrcUp*w-Math.min(vrcUp,vrcDown)*w*topSpan)+",-"+(1-rY)*h+" "
-			// peak point
-			+vrcUp*w+",-"+(1-rY)*h
-			// base control point
-			+" s"+vrcDown*(1-baseSpan)*w+","+(1-rY)*h
-			// lower base point
-			+" "+vrcDown*w+","+(1-rY)*h
-			+" L"+(px+w)+","+(py+h)
-			+"Z")
-		)
+		
+		return (horizontal ? horizontalPath: verticalPath)
 	}
 	
 	distributionSliders[p].updateParticles = function() {
@@ -356,40 +398,39 @@ function setUpDistributionSlider(p) {
 		.on("drag", dragmove)
 	
 	function dragmove(d) {
+		if (!wasDraggedOnce) {
+			d3.selectAll(".dragIndicationTriangle, .dragIndicationText, .distributionText")
+				.transition()
+				.duration(600)
+				.style({"fill-opacity": 0})
+				.remove()
+			
+			wasDraggedOnce = true
+		}
 		distributionCurve.attr("d", getPath(d3.event.x, d3.event.y))
 	}
 	
 	var meanDim = (gMean[p] - gMin[p]) / (gMax[p]-gMin[p])
 	var varDim = gVar[p] / (gMax[p]-gMin[p]) * varFactorIntoPath
+	var dPeakX = px+w*(horizontal ? meanDim : 1-varDim)
+	var dPeakY = py+h*(horizontal ? varDim : meanDim)
 	
 	var distributionCurve = svg.append("path")
 		.attr("class", "distributionCurve")
 		.attr("d", getPath( 
-			px+w*(horizontal ? meanDim : 1-varDim),
-			py+h*(horizontal ? varDim : meanDim)))
+			dPeakX,
+			dPeakY))
 		.style({'fill': "url(#lgradVert_"+p+")"})
 		.call(drag)
 	
 	// produces the opacity background pattern
-	if (p === "a") {
-		
+	if (p === "a")
 		svg.append("rect")
 			.attr("width", ow)
 			.attr("height", oh*perc)
 			.attr("x", opx)
 			.attr("y", opy+(1-perc)*oh)
 			.style({'fill': "url(#alphaPattern_"+p+")"})
-		
-//		var side = (horizontal ? oh : ow)*perc/4
-//		for (var i=0; i<4; i++)
-//			for (var k=0; k<(horizontal ? ow : oh)/side; k++)
-//				svg.append("rect")
-//					.attr("width", side)
-//					.attr("height", side)
-//					.attr("x", opx+(horizontal ? k : i)*side)
-//					.attr("y", py+(horizontal ? h : 0)+(horizontal ? i : k)*side)
-//					.style({"fill": (i+k) % 2 ? "#ddd" : "#999"})
-	}
 	
 	svg.append("rect")
 		.attr("class", "scale")
@@ -424,8 +465,31 @@ function setUpDistributionSlider(p) {
 	svg.append("text")
 		.attr("x", opx+ow*((horizontal ? 0 : perc)+.02))
 		.attr("y", opy+oh*((horizontal ? perc : 0)+.07))
-		.style({"font-family": '"Open Sans",sans-serif', "font-weight": 100})
+		.style({"font-family": fontFamily, "font-weight": 100})
 		.text(pPropertiesName[p])
+	
+	svg.append("text")
+		.attr("class", "distributionText")
+		.attr("x", opx+ow*((horizontal ? 0 : perc)+.02))
+		.attr("y", opy+oh*((horizontal ? perc : 0)+.20))
+		.style({"font-family": fontFamily, "font-size": "50%",
+			"font-weight": 100, "fill": "#777"})
+		.text("distribution")
+		
+	svg.append("path")
+		.attr("class", "dragIndicationTriangle")
+		.style({'fill': "#555"}) // , stroke: "#ccc", "stroke-width": .5
+		.attr("d",
+		  "M"+(peakX+10)+","+(peakY+0)
+		+" L"+(peakX+10)+","+(peakY+6)
+		+" L"+(peakX+5)+","+(peakY+3)+" Z")
+	
+	svg.append("text")
+		.attr("class", "dragIndicationText")
+		.attr("x", peakX+13)
+		.attr("y", peakY+6)
+		.style({"font-family": fontFamily, "font-size": "50%", "font-weight": 100})
+		.text("drag")
 	
 }
 
@@ -469,21 +533,6 @@ function progressParticleSystem() {
 		// lightness is bound to z-index
 		if (pProperties[i] !== "l")
 			step(pProperties[i])
-	
-	// additional constrains
-	for (var i=0; i<pls.length; i++) {
-		// increasing radius decreases opacity and increases blur
-//		var rAct = pls[i].r.activity
-//		if (rAct > 0 && pls[i].r.activityRounds > 0) {
-//			pls[i].a.acc -= rAct*globalActivityFactor*gVar.a/10
-//			pls[i].g.acc += rAct*globalActivityFactor*gVar.g
-//		}
-		// increasing sharpness decreases opacity
-//		var gAct = pls[i].g.activity
-//		if (gAct < 0 && pls[i].g.activityRounds > 0) {
-//			pls[i].a.acc -= gAct*globalActivityFactor*gVar.a/10
-//		}
-	}
 
 	log.updateLog()
 	for(var prop in distributionSliders)
@@ -550,14 +599,14 @@ function step(attr) {
 		var randomP = pls[Math.round(Math.random()*(pls.length-1))]
 		
 		randomP[attr].activity = (Math.random()-0.5)
-		randomP[attr].activityRounds += Math.round(Math.random()*activityRoundsMax)
+		randomP[attr].activityRounds += Math.round(activityRoundsMax/3 + Math.random()*activityRoundsMax)
+		// additional constraints/tendencies
 		// couple movements
 		if (attr === "x" || attr === "y")
 			randomP[attr === "x" ? "y" : "x"].activityRounds += Math.round(Math.random()*activityRoundsMax)
-		// the closest circles (z-index) should have a small radius
-		// TODO
-//		if (attr === "r")
-//			p[attr].activity += p.pNo/numberOfParticles/3
+		// the closest circles (z-index) should tend to have a small radius & blur
+		if ((attr === "r" || attr === "g") && randomP[attr].activity > 0)
+			randomP[attr].activity *= 1-randomP.pNo/numberOfParticles
 	}
 	
 	for (var i=0; i<pls.length; i++) {
@@ -683,7 +732,6 @@ function setUpSVG() {
 	viewboxWhiteFrame.append("rect").attr("x", "-100%").attr("y", "-100%").attr("width", "100%").attr("height", "300%").style("fill", "#fff" )
 	viewboxWhiteFrame.append("rect").attr("x", "0%").attr("y", "-100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
 	viewboxWhiteFrame.append("rect").attr("x", "0%").attr("y", "100%").attr("width", "100%").attr("height", "100%").style("fill", "#fff" )
-	
 }
 
 log.contains = function(prop, attr) {
@@ -857,10 +905,12 @@ function openSVG() {
 	setSVGSizeInWindow(prev)
 }
 
-function pause() {
-	pauseStepping = !pauseStepping
-	if (!pauseStepping)
+function pause(y) {
+	if (!y && pauseStepping) { // reinitiate
+		pauseStepping = y
 		progressParticleSystem()
+	}
+	pauseStepping = y
 }
 
 function setSVGSizeInWindow(percent) {
@@ -877,16 +927,21 @@ function setUpKShortcuts() {
 	document.addEventListener("keydown", function (evt) {
 		switch(evt.keyCode) {
 			case 83: /*s*/ openSVG(); break
-			case 69: /*e*/ pause(); break
+			case 69: /*e*/ pause(!pauseStepping); /*switch*/ break
 			case 107:/*+*/ setSVGSizeInWindow(SVGsizeInWindow*1.1); break
 			case 109:/*-*/ setSVGSizeInWindow(SVGsizeInWindow*0.9); break
 		}
 	}, false)
 }
 
+
+
 function toogleMenuEntrySticky(p) {
 	var ds = d3.select("#li_"+p)
-	ds.classed("toggledOn", !ds.classed("toggledOn"))
+	var y = !ds.classed("toggledOn")
+	ds.classed("toggledOn", y)
+	numberOfStickyMenuEntries += y ? 1 : -1
+	window.onresize()
 }
 
 bokeh.clickHue = function() { toogleMenuEntrySticky("h") }

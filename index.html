@@ -10,6 +10,8 @@
 
 <body>
 
+<div id="title">Bokeh</div>
+
 <div class="vertAlign">
 <span class="helperSpanToAlignImageVertically"></span>
 <ul class="menu mLeft">
@@ -108,6 +110,7 @@
 <li id="li_g">
 	<svg id="li_g_svg" class="symbolSVG" onclick="bokeh.clickGamma()"
 	   xmlns="http://www.w3.org/2000/svg"
+	   xmlns:xlink="http://www.w3.org/1999/xlink"
 	  viewBox="0 0 354.60001 354.60001">
 	  <defs>
 		<filter
@@ -247,6 +250,7 @@
 	<svg id="li_bg_svg" onclick="bokeh.clickBackground()"
 		class="symbolSVG"
 		xmlns="http://www.w3.org/2000/svg"
+		xmlns:xlink="http://www.w3.org/1999/xlink"
 		viewBox="0 0 442.57144 442.57144"
 	>
 	  <defs>
@@ -279,16 +283,17 @@
 		<svg id="bg_svg"
 			preserveAspectRatio="xMinYMid meet"
 			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 300 100">
+			xmlns:xlink="http://www.w3.org/1999/xlink"
+			viewBox="0 0 303 101">
 		<defs>
 			<linearGradient id="allHues">
-				  <stop style="stop-color:red;" offset="0" />
-				  <stop style="stop-color:yellow;" offset="0.18512578" />
-				  <stop style="stop-color:lime;" offset="0.34256288" />
-				  <stop style="stop-color:aqua;" offset="0.5" />
-				  <stop style="stop-color:blue;" offset="0.65429997" />
-				  <stop style="stop-color:fuchsia;" offset="0.8119877" />
-				  <stop style="stop-color:red;" offset="1" />
+				<stop style="stop-color:red;" offset="0" />
+				<stop style="stop-color:yellow;" offset="0.18512578" />
+				<stop style="stop-color:lime;" offset="0.34256288" />
+				<stop style="stop-color:aqua;" offset="0.5" />
+				<stop style="stop-color:blue;" offset="0.65429997" />
+				<stop style="stop-color:fuchsia;" offset="0.8119877" />
+				<stop style="stop-color:red;" offset="1" />
 			</linearGradient>
 			<linearGradient id="saturation">
 				<stop style="stop-color:grey;" offset="0" />
@@ -305,7 +310,7 @@
 			</linearGradient>
 			<linearGradient id="sliderGradient" gradientTransform="rotate(90)">
 				<stop style="stop-color: #fff;" offset="0" />
-				<stop style="stop-color: #555;" offset="1" />
+				<stop style="stop-color: #ccc;" offset="1" />
 			</linearGradient>
 			<pattern id="bg_svg_alphaPattern" patternUnits="userSpaceOnUse"
 			width="10" height="10" x="0" y="0">
@@ -314,7 +319,7 @@
 				<rect x="0" y="5" width="5" height="5" style="fill: #999" />
 				<rect x="5" y="5" width="5" height="5" style="fill: #ddd" />
 			</pattern>
-			<rect id="slider" x="0" y="25" width="3" height="15" style="fill: url(#sliderGradient);" />
+			<rect id="slider" x="0" y="24" width="3" height="17" style="fill: url(#sliderGradient); stroke: #888; stroke-width: .4" />
 
 		</defs>
 
@@ -325,7 +330,7 @@
 		<rect id="bgLightness" class="draggable" x="0" y= "65" width="300" height="15" style="fill:url(#lightness)" />
 		<rect x="0" y="85" width="300" height="15" fill="url(#bg_svg_alphaPattern)" />
 		<rect id="bgOpacity" class="draggable" x="0" y= "85" width="300" height="15" style="fill:url(#alpha)" />
-
+		
 		<use id="bgHueSlider" x="10" y="0" xlink:href="#slider" class="draggable" />
 		<use id="bgSaturationSlider" x="15" y="20" xlink:href="#slider" class="draggable" />
 		<use id="bgLightnessSlider" x="40" y="40" xlink:href="#slider" class="draggable" />
@@ -343,6 +348,7 @@
 	<svg id="li_p_svg" onclick="bokeh.clickParticle()"
 		class="symbolSVG"
 		xmlns="http://www.w3.org/2000/svg"
+		xmlns:xlink="http://www.w3.org/1999/xlink"
 		viewBox="0 0 100 100"
 	>
 		<defs>
@@ -507,7 +513,8 @@
 		
 <div id="svgWrapper">
 <span class="helperSpanToAlignImageVertically"></span>
-<svg id="bokehSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+<svg id="bokehSvg" xmlns="http://www.w3.org/2000/svg"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
 </div>
 
 <div id="fps" title="steps per second, an indication of rendering speed"></div>
