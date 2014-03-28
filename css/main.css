@@ -93,7 +93,7 @@ svg text {
 	/*transition: all 500ms ease-in-out;*/
 }
 .mRight .liKasten, .mRight .liKasten svg, .mRight li, .mRight li img, .mRight li .symbolSVG {
-/*	transition: all 100ms ease-in-out;*/
+	/*transition: all 100ms ease-in-out;*/
 }
 .mRight li img, .mRight li .symbolSVG {
 	opacity: 0.7;

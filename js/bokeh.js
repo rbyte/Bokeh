@@ -60,8 +60,8 @@ var log = {}
 log.items = []
 
 var pls = [] // particle list
-var SVGsizeInWindow = 0.3 // percent
-var numberOfParticles = 20
+var SVGsizeInWindow = 0.15 // percent
+var numberOfParticles = 25
 // if 0, no transition is triggered (just steps)
 var transitionDuration = 0
 const kissenSize = 0.02 // [0, 0.5]
@@ -113,18 +113,19 @@ function updateScreenElemsSize() {
 			cssRules[i].style.setProperty("width", (menuSymbolBaseSize)+"px")
 			cssRules[i].style.setProperty("height", (menuSymbolBaseSize)+"px")
 		}
-		// those are set in the js after the dynamic size has been set: avoids shacking on startup
-		if (cssRules[i].selectorText === '.mLeft .liKasten, .mLeft .liKasten svg, .mLeft li, .mLeft li img, .mLeft li .symbolSVG') {
-			setTimeout(function() {
-				cssRules[i].style.setProperty("transition", "all 500ms ease-in-out")
-			}, 100)
-		}
-		if (cssRules[i].selectorText === 'mRight .liKasten, .mRight .liKasten svg, .mRight li, .mRight li img, .mRight li .symbolSVG') {
-			setTimeout(function() {
-				cssRules[i].style.setProperty("transition", "all 100ms ease-in-out")
-			}, 100)
-		}
 	}
+	// those are set in the js after the dynamic size has been set: avoids shacking on startup
+	// wait until CSS changes are flushed
+	setTimeout(function() {
+		for (var i=0; i<cssRules.length; i++) {
+			if (cssRules[i].selectorText === '.mLeft .liKasten, .mLeft .liKasten svg, .mLeft li, .mLeft li img, .mLeft li .symbolSVG') {
+				cssRules[i].style.setProperty("transition", "all 500ms ease-in-out")
+			}
+			if (cssRules[i].selectorText === 'mRight .liKasten, .mRight .liKasten svg, .mRight li, .mRight li img, .mRight li .symbolSVG') {
+				cssRules[i].style.setProperty("transition", "all 100ms ease-in-out")
+			}
+		}
+	}, 300)
 }
 
 function setUpSliders() {
