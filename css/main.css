@@ -40,6 +40,7 @@ body {
     vertical-align: middle;
 	/*top: 5%;*/
 	/*height: 100%;*/
+	transition: opacity 500ms ease-in-out;
 	margin: 0;
 	padding: 0;
 	z-index: 3;
@@ -94,6 +95,7 @@ svg text {
 }
 .mRight .liKasten, .mRight .liKasten svg, .mRight li, .mRight li img, .mRight li .symbolSVG {
 	/*transition: all 100ms ease-in-out;*/
+	/*opacity: 1;*/
 }
 .mRight li img, .mRight li .symbolSVG {
 	opacity: 0.7;
@@ -159,6 +161,7 @@ svg text {
 	position: fixed;
 	color: #000;
 	opacity: 0.15;
+	font-family: "Open Sans Light", "Open Sans", sans-serif;
 	font-size: 100%;
 	bottom: 1%;
 	right: 1%;

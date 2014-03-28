@@ -77,6 +77,7 @@ var numberOfStickyMenuEntries = 0
 var lastStep
 var timeDeltaBetweenSteps = []
 var lastFPSupdate
+var menuElementsAreHidden = false
 
 bokeh.run = function () {
 	window.onresize = function(event) {
@@ -1046,6 +1047,25 @@ function openAsPNG() {
 	img.src = "data:image/svg+xml,"+encodeURIComponent(data)
 }
 
+function switchFullscreen() {
+	menuElementsAreHidden = !menuElementsAreHidden
+	var mainCss = document.styleSheets[0]
+	var cssRules = mainCss.cssRules ? mainCss.cssRules : mainCss.rules
+	for (var i=0; i<cssRules.length; i++) {
+		if (cssRules[i].selectorText === '.menu') {
+			cssRules[i].style.setProperty("opacity", menuElementsAreHidden ? 0 : 1)
+		}
+	}
+	
+	if (menuElementsAreHidden) {
+		// TODO update size slider
+		var winW = document.body.clientWidth
+		var winH = window.innerHeight
+		var ratioDiff = winW/winH - svgViewboxWidth/svgViewboxHeight
+		setSVGSizeInWindow(1+Math.abs(ratioDiff))
+	}
+}
+
 function setUpKShortcuts() {
 	// prevents text selection and alternation of cursor in chrome during drag
 	document.onselectstart = function(){ return false; }
@@ -1068,9 +1088,9 @@ function setUpKShortcuts() {
 			case 83: /*s*/ openSVG(); break
 			case 68: /*d*/ bokeh.roleTheDice(); break
 			case 69: /*e*/ pause(!pauseStepping); /*switch*/ break
+			case 70: /*f*/ switchFullscreen(); break
 			case 71: /*g*/  break
 			case 107:/*+*/ setSVGSizeInWindow(SVGsizeInWindow*1.1); break
-			case 109:/*-*/ setSVGSizeInWindow(SVGsizeInWindow*0.9); break
 			case 109:/*-*/ setSVGSizeInWindow(SVGsizeInWindow*0.9); break
 		}
 	}, false)
