@@ -1,9 +1,9 @@
 
+add icon
+add license
 testing!
-github hochladen
-	fix download link
 veröffentlichen
-	tell wallpaper guy
+tell wallpaper guy
 
 MAYBE:
 info: and what the hell this is in the first place
@@ -16,7 +16,6 @@ display lock symbol if menu item is clicked
 during dragging, menu should not unhover in case of overshoot
 keyboard only option
 fps does not work if speed is not 100% (because of d3 transitions)
-menu shakes at beginning, because transitions are enabled and size is set afterwards in js
 background colour picker: make simple click working
 update size slider on +, - or mouse wheel
 add more mouse wheel events (for sliders)

@@ -95,6 +95,17 @@ function updateScreenElemsSize() {
 			cssRules[i].style.setProperty("width", (menuSymbolBaseSize)+"px")
 			cssRules[i].style.setProperty("height", (menuSymbolBaseSize)+"px")
 		}
+		// those are set in the js after the dynamic size has been set: avoids shacking on startup
+		if (cssRules[i].selectorText === '.mLeft .liKasten, .mLeft .liKasten svg, .mLeft li, .mLeft li img, .mLeft li .symbolSVG') {
+			setTimeout(function() {
+				cssRules[i].style.setProperty("transition", "all 500ms ease-in-out")
+			}, 100)
+		}
+		if (cssRules[i].selectorText === 'mRight .liKasten, .mRight .liKasten svg, .mRight li, .mRight li img, .mRight li .symbolSVG') {
+			setTimeout(function() {
+				cssRules[i].style.setProperty("transition", "all 100ms ease-in-out")
+			}, 100)
+		}
 	}
 }
 
@@ -506,7 +517,6 @@ function setUpDistributionSlider(p) {
 		.attr("y", peakY+8)
 		.style({"font-family": fontFamily, "font-size": "50%", "font-weight": 100})
 		.text("drag")
-	
 }
 
 function Particle(pNo) {
