@@ -32,7 +32,7 @@ var pPropertiesName = {
 // defaults
 var gMean=	{h: 140,s: 220,	l: 190,	a: .22,	g: .070,x: .5,	y: .5,	r: .15}
 var gVar=	{h: 4,	s: 8,	l: 15,	a: .02,	g: .025,x: .22,	y: .22,	r: .07}
-var gMin=	{h: 0,	s: 0,	l: 0,	a: .04,	g: .004,x: -.2,	y: -.2,	r: .01, transitionDuration: 0, numberOfParticles: 1, SVGsizeInWindow: 0.005}
+var gMin=	{h: 0,	s: 0,	l: 0,	a: .04,	g: .001,x: -.2,	y: -.2,	r: .01, transitionDuration: 0, numberOfParticles: 1, SVGsizeInWindow: 0.005}
 var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .16,	x: 1.2,	y: 1.2,	r: .45, transitionDuration: 1000, numberOfParticles: 100, SVGsizeInWindow: 2}
 var zDep=	{h: 0,	s: 0,	l: 1,	a: 1,	g: -1,	x: 0,	y: 0,	r: -1}
 // zDep is z-index dependency of attribute: direction and factor
@@ -240,7 +240,7 @@ function setUpDistributionSlider(p) {
 	varianceOfVrc = .375,
 	toGroundCutoff = .2,
 	varFactorIntoPath = 5,
-	stdMargin = .03,
+	stdMargin = .01,
 	left = horizontal ? stdMargin : toGroundCutoff,
 	right = stdMargin,
 	top = stdMargin,
@@ -963,17 +963,6 @@ function round(number) {
 	return Number(number.toFixed(1))
 }
 
-function openSVG() {
-	var svg = document.getElementById("bokehSvg")
-	var prev = SVGsizeInWindow
-	setSVGSizeInWindow(3)
-	window.open("data:image/svg+xml," + encodeURIComponent(
-	// http://stackoverflow.com/questions/1700870/how-do-i-do-outerhtml-in-firefox
-		svg.outerHTML || new XMLSerializer().serializeToString(svg)
-	))
-	setSVGSizeInWindow(prev)
-}
-
 function pause(y) {
 	if (!y && pauseStepping) { // reinitiate
 		pauseStepping = y
@@ -999,6 +988,64 @@ bokeh.roleTheDice = function() {
 			step(pProperties[i])
 }
 
+function toogleMenuEntrySticky(p) {
+	var ds = d3.select("#li_"+p)
+	var y = !ds.classed("toggledOn")
+	ds.classed("toggledOn", y)
+	numberOfStickyMenuEntries += y ? 1 : -1
+	window.onresize()
+}
+
+function openSVG() {
+	var svg = document.getElementById("bokehSvg")
+	var prev = SVGsizeInWindow
+	setSVGSizeInWindow(3)
+	window.open("data:image/svg+xml," + encodeURIComponent(
+	// http://stackoverflow.com/questions/1700870/how-do-i-do-outerhtml-in-firefox
+		svg.outerHTML || new XMLSerializer().serializeToString(svg)
+	))
+	setSVGSizeInWindow(prev)
+}
+
+function openAsPNG() {
+	var widthPxDefault = 800
+	var widthPx = widthPxDefault
+	var url = prompt("PNG width in pixels:", widthPxDefault)
+	try {
+		widthPx = Math.max(10, Math.abs(parseInt(url)))
+	} catch(e) {
+		widthPx = widthPxDefault
+	}
+	
+	var canvas = document.getElementById("savePngHelperCanvas")
+	var context = canvas.getContext("2d")
+	var heightPx = widthPx*svgViewboxHeight/svgViewboxWidth
+	canvas.setAttribute("width", widthPx)
+	canvas.setAttribute("height", heightPx)
+	
+	var svg = document.getElementById("bokehSvg")
+	svg.setAttribute("width", widthPx)
+	svg.setAttribute("height", heightPx)
+	var data = svg.outerHTML || new XMLSerializer().serializeToString(svg)
+	svg.removeAttribute("width")
+	svg.removeAttribute("height")
+	
+	var img = new Image()
+	img.onload = function() {
+		context.drawImage(img, 0, 0)
+		try {
+			// does not work in chrome because the canvas is "tainted" by the svg input
+			// http://stackoverflow.com/questions/2390232/why-does-canvas-todataurl-throw-a-security-exception
+			window.open(canvas.toDataURL('image/png'))
+		} catch(e) {
+			alert("Not supported by your browser! Sorry.")
+		}
+		context.clearRect(0, 0, widthPx, heightPx)
+	}
+	//img.src = "hue2.svg"
+	img.src = "data:image/svg+xml,"+encodeURIComponent(data)
+}
+
 function setUpKShortcuts() {
 	// prevents text selection and alternation of cursor in chrome during drag
 	document.onselectstart = function(){ return false; }
@@ -1021,19 +1068,12 @@ function setUpKShortcuts() {
 			case 83: /*s*/ openSVG(); break
 			case 68: /*d*/ bokeh.roleTheDice(); break
 			case 69: /*e*/ pause(!pauseStepping); /*switch*/ break
+			case 71: /*g*/  break
 			case 107:/*+*/ setSVGSizeInWindow(SVGsizeInWindow*1.1); break
 			case 109:/*-*/ setSVGSizeInWindow(SVGsizeInWindow*0.9); break
 			case 109:/*-*/ setSVGSizeInWindow(SVGsizeInWindow*0.9); break
 		}
 	}, false)
-}
-
-function toogleMenuEntrySticky(p) {
-	var ds = d3.select("#li_"+p)
-	var y = !ds.classed("toggledOn")
-	ds.classed("toggledOn", y)
-	numberOfStickyMenuEntries += y ? 1 : -1
-	window.onresize()
 }
 
 bokeh.clickHue = function() { toogleMenuEntrySticky("h") }
@@ -1043,8 +1083,8 @@ bokeh.clickGamma = function() { toogleMenuEntrySticky("g") }
 bokeh.clickAlpha = function() { toogleMenuEntrySticky("a") }
 bokeh.clickRadius = function() { toogleMenuEntrySticky("r") }
 bokeh.clickBackground = function() { toogleMenuEntrySticky("bg") }
-
 bokeh.clickDownload = function() { openSVG() }
+bokeh.clickDownloadPNG = function() { openAsPNG() }
 
 return bokeh
 }()
