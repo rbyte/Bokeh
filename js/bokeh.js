@@ -12,8 +12,8 @@ var pPropertiesName = {
 	y: "Vertical Position", r: "Radius"}
 
 // defaults
-var gMean=	{h: 140,s: 220,	l: 210,	a: .22,	g: .070,x: .5,	y: .5,	r: .18}
-var gVar=	{h: 4,	s: 8,	l: 15,	a: .03,	g: .025,x: .22,	y: .22,	r: .07}
+var gMean=	{h: 140,s: 220,	l: 190,	a: .22,	g: .070,x: .5,	y: .5,	r: .15}
+var gVar=	{h: 4,	s: 8,	l: 15,	a: .02,	g: .025,x: .22,	y: .22,	r: .07}
 var gMin=	{h: 0,	s: 0,	l: 0,	a: .04,	g: .004,x: -.2,	y: -.2,	r: .01, transitionDuration: 0, numberOfParticles: 1, SVGsizeInWindow: 0.005}
 var gMax=	{h: 255,s: 255,	l: 255,	a: .8,	g: .16,	x: 1.2,	y: 1.2,	r: .45, transitionDuration: 1000, numberOfParticles: 100, SVGsizeInWindow: 2}
 var zDep=	{h: 0,	s: 0,	l: 1,	a: 1,	g: -1,	x: 0,	y: 0,	r: -1}
@@ -42,8 +42,8 @@ var log = {}
 log.items = []
 
 var pls = [] // particle list
-var SVGsizeInWindow = 0.2 // percent
-var numberOfParticles = 30
+var SVGsizeInWindow = 0.3 // percent
+var numberOfParticles = 20
 // if 0, no transition is triggered (just steps)
 var transitionDuration = 0
 const kissenSize = 0.02 // [0, 0.5]
@@ -84,16 +84,16 @@ function updateScreenElemsSize() {
 	// the more items are sticky, the smaller all get, in order to fit
 	var menuSymbolEnlargedSize = menuSymbolBaseSize*(3.6-Math.max(1,numberOfStickyMenuEntries)/3)
 	// https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration
-	var mysheet = document.styleSheets[0]
-	var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules
-	for (var i=0; i<myrules.length; i++) {
-		if (myrules[i].selectorText === '.mLeft li:hover img, .mLeft li:hover .symbolSVG, .toggledOn img, .toggledOn .symbolSVG') {
-			myrules[i].style.setProperty("width", menuSymbolEnlargedSize+"px", "important")
-			myrules[i].style.setProperty("height", menuSymbolEnlargedSize+"px", "important")
+	var mainCss = document.styleSheets[0]
+	var cssRules = mainCss.cssRules ? mainCss.cssRules : mainCss.rules
+	for (var i=0; i<cssRules.length; i++) {
+		if (cssRules[i].selectorText === '.mLeft li:hover img, .mLeft li:hover .symbolSVG, .toggledOn img, .toggledOn .symbolSVG') {
+			cssRules[i].style.setProperty("width", menuSymbolEnlargedSize+"px", "important")
+			cssRules[i].style.setProperty("height", menuSymbolEnlargedSize+"px", "important")
 		}
-		if (myrules[i].selectorText === '.menu li img, .menu li .symbolSVG') {
-			myrules[i].style.setProperty("width", (menuSymbolBaseSize)+"px")
-			myrules[i].style.setProperty("height", (menuSymbolBaseSize)+"px")
+		if (cssRules[i].selectorText === '.menu li img, .menu li .symbolSVG') {
+			cssRules[i].style.setProperty("width", (menuSymbolBaseSize)+"px")
+			cssRules[i].style.setProperty("height", (menuSymbolBaseSize)+"px")
 		}
 	}
 }
@@ -128,7 +128,7 @@ function setUpSliders() {
 		set(rX)
 		d3.selectAll("#bg"+pName+", #bg"+pName+"Slider")
 			.call(d3.behavior.drag().on("drag", function (d) {
-			console.log(d3.event.x)
+//			console.log(d3.event.x)
 			var rX = bound(0, d3.event.x, barW) / barW
 			bgColor[e] = rX * bgColorMax[e]
 			set(rX)
@@ -494,7 +494,7 @@ function setUpDistributionSlider(p) {
 		
 	svg.append("path")
 		.attr("class", "dragIndicationTriangle")
-		.style({'fill': "#fff", stroke: "#333", "stroke-width": .4}) // 
+		.style({'fill': "#777"}) // , stroke: "#333", "stroke-width": .4
 		.attr("d",
 		  "M"+(peakX+13)+","+(peakY+3)
 		+" L"+(peakX+13)+","+(peakY+7)
@@ -554,13 +554,16 @@ function progressParticleSystem(firstTime) {
 	for(var prop in distributionSliders)
 		distributionSliders[prop].updateParticles()
 	
-//	console.clear()
+	var writeToConsole = false
+	if (writeToConsole)
+		console.clear()
 	for (var i=0; i<pls.length; i++) {
 		var p = pls[i]
-//		console.log(p.pNo+": g "+Math.round(p.g._)
-//			+",\tr "+Math.round(p.r._)
-//			+",\tl "+Math.round(p.l._)
-//			+",\ta "+Math.round(p.a._*255))
+		if (writeToConsole)
+			console.log(p.pNo+": g "+Math.round(p.g._)
+				+",\tr "+Math.round(p.r._)
+				+",\tl "+Math.round(p.l._)
+				+",\ta "+Math.round(p.a._*255))
 		
 		function applyTransition(obj) {
 			if (transitionDuration !== 0) {
@@ -898,10 +901,16 @@ function createSVGcircle(x, y, r, h, s, l, a, g) {
 	c.filter = d3.select("#bokehSvg defs")
 		.append("filter")
 		.attr("id", filterName)
+		// these settings can immensely improve performce
 		.attr("x", -3)
 		.attr("y", -3)
 		.attr("width", 8)
 		.attr("height", 8)
+		// blocks visible ...
+//		.attr("x", 0)
+//		.attr("y", 0)
+//		.attr("width", 1)
+//		.attr("height", 1)
 	c.feGaussianBlur = c.filter.append("feGaussianBlur")
 		.attr("stdDeviation", g)
 	
@@ -962,9 +971,26 @@ bokeh.roleTheDice = function() {
 }
 
 function setUpKShortcuts() {
+	// prevents text selection and alternation of cursor in chrome during drag
+	document.onselectstart = function(){ return false; }
+	
+	function scrollMouseWheelOnBokehSvgHandler(e) {
+		var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)))
+		setSVGSizeInWindow(SVGsizeInWindow*(1+.1*delta))
+	}
+	
+	var bokehSvg = document.getElementById("bokehSvg")
+	if (bokehSvg.addEventListener) {
+		// IE9, Chrome, Safari, Opera
+		bokehSvg.addEventListener("mousewheel", scrollMouseWheelOnBokehSvgHandler, false)
+		// Firefox
+		bokehSvg.addEventListener("DOMMouseScroll", scrollMouseWheelOnBokehSvgHandler, false)
+	}
+	
 	document.addEventListener("keydown", function (evt) {
 		switch(evt.keyCode) {
-			case 83: /*s*/ bokeh.roleTheDice(); break
+			case 83: /*s*/ openSVG(); break
+			case 68: /*d*/ bokeh.roleTheDice(); break
 			case 69: /*e*/ pause(!pauseStepping); /*switch*/ break
 			case 107:/*+*/ setSVGSizeInWindow(SVGsizeInWindow*1.1); break
 			case 109:/*-*/ setSVGSizeInWindow(SVGsizeInWindow*0.9); break

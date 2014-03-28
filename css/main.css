@@ -91,8 +91,11 @@ svg text {
 .mLeft .liKasten, .mLeft .liKasten svg, .mLeft li, .mLeft li img, .mLeft li .symbolSVG {
 	transition: all 500ms ease-in-out;
 }
-.mRight .liKasten, .mRight .liKasten svg, .mRight li, .mRight li img, .mRight li .symbolSVG {
+.mRight .liKasten, .mRight .liKasten svg, .mRight li, .mRight li img, .mRight li .symbolSVG, #title {
 	transition: all 100ms ease-in-out;
+}
+.mRight li img, .mRight li .symbolSVG {
+	opacity: 0.7;
 }
 .left { left: 100%; }
 .right { right: 100%; }
@@ -144,12 +147,12 @@ svg text {
 }
 #title {
 	position: fixed;
-	top: 4%;
+	top: 3%;
 	left: 10%;
 	font-family: "Open Sans Light", "Open Sans", sans-serif;
 	font-size: 700%;
 	font-weight: 100;
-	color: #f3f3f3;
+	color: #f1f1f1;
 	/*text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.08);*/
 	user-select: none;
 	pointer-events: none;

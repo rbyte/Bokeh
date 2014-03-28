@@ -1,7 +1,4 @@
 
-fullscreen -> switch
-
-code refactoring
 testing!
 github hochladen
 	fix download link
@@ -9,28 +6,25 @@ veröffentlichen
 	tell wallpaper guy
 
 MAYBE:
-chromium: frame white rects overlay title
 info: and what the hell this is in the first place
+fullscreen -> switch
+chromium: dragging hue does change saturation symbol only after end of drag
+chromium: frame white rects overlay title
 on download svg, chromium shows it, but without the blur applied
 open sans light into css
-chromium: dSlider cursor during drag is not a crosshair - fix
 display lock symbol if menu item is clicked
-improve calculations (additions) to look more like bokeh bg image
-lightness?
 during dragging, menu should not unhover in case of overshoot
 keyboard only option
+fps does not work if speed is not 100% (because of d3 transitions)
+menu shakes at beginning, because transitions are enabled and size is set afterwards in js
 background colour picker: make simple click working
-size with  + - and wheel! -> update slider too
+update size slider on +, - or mouse wheel
+add more mouse wheel events (for sliders)
 // https://developer.mozilla.org/en-US/docs/HTML/Canvas/Drawing_DOM_objects_into_a_canvas
 save as png -> link, resolution selection?
-
 distribution slider vertical: there are still flaws
-removing particles does not remove their blur filters in defs
-correlate size more with z-index
 performance improvement
-	Gauss Radius Reduzieren in feFilter
 	Use Radial Gradient Stop Approximation
-by default, log n steps
 interactivity (mouse playing)
 	hover highlights particle in dSliders
 pick individual particles in distribution slider and drag their value
