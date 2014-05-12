@@ -106,11 +106,11 @@ svg text {
 	border-left: 4px solid #666;
 }
 .menu li:hover, .mRight li:hover .liKasten svg {
-	background: rgba(0, 0, 0, 0.05);
+	background: rgba(0, 0, 0, 0.07);
 }
 .mLeft li:hover .liKasten svg {
 	/*box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);*/
-/*	background: rgba(0, 0, 0, 0.02);*/
+	background: rgba(0, 0, 0, 0.04);
 }
 .menu li:hover .liKasten, .toggledOn .liKasten {
 	/*background: rgba(0, 0, 0, 0.05);*/
